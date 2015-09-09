@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>swri_console</name>
+  <version>0.1.0</version>
+  <description>
+
+     swri_console - An alternative rosout viewer.
+
+  </description>
+  <maintainer email="elliotjo@gmail.com">elliotjo</maintainer>
+  <author>elliotjo</author>
+  <license>?</license>
+
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <depend>qt_build</depend>
+  <depend>roscpp</depend>
+  <depend>libqt4-dev</depend>
+  <depend>rosgraph_msgs</depend>
+ 
+</package>

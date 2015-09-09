@@ -1,0 +1,13 @@
+/**
+\mainpage
+\htmlinclude manifest.html
+
+\b swri_console is an alternative viewer for watching the rosout
+console output that isn't as horrible as rqt_console.
+
+
+\section codeapi Code API
+
+swri_console is a standalone application and does not provide a public API.
+
+*/
