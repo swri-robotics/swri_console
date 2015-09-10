@@ -27,6 +27,10 @@ class ConsoleWindow : public QMainWindow {
   void messagesAdded();
 
   void userScrolled(int);
+
+  void includeFilterUpdated(const QString &);
+  void excludeFilterUpdated(const QString &);
+  
 private:
   
   Ui::ConsoleWindow ui;

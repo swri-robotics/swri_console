@@ -6,6 +6,7 @@
 #include <set>
 #include <string>
 #include <deque>
+#include <QStringList>
 
 namespace swri_console
 {
@@ -21,6 +22,8 @@ class LogDatabaseProxyModel : public QAbstractListModel
 
   void setNodeFilter(const std::set<std::string> &names);
   void setSeverityFilter(uint8_t severity_mask);
+  void setIncludeFilters(const QStringList &list);
+  void setExcludeFilters(const QStringList &list);
 
   virtual int rowCount(const QModelIndex &parent) const;
   virtual QVariant data(const QModelIndex &index, int role) const;
@@ -53,6 +56,9 @@ class LogDatabaseProxyModel : public QAbstractListModel
 
   std::deque<size_t> early_mapping_;
   std::deque<size_t> msg_mapping_;
+
+  QStringList include_strings_;
+  QStringList exclude_strings_;
 };
 }  // swri_console
 #endif  // SWRI_CONSOLE_LOG_DATABASE_PROXY_MODEL_H_

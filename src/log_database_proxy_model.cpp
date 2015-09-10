@@ -48,6 +48,20 @@ void LogDatabaseProxyModel::setAbsoluteTime(bool absolute)
   }
 }
 
+void LogDatabaseProxyModel::setIncludeFilters(
+  const QStringList &list)
+{
+  include_strings_ = list;
+  reset();
+}
+
+void LogDatabaseProxyModel::setExcludeFilters(
+  const QStringList &list)
+{
+  exclude_strings_ = list;
+  reset();
+}
+
 int LogDatabaseProxyModel::rowCount(const QModelIndex &parent) const
 {
   if (parent.isValid()) {
@@ -105,7 +119,7 @@ QVariant LogDatabaseProxyModel::data(
     snprintf(header, sizeof(header),
              "[%c %s] ", level, stamp);
 
-    return QVariant(QString(header) + QString(item.msg.c_str()));
+    return QVariant(QString(header) + item.msg);
   } else if (role == Qt::ToolTipRole) {
     char buffer[4096];
     snprintf(buffer, sizeof(buffer),
@@ -124,7 +138,7 @@ QVariant LogDatabaseProxyModel::data(
              item.line);
     
     QString text = (QString(buffer) +
-                    QString(item.msg.c_str()) + 
+                    item.msg + 
                     QString("</p>"));
                             
     return QVariant(text);
@@ -225,6 +239,18 @@ bool LogDatabaseProxyModel::acceptLogEntry(const LogEntry &item)
     return false;
   }
 
+  for (int i = 0; i < include_strings_.size(); i++) {
+    if (!item.msg.contains(include_strings_[i])) {
+      return false;
+    }
+  }
+  
+  for (int i = 0; i < exclude_strings_.size(); i++) {
+    if (item.msg.contains(exclude_strings_[i])) {
+      return false;
+    }
+  }
+  
   return true;
 }
 

@@ -54,10 +54,18 @@ ConsoleWindow::ConsoleWindow(LogDatabase *db)
   QObject::connect(
     db_proxy_, SIGNAL(messagesAdded()),
     this, SLOT(messagesAdded()));
-  
+
   QObject::connect(
     ui.messageList->verticalScrollBar(), SIGNAL(valueChanged(int)),
     this, SLOT(userScrolled(int)));
+
+  QObject::connect(
+    ui.includeText, SIGNAL(textChanged(const QString &)),
+    this, SLOT(includeFilterUpdated(const QString &)));
+
+  QObject::connect(
+    ui.excludeText, SIGNAL(textChanged(const QString &)),
+    this, SLOT(excludeFilterUpdated(const QString &)));
   
   setSeverityFilter();
 }
@@ -131,6 +139,36 @@ void ConsoleWindow::userScrolled(int value)
   } else {
     ui.checkFollowNewest->setChecked(true);
   }
+}
+
+void ConsoleWindow::includeFilterUpdated(const QString &text)
+{
+  QStringList items = text.split(";", QString::SkipEmptyParts);
+  QStringList filtered;
+  
+  for (int i = 0; i < items.size(); i++) {
+    QString x = items[i].trimmed();
+    if (!x.isEmpty()) {
+      filtered.append(x);
+    }
+  }
+
+  db_proxy_->setIncludeFilters(filtered);
+}
+
+void ConsoleWindow::excludeFilterUpdated(const QString &text)
+{
+  QStringList items = text.split(";", QString::SkipEmptyParts);
+  QStringList filtered;
+  
+  for (int i = 0; i < items.size(); i++) {
+    QString x = items[i].trimmed();
+    if (!x.isEmpty()) {
+      filtered.append(x);
+    }
+  }
+
+  db_proxy_->setExcludeFilters(filtered);
 }
 }  // namespace swri_console
 
