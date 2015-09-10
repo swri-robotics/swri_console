@@ -244,7 +244,7 @@ bool LogDatabaseProxyModel::acceptLogEntry(const LogEntry &item)
   }
   
   for (int i = 0; i < exclude_strings_.size(); i++) {
-    if (item.msg.contains(exclude_strings_[i])) {
+    if (item.msg.contains(exclude_strings_[i], Qt::CaseInsensitive)) {
       return false;
     }
   }
@@ -262,7 +262,7 @@ bool LogDatabaseProxyModel::testIncludeFilter(const LogEntry &item)
   }
   
   for (int i = 0; i < include_strings_.size(); i++) {
-    if (item.msg.contains(include_strings_[i])) {
+    if (item.msg.contains(include_strings_[i], Qt::CaseInsensitive)) {
       return true;
     }
   }
