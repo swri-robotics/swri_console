@@ -66,6 +66,11 @@ ConsoleWindow::ConsoleWindow(LogDatabase *db)
   QObject::connect(
     ui.excludeText, SIGNAL(textChanged(const QString &)),
     this, SLOT(excludeFilterUpdated(const QString &)));
+
+  QList<int> sizes;
+  sizes.append(100);
+  sizes.append(1000);
+  ui.splitter->setSizes(sizes);
   
   setSeverityFilter();
 }
