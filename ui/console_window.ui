@@ -122,7 +122,14 @@
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QLineEdit" name="includeText"/>
+           <widget class="QLineEdit" name="includeText">
+            <property name="toolTip">
+             <string>Filter for messages that include substrings. Separate substrings with a semicolon.</string>
+            </property>
+            <property name="statusTip">
+             <string/>
+            </property>
+           </widget>
           </item>
           <item row="1" column="0">
            <widget class="QLabel" name="label_2">
@@ -132,7 +139,11 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QLineEdit" name="excludeText"/>
+           <widget class="QLineEdit" name="excludeText">
+            <property name="toolTip">
+             <string>Filter for messages that don't include substrings. Separate substrings with a semicolon.</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>

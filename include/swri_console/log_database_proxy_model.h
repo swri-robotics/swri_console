@@ -46,6 +46,7 @@ class LogDatabaseProxyModel : public QAbstractListModel
   void scheduleIdleProcessing();
   
   bool acceptLogEntry(const LogEntry &item);
+  bool testIncludeFilter(const LogEntry &item);
 
   size_t earliest_index_;
   size_t latest_index_;

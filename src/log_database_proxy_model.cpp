@@ -239,10 +239,8 @@ bool LogDatabaseProxyModel::acceptLogEntry(const LogEntry &item)
     return false;
   }
 
-  for (int i = 0; i < include_strings_.size(); i++) {
-    if (!item.msg.contains(include_strings_[i])) {
-      return false;
-    }
+  if (!testIncludeFilter(item)) {
+    return false;
   }
   
   for (int i = 0; i < exclude_strings_.size(); i++) {
@@ -252,6 +250,24 @@ bool LogDatabaseProxyModel::acceptLogEntry(const LogEntry &item)
   }
   
   return true;
+}
+
+// Return true if the item message contains at least one of the
+// strings in include_filter_.  Always returns true if there are no
+// include strings.
+bool LogDatabaseProxyModel::testIncludeFilter(const LogEntry &item)
+{
+  if (include_strings_.empty()) {
+    return true;
+  }
+  
+  for (int i = 0; i < include_strings_.size(); i++) {
+    if (item.msg.contains(include_strings_[i])) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 void LogDatabaseProxyModel::minTimeUpdated()
