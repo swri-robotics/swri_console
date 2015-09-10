@@ -3,6 +3,8 @@
 namespace swri_console
 {
 LogDatabase::LogDatabase()
+  :
+  min_time_(ros::TIME_MAX)
 {
 }
 
@@ -12,6 +14,11 @@ LogDatabase::~LogDatabase()
 
 void LogDatabase::queueMessage(const rosgraph_msgs::Log &msg)
 {
+  if (msg.header.stamp < min_time_) {
+    min_time_ = msg.header.stamp;
+    Q_EMIT minTimeUpdated();
+  }
+  
   nodes_[msg.name]++;
 
   LogEntry log;

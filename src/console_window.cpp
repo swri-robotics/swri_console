@@ -21,6 +21,9 @@ ConsoleWindow::ConsoleWindow(LogDatabase *db)
 
   QObject::connect(ui.action_NewWindow, SIGNAL(triggered(bool)),
                    this, SIGNAL(createNewWindow()));
+
+  QObject::connect(ui.action_AbsoluteTimes, SIGNAL(toggled(bool)),
+                   db_proxy_, SLOT(setAbsoluteTime(bool)));
   
   ui.nodeList->setModel(db_->nodeListModel());
   ui.messageList->setModel(db_proxy_);

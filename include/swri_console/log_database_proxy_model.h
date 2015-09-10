@@ -21,7 +21,7 @@ class LogDatabaseProxyModel : public QAbstractListModel
 
   void setNodeFilter(const std::set<std::string> &names);
   void setSeverityFilter(uint8_t severity_mask);
-  
+
   virtual int rowCount(const QModelIndex &parent) const;
   virtual QVariant data(const QModelIndex &index, int role) const;
 
@@ -33,6 +33,9 @@ class LogDatabaseProxyModel : public QAbstractListModel
  public Q_SLOTS:
   void processNewMessages();
   void processOldMessages();
+  void minTimeUpdated();
+  void setAbsoluteTime(bool absolute);
+  
   
  private:
   LogDatabase *db_;
@@ -46,6 +49,7 @@ class LogDatabaseProxyModel : public QAbstractListModel
   
   std::set<std::string> names_;
   uint8_t severity_mask_;
+  bool display_absolute_time_;
 
   std::deque<size_t> early_mapping_;
   std::deque<size_t> msg_mapping_;

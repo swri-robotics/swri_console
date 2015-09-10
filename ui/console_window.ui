@@ -148,7 +148,7 @@
      <x>0</x>
      <y>0</y>
      <width>1035</width>
-     <height>25</height>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -163,7 +163,7 @@
     <property name="title">
      <string>Options</string>
     </property>
-    <addaction name="actionRelative_Times"/>
+    <addaction name="action_AbsoluteTimes"/>
    </widget>
    <addaction name="menu_File"/>
    <addaction name="menuOptions"/>
@@ -188,7 +188,10 @@
     <string>Ctrl+N</string>
    </property>
   </action>
-  <action name="actionRelative_Times">
+  <action name="action_AbsoluteTimes">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Absolute Times</string>
    </property>

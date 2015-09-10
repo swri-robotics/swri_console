@@ -12,6 +12,9 @@ LogDatabaseProxyModel::LogDatabaseProxyModel(LogDatabase *db)
 {  
   QObject::connect(db_, SIGNAL(messagesAdded()),
                    this, SLOT(processNewMessages()));
+
+  QObject::connect(db_, SIGNAL(minTimeUpdated()),
+                   this, SLOT(minTimeUpdated()));
 }
 
 LogDatabaseProxyModel::~LogDatabaseProxyModel()
@@ -29,6 +32,20 @@ void LogDatabaseProxyModel::setSeverityFilter(uint8_t severity_mask)
 {
   severity_mask_ = severity_mask;
   reset();
+}
+
+void LogDatabaseProxyModel::setAbsoluteTime(bool absolute)
+{
+  if (absolute == display_absolute_time_) {
+    return;
+  }
+
+  display_absolute_time_ = absolute;
+
+  if (msg_mapping_.size()) {
+    Q_EMIT dataChanged(index(0),
+                       index(msg_mapping_.size()));
+  }
 }
 
 int LogDatabaseProxyModel::rowCount(const QModelIndex &parent) const
@@ -51,8 +68,67 @@ QVariant LogDatabaseProxyModel::data(
   const LogEntry &item = db_->log()[msg_mapping_[index.row()]];
 
   if (role == Qt::DisplayRole) {
-    return QVariant(QString(item.msg.c_str()));
-  }   
+    char level = '?';
+    if (item.level == rosgraph_msgs::Log::DEBUG) {
+      level = 'D';
+    } else if (item.level == rosgraph_msgs::Log::INFO) {
+      level = 'I';
+    } else if (item.level == rosgraph_msgs::Log::WARN) {
+      level = 'W';
+    } else if (item.level == rosgraph_msgs::Log::ERROR) {
+      level = 'E';
+    } else if (item.level == rosgraph_msgs::Log::FATAL) {
+      level = 'F';
+    }
+
+    char stamp[128];
+    if (display_absolute_time_) {
+      snprintf(stamp, sizeof(stamp),
+               "%u.%09u",
+               item.stamp.sec,
+               item.stamp.nsec);
+    } else {
+      ros::Duration t = item.stamp - db_->minTime();
+
+      int32_t secs = t.sec;
+      int hours = secs / 60 / 60;
+      int minutes = (secs / 60) % 60;
+      int seconds = (secs % 60);
+      int milliseconds = t.nsec / 1000000;
+      
+      snprintf(stamp, sizeof(stamp),
+               "%d:%02d:%02d:%03d",
+               hours, minutes, seconds, milliseconds);
+    }
+
+    char header[1024];
+    snprintf(header, sizeof(header),
+             "[%c %s] ", level, stamp);
+
+    return QVariant(QString(header) + QString(item.msg.c_str()));
+  } else if (role == Qt::ToolTipRole) {
+    char buffer[4096];
+    snprintf(buffer, sizeof(buffer),
+             "<p style='white-space:pre'>"
+             "Timestamp: %d.%09d\n"
+             "Node: %s\n"
+             "Function: %s\n"
+             "File: %s\n"
+             "Line: %d\n"
+             "\n",
+             item.stamp.sec,
+             item.stamp.nsec,
+             item.node.c_str(),
+             item.function.c_str(),
+             item.file.c_str(),
+             item.line);
+    
+    QString text = (QString(buffer) +
+                    QString(item.msg.c_str()) + 
+                    QString("</p>"));
+                            
+    return QVariant(text);
+  }
   
   return QVariant();
 }
@@ -150,5 +226,12 @@ bool LogDatabaseProxyModel::acceptLogEntry(const LogEntry &item)
   }
 
   return true;
+}
+
+void LogDatabaseProxyModel::minTimeUpdated()
+{
+  if (!display_absolute_time_ && msg_mapping_.size()) {
+    Q_EMIT dataChanged(index(0), index(msg_mapping_.size()));
+  }  
 }
 }  // namespace swri_console
