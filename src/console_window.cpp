@@ -22,8 +22,14 @@ ConsoleWindow::ConsoleWindow(LogDatabase *db)
   QObject::connect(ui.action_NewWindow, SIGNAL(triggered(bool)),
                    this, SIGNAL(createNewWindow()));
 
-  QObject::connect(ui.action_AbsoluteTimes, SIGNAL(toggled(bool)),
+  QObject::connect(ui.action_AbsoluteTimestamps, SIGNAL(toggled(bool)),
                    db_proxy_, SLOT(setAbsoluteTime(bool)));
+
+  QObject::connect(ui.action_ShowTimestamps, SIGNAL(toggled(bool)),
+                   db_proxy_, SLOT(setDisplayTime(bool)));
+
+  QObject::connect(ui.action_SelectFont, SIGNAL(triggered(bool)),
+                   this, SIGNAL(selectFont()));
   
   ui.nodeList->setModel(db_->nodeListModel());
   ui.messageList->setModel(db_proxy_);
@@ -71,7 +77,8 @@ ConsoleWindow::ConsoleWindow(LogDatabase *db)
   sizes.append(100);
   sizes.append(1000);
   ui.splitter->setSizes(sizes);
-  
+
+  db_proxy_->setDisplayTime(true);
   setSeverityFilter();
 }
 
@@ -174,6 +181,12 @@ void ConsoleWindow::excludeFilterUpdated(const QString &text)
   }
 
   db_proxy_->setExcludeFilters(filtered);
+}
+
+void ConsoleWindow::setFont(const QFont &font)
+{
+  ui.messageList->setFont(font);
+  ui.nodeList->setFont(font);
 }
 }  // namespace swri_console
 

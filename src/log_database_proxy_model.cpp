@@ -25,7 +25,6 @@ void LogDatabaseProxyModel::setNodeFilter(const std::set<std::string> &names)
 {
   names_ = names;
   reset();
-
 }
 
 void LogDatabaseProxyModel::setSeverityFilter(uint8_t severity_mask)
@@ -41,6 +40,20 @@ void LogDatabaseProxyModel::setAbsoluteTime(bool absolute)
   }
 
   display_absolute_time_ = absolute;
+
+  if (display_time_ && msg_mapping_.size()) {
+    Q_EMIT dataChanged(index(0),
+                       index(msg_mapping_.size()));
+  }
+}
+
+void LogDatabaseProxyModel::setDisplayTime(bool display)
+{
+  if (display == display_time_) {
+    return;
+  }
+
+  display_time_ = display;
 
   if (msg_mapping_.size()) {
     Q_EMIT dataChanged(index(0),
@@ -116,9 +129,14 @@ QVariant LogDatabaseProxyModel::data(
     }
 
     char header[1024];
-    snprintf(header, sizeof(header),
-             "[%c %s] ", level, stamp);
-
+    if (display_time_) {
+      snprintf(header, sizeof(header),
+               "[%c %s] ", level, stamp);
+    } else {
+      snprintf(header, sizeof(header),
+               "[%c] ", level);
+    }
+      
     return QVariant(QString(header) + item.msg);
   } else if (role == Qt::ToolTipRole) {
     char buffer[4096];
@@ -272,7 +290,9 @@ bool LogDatabaseProxyModel::testIncludeFilter(const LogEntry &item)
 
 void LogDatabaseProxyModel::minTimeUpdated()
 {
-  if (!display_absolute_time_ && msg_mapping_.size()) {
+  if (display_time_ &&
+      !display_absolute_time_
+      && msg_mapping_.size()) {
     Q_EMIT dataChanged(index(0), index(msg_mapping_.size()));
   }  
 }

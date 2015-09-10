@@ -5,6 +5,7 @@
 #include <string>
 #include <QObject>
 #include <QList>
+#include <QFont>
 #include <rosgraph_msgs/Log.h>
 #include <swri_console/log_database.h>
 
@@ -25,11 +26,15 @@ class ConsoleMaster : public QObject
                                              
  public Q_SLOTS:
   void createNewWindow();
+  void selectFont();
+
+  void fontSelectionChanged(const QFont &font);
   
  Q_SIGNALS:
   void connected(bool);
-  void rosShutdown();
-
+  void rosShutdown();  
+  void fontChanged(const QFont &font);
+  
  private:
   void startRos();
   void stopRos();
@@ -44,6 +49,8 @@ class ConsoleMaster : public QObject
   QList<ConsoleWindow*> windows_;
 
   LogDatabase db_;
+
+  QFont window_font_;
 };
 }  // namespace swri_console
 

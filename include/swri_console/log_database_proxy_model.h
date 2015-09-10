@@ -37,6 +37,7 @@ class LogDatabaseProxyModel : public QAbstractListModel
   void processNewMessages();
   void processOldMessages();
   void minTimeUpdated();
+  void setDisplayTime(bool display);
   void setAbsoluteTime(bool absolute);
   
   
@@ -53,6 +54,7 @@ class LogDatabaseProxyModel : public QAbstractListModel
   
   std::set<std::string> names_;
   uint8_t severity_mask_;
+  bool display_time_;
   bool display_absolute_time_;
 
   std::deque<size_t> early_mapping_;

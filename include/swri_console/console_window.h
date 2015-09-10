@@ -19,7 +19,8 @@ class ConsoleWindow : public QMainWindow {
 
  Q_SIGNALS:
   void createNewWindow();
-  
+  void selectFont();
+                                       
  public Q_SLOTS:
   void connected(bool);
   void setSeverityFilter();
@@ -30,9 +31,10 @@ class ConsoleWindow : public QMainWindow {
 
   void includeFilterUpdated(const QString &);
   void excludeFilterUpdated(const QString &);
+
+  void setFont(const QFont &font);
   
-private:
-  
+private:  
   Ui::ConsoleWindow ui;
   LogDatabase *db_;
   LogDatabaseProxyModel *db_proxy_;

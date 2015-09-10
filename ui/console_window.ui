@@ -193,7 +193,9 @@
     <property name="title">
      <string>Options</string>
     </property>
-    <addaction name="action_AbsoluteTimes"/>
+    <addaction name="action_ShowTimestamps"/>
+    <addaction name="action_AbsoluteTimestamps"/>
+    <addaction name="action_SelectFont"/>
    </widget>
    <addaction name="menu_File"/>
    <addaction name="menuOptions"/>
@@ -218,12 +220,31 @@
     <string>Ctrl+N</string>
    </property>
   </action>
-  <action name="action_AbsoluteTimes">
+  <action name="action_AbsoluteTimestamps">
    <property name="checkable">
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Absolute Times</string>
+    <string>Absolute Timestamps</string>
+   </property>
+   <property name="toolTip">
+    <string>Absolute Timestamps</string>
+   </property>
+  </action>
+  <action name="action_ShowTimestamps">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show Timestamps</string>
+   </property>
+  </action>
+  <action name="action_SelectFont">
+   <property name="text">
+    <string>Select Font...</string>
    </property>
   </action>
  </widget>
