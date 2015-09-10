@@ -1,9 +1,11 @@
 #include <swri_console/console_window.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <set>
 #include <swri_console/log_database.h>
 #include <swri_console/log_database_proxy_model.h>
 #include <rosgraph_msgs/Log.h>
+#include <QScrollBar>
 
 using namespace Qt;
 
@@ -22,6 +24,7 @@ ConsoleWindow::ConsoleWindow(LogDatabase *db)
   
   ui.nodeList->setModel(db_->nodeListModel());
   ui.messageList->setModel(db_proxy_);
+  ui.messageList->setUniformItemSizes(true);
   
   QObject::connect(
     ui.nodeList->selectionModel(),
@@ -47,7 +50,11 @@ ConsoleWindow::ConsoleWindow(LogDatabase *db)
     this, SLOT(setSeverityFilter()));
   QObject::connect(
     db_proxy_, SIGNAL(messagesAdded()),
-    this, SLOT(messagesAdded()));    
+    this, SLOT(messagesAdded()));
+  
+  QObject::connect(
+    ui.messageList->verticalScrollBar(), SIGNAL(valueChanged(int)),
+    this, SLOT(userScrolled(int)));
   
   setSeverityFilter();
 }
@@ -111,6 +118,15 @@ void ConsoleWindow::messagesAdded()
 {
   if (ui.checkFollowNewest->isChecked()) {
     ui.messageList->scrollToBottom();
+  }
+}
+
+void ConsoleWindow::userScrolled(int value)
+{
+  if (value != ui.messageList->verticalScrollBar()->maximum()) {
+    ui.checkFollowNewest->setChecked(false);
+  } else {
+    ui.checkFollowNewest->setChecked(true);
   }
 }
 }  // namespace swri_console

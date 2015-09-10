@@ -26,6 +26,7 @@ class ConsoleWindow : public QMainWindow {
   void nodeSelectionChanged();
   void messagesAdded();
 
+  void userScrolled(int);
 private:
   
   Ui::ConsoleWindow ui;
