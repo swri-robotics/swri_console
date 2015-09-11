@@ -7,6 +7,7 @@
 #include <string>
 #include <deque>
 #include <QStringList>
+#include <QRegExp>
 
 namespace swri_console
 {
@@ -24,6 +25,10 @@ class LogDatabaseProxyModel : public QAbstractListModel
   void setSeverityFilter(uint8_t severity_mask);
   void setIncludeFilters(const QStringList &list);
   void setExcludeFilters(const QStringList &list);
+  void setIncludeRegexpPattern(const QString& pattern);
+  void setExcludeRegexpPattern(const QString& pattern);
+  bool isIncludeValid() const;
+  bool isExcludeValid() const;
 
   virtual int rowCount(const QModelIndex &parent) const;
   virtual QVariant data(const QModelIndex &index, int role) const;
@@ -39,8 +44,8 @@ class LogDatabaseProxyModel : public QAbstractListModel
   void minTimeUpdated();
   void setDisplayTime(bool display);
   void setAbsoluteTime(bool absolute);
-  
-  
+  void setUseRegularExpressions(bool useRegexps);
+
  private:
   LogDatabase *db_;
 
@@ -56,10 +61,13 @@ class LogDatabaseProxyModel : public QAbstractListModel
   uint8_t severity_mask_;
   bool display_time_;
   bool display_absolute_time_;
+  bool use_regular_expressions_;
 
   std::deque<size_t> early_mapping_;
   std::deque<size_t> msg_mapping_;
 
+  QRegExp include_regexp_;
+  QRegExp exclude_regexp_;
   QStringList include_strings_;
   QStringList exclude_strings_;
 };
