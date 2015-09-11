@@ -105,13 +105,21 @@ void ConsoleWindow::nodeSelectionChanged()
 {
   QModelIndexList selection = ui.nodeList->selectionModel()->selectedIndexes();
   std::set<std::string> nodes;
+  QStringList node_names;
 
   for (size_t i = 0; i < selection.size(); i++) {
     std::string name = db_->nodeListModel()->nodeName(selection[i]);
     nodes.insert(name);
+    node_names.append(name.c_str());
   }
 
   db_proxy_->setNodeFilter(nodes);
+
+  for (size_t i = 0; i < node_names.size(); i++) {
+    node_names[i] = node_names[i].split("/", QString::SkipEmptyParts).last();
+  }
+    
+  setWindowTitle(QString("SWRI Console (") + node_names.join(", ") + ")");
 }
 
 void ConsoleWindow::setSeverityFilter()
