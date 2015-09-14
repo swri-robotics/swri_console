@@ -22,6 +22,8 @@ class ConsoleWindow : public QMainWindow {
   void selectFont();
                                        
  public Q_SLOTS:
+  void clearLogs();
+  void clearNodes();
   void connected(bool);
   void setSeverityFilter();
   void nodeSelectionChanged();

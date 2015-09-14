@@ -12,6 +12,17 @@ LogDatabase::~LogDatabase()
 {
 }
 
+void LogDatabase::clear()
+{
+  std::map<std::string, size_t>::iterator iter;
+  for (iter = nodes_.begin(); iter != nodes_.end(); iter++)
+  {
+    (*iter).second = 0;
+  }
+  node_list_model_.clearLogs();
+  log_.clear();
+}
+
 void LogDatabase::queueMessage(const rosgraph_msgs::Log &msg)
 {
   if (msg.header.stamp < min_time_) {

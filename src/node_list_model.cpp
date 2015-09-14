@@ -68,4 +68,24 @@ void NodeListModel::update(const std::map<std::string, size_t> &updated_counts)
   Q_EMIT dataChanged(index(0),
                      index(ordering_.size()-1));
 }
+
+void NodeListModel::clear()
+{
+  unsigned long size = data_.size();
+  beginRemoveRows(index(0), 0, size-1);
+  data_.clear();
+  ordering_.clear();
+  endRemoveRows();
+}
+
+void NodeListModel::clearLogs()
+{
+  std::map<std::string, size_t>::iterator iter;
+  for (iter = data_.begin(); iter != data_.end(); iter++)
+  {
+    (*iter).second = 0;
+  }
+
+  Q_EMIT dataChanged(index(0), index(data_.size()-1));
+}
 }  // namespace swri_console

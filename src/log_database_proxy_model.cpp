@@ -165,6 +165,12 @@ QVariant LogDatabaseProxyModel::data(
   return QVariant();
 }
 
+void LogDatabaseProxyModel::clear()
+{
+  db_->clear();
+  reset();
+}
+
 void LogDatabaseProxyModel::reset()
 {
   beginResetModel();

@@ -61,6 +61,11 @@ ConsoleWindow::ConsoleWindow(LogDatabase *db)
     db_proxy_, SIGNAL(messagesAdded()),
     this, SLOT(messagesAdded()));
 
+  QObject::connect( ui.clearLogsButton, SIGNAL(clicked()),
+                    this, SLOT(clearLogs()));
+  QObject::connect( ui.clearNodeListButton, SIGNAL(clicked()),
+                    this, SLOT(clearNodes()));
+
   QObject::connect(
     ui.messageList->verticalScrollBar(), SIGNAL(valueChanged(int)),
     this, SLOT(userScrolled(int)));
@@ -85,6 +90,18 @@ ConsoleWindow::ConsoleWindow(LogDatabase *db)
 ConsoleWindow::~ConsoleWindow()
 {
   delete db_proxy_;
+}
+
+void ConsoleWindow::clearLogs()
+{
+  db_proxy_->clear();
+}
+
+
+void ConsoleWindow::clearNodes()
+{
+  db_proxy_->clear();
+  db_->nodeListModel()->clear();
 }
 
 void ConsoleWindow::connected(bool connected)

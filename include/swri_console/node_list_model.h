@@ -22,6 +22,7 @@ class NodeListModel : public QAbstractListModel
   virtual QVariant data(const QModelIndex &index, int role) const;
   
   void clear();
+  void clearLogs();
   void update(const std::map<std::string, size_t> &updated_counts);
 
  private:

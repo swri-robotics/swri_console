@@ -30,6 +30,7 @@ public:
   ~LogDatabase();
   
   NodeListModel *nodeListModel() { return &node_list_model_; }
+  void clear();
   const std::deque<LogEntry>& log() { return log_; }
   const ros::Time& minTime() const { return min_time_; }
 

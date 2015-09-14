@@ -28,6 +28,8 @@ class LogDatabaseProxyModel : public QAbstractListModel
   virtual int rowCount(const QModelIndex &parent) const;
   virtual QVariant data(const QModelIndex &index, int role) const;
 
+  void clear();
+
   void reset();
 
  Q_SIGNALS:

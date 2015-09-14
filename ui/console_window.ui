@@ -27,7 +27,7 @@
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
-      <widget class="QWidget" name="layoutWidget">
+      <widget class="QWidget" name="layoutWidget3">
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
          <widget class="QListView" name="nodeList">
@@ -40,6 +40,26 @@
           <property name="selectionMode">
            <enum>QAbstractItemView::ExtendedSelection</enum>
           </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QWidget" name="clearButtonPanel">
+          <layout class="QHBoxLayout" name="clearButtonHboxLayout">
+           <item>
+            <widget class="QPushButton" name="clearNodeListButton">
+             <property name="text">
+              <string>Clear Node List</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="clearLogsButton">
+             <property name="text">
+              <string>Clear Logs</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </widget>
         </item>
         <item>
