@@ -47,7 +47,8 @@ int main(int argc, char **argv)
   QApplication app(argc, argv);
   loadFonts();
   
-  swri_console::ConsoleMaster master(argc,argv);
+  swri_console::ConsoleMaster master;
+  master.createNewWindow();
   app.connect(&app, SIGNAL(lastWindowClosed()), &app, SLOT(quit()));
   int result = app.exec();
   return result;

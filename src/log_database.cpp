@@ -12,23 +12,23 @@ LogDatabase::~LogDatabase()
 {
 }
 
-void LogDatabase::queueMessage(const rosgraph_msgs::Log &msg)
+void LogDatabase::queueMessage(const rosgraph_msgs::LogConstPtr msg)
 {
-  if (msg.header.stamp < min_time_) {
-    min_time_ = msg.header.stamp;
+  if (msg->header.stamp < min_time_) {
+    min_time_ = msg->header.stamp;
     Q_EMIT minTimeUpdated();
   }
   
-  nodes_[msg.name]++;
+  nodes_[msg->name]++;
 
   LogEntry log;
-  log.stamp = msg.header.stamp;
-  log.level = msg.level;
-  log.node = msg.name;
-  log.file = msg.file;
-  log.function = msg.function;
-  log.line = msg.line;
-  log.msg = QString(msg.msg.c_str());
+  log.stamp = msg->header.stamp;
+  log.level = msg->level;
+  log.node = msg->name;
+  log.file = msg->file;
+  log.function = msg->function;
+  log.line = msg->line;
+  log.msg = QString(msg->msg.c_str());
   new_msgs_.push_back(log);    
 }
 

@@ -33,13 +33,14 @@ public:
   const std::deque<LogEntry>& log() { return log_; }
   const ros::Time& minTime() const { return min_time_; }
 
-  void queueMessage(const rosgraph_msgs::Log &msg);
-  void processQueue();
-
  Q_SIGNALS:
   void messagesAdded();
   void minTimeUpdated();
-  
+
+public Q_SLOTS:
+  void queueMessage(const rosgraph_msgs::LogConstPtr msg);
+  void processQueue();
+
 private:  
   std::map<std::string, size_t> nodes_;
   std::deque<LogEntry> log_;

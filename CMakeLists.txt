@@ -30,18 +30,20 @@ file (GLOB HEADER_FILES
   include/swri_console/console_window.h
   include/swri_console/log_database.h
   include/swri_console/node_list_model.h
-  include/swri_console/log_database_proxy_model.h)
+  include/swri_console/log_database_proxy_model.h
+  include/swri_console/ros_thread.h)
 file (GLOB SRC_FILES
   src/console_master.cpp
   src/console_window.cpp
   src/log_database.cpp
   src/node_list_model.cpp
-  src/log_database_proxy_model.cpp)
+  src/log_database_proxy_model.cpp
+  src/ros_thread.cpp)
 QT4_ADD_RESOURCES(RCC_SRCS resources/images.qrc)
 QT4_WRAP_UI(SRC_FILES ${UI_FILES})
 QT4_WRAP_CPP(SRC_FILES ${HEADER_FILES})
 
-add_executable(swri_console ${SRC_FILES} ${RCC_SRCS} src/main.cpp)
+add_executable(swri_console ${HEADER_FILES} ${SRC_FILES} ${RCC_SRCS} src/main.cpp)
 target_link_libraries(${PROJECT_NAME} 
   ${QT_LIBRARIES}
   ${catkin_LIBRARIES})
