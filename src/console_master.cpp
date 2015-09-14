@@ -41,14 +41,18 @@ void ConsoleMaster::createNewWindow()
   QObject::connect(win, SIGNAL(selectFont()),
                    this, SLOT(selectFont()));
 
-  QObject::connect(&ros_thread_, SIGNAL(logReceived(const rosgraph_msgs::LogConstPtr& )),
-                   &db_, SLOT(queueMessage(const rosgraph_msgs::LogConstPtr&) ));
-
-  QObject::connect(&ros_thread_, SIGNAL(spun()),
-                   &db_, SLOT(processQueue()));
 
   if (!ros_thread_.isRunning())
   {
+    // There's only one ROS thread, and it services every window.  We need to initialize
+    // it and its connections to the LogDatabase when we first create a window, but
+    // after that it doesn't need to be modified again.
+    QObject::connect(&ros_thread_, SIGNAL(logReceived(const rosgraph_msgs::LogConstPtr& )),
+                     &db_, SLOT(queueMessage(const rosgraph_msgs::LogConstPtr&) ));
+
+    QObject::connect(&ros_thread_, SIGNAL(spun()),
+                     &db_, SLOT(processQueue()));
+
     ros_thread_.start();
   }
 

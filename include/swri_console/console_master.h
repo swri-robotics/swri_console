@@ -33,6 +33,8 @@ class ConsoleMaster : public QObject
 
  private:
 
+  // All ROS operations are done on a separate thread to ensure they do not
+  // cause the GUI thread to block.
   RosThread ros_thread_;
   
   bool connected_;

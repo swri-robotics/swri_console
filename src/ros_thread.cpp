@@ -11,14 +11,14 @@ RosThread::RosThread() :
   ros::init(argc, QCoreApplication::argv(), "swri_console",
             ros::init_options::AnonymousName |
             ros::init_options::NoRosout);
-  nh_ = boost::make_shared<ros::NodeHandle>();
 }
 
 void RosThread::run()
 {
+  nh_ = boost::make_shared<ros::NodeHandle>();
   startRos();
 
-  ros::Rate r(100);
+  ros::Rate r(10);
   while (is_running_)
   {
     bool master_status = ros::master::check();
