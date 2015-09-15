@@ -15,10 +15,6 @@ RosThread::RosThread() :
 
 void RosThread::run()
 {
-  nh_ = boost::make_shared<ros::NodeHandle>();
-  startRos();
-
-  ros::Rate r(10);
   while (is_running_)
   {
     bool master_status = ros::master::check();
@@ -31,7 +27,7 @@ void RosThread::run()
       ros::spinOnce();
       Q_EMIT spun();
     }
-    r.sleep();
+    msleep(50);
   }
 }
 
@@ -51,7 +47,8 @@ void RosThread::startRos()
   ros::start();
   is_connected_ = true;
 
-  rosout_sub_ = nh_->subscribe("/rosout", 10000,
+  ros::NodeHandle nh;
+  rosout_sub_ = nh.subscribe("/rosout", 10000,
                              &RosThread::handleRosout,
                              this);
   Q_EMIT connected(true);
@@ -59,6 +56,7 @@ void RosThread::startRos()
 
 void RosThread::stopRos()
 {
+  ros::shutdown();
   is_connected_ = false;
   Q_EMIT connected(false);
 }

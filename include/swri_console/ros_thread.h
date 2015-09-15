@@ -7,8 +7,6 @@
 #include <rosgraph_msgs/Log.h>
 #include <QMetaType>
 
-#include <boost/shared_ptr.hpp>
-
 namespace swri_console
 {
   class RosThread : public QThread
@@ -47,7 +45,6 @@ namespace swri_console
     volatile bool is_running_;
     bool is_connected_;
     ros::Subscriber rosout_sub_;
-    boost::shared_ptr<ros::NodeHandle> nh_;
   };
 }
 
