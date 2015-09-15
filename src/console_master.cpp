@@ -1,34 +1,25 @@
 #include <swri_console/console_master.h>
-#include <ros/ros.h>
-#include <ros/network.h>
-#include <string>
-#include <std_msgs/String.h>
-#include <sstream>
 #include <swri_console/console_window.h>
 #include <QFontDialog>
 
 namespace swri_console
 {
-ConsoleMaster::ConsoleMaster(int argc, char** argv)
+ConsoleMaster::ConsoleMaster()
   :
   connected_(false),
   window_font_(QFont("Ubuntu Mono", 9))
 {
-  ros::init(argc, argv, "swri_console",
-            ros::init_options::AnonymousName |
-            ros::init_options::NoRosout);
-  createNewWindow();
-
-  update_timer_ = startTimer(100);
+  // The RosThread takes advantage of queued connections when emitting log messages
+  // to ensure that the messages are processed in the console window's event thread.
+  // In order for that to work, we have to manually register the message type with
+  // Qt's QMetaType system.
+  qRegisterMetaType<rosgraph_msgs::LogConstPtr>("rosgraph_msgs::LogConstPtr");
 }
 
 ConsoleMaster::~ConsoleMaster()
 {
-  if(ros::isStarted()) {
-    ros::shutdown(); // explicitly needed since we use ros::start();
-    ros::waitForShutdown();
-  }
-  // wait();
+  ros_thread_.shutdown();
+  ros_thread_.wait();
 }
 
 void ConsoleMaster::createNewWindow()
@@ -40,7 +31,7 @@ void ConsoleMaster::createNewWindow()
   QObject::connect(win, SIGNAL(createNewWindow()),
                    this, SLOT(createNewWindow()));
 
-  QObject::connect(this, SIGNAL(connected(bool)),
+  QObject::connect(&ros_thread_, SIGNAL(connected(bool)),
                    win, SLOT(connected(bool)));
 
   QObject::connect(this,
@@ -49,47 +40,23 @@ void ConsoleMaster::createNewWindow()
 
   QObject::connect(win, SIGNAL(selectFont()),
                    this, SLOT(selectFont()));
-                     
-  win->show();
-}
 
-void ConsoleMaster::timerEvent(QTimerEvent *event)
-{
-  bool master_status = ros::master::check();
-  
-  if (!connected_ && master_status) {
-    startRos();
-  } else if (connected_ && !master_status) {
-    stopRos();
-  } else if (connected_ && master_status) {
-    ros::spinOnce();
-    db_.processQueue();
+
+  if (!ros_thread_.isRunning())
+  {
+    // There's only one ROS thread, and it services every window.  We need to initialize
+    // it and its connections to the LogDatabase when we first create a window, but
+    // after that it doesn't need to be modified again.
+    QObject::connect(&ros_thread_, SIGNAL(logReceived(const rosgraph_msgs::LogConstPtr& )),
+                     &db_, SLOT(queueMessage(const rosgraph_msgs::LogConstPtr&) ));
+
+    QObject::connect(&ros_thread_, SIGNAL(spun()),
+                     &db_, SLOT(processQueue()));
+
+    ros_thread_.start();
   }
-}
 
-void ConsoleMaster::startRos()
-{
-  ros::start();
-  connected_ = true;
-
-  ros::NodeHandle nh;
-  rosout_sub_ = nh.subscribe("/rosout", 10000,
-                             &ConsoleMaster::handleRosout,
-                             this);
-  ros::NodeHandle();
-  Q_EMIT connected(true);
-}
-
-void ConsoleMaster::stopRos()
-{
-  ros::shutdown();
-  connected_ = false;
-  Q_EMIT connected(false);    
-}
-
-void ConsoleMaster::handleRosout(const rosgraph_msgs::LogConstPtr &msg)
-{
-  db_.queueMessage(*msg);
+  win->show();
 }
 
 void ConsoleMaster::fontSelectionChanged(const QFont &font)

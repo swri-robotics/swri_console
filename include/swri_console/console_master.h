@@ -1,13 +1,14 @@
 #ifndef SWRI_CONSOLE_ROSOUT_SOURCE_H_
 #define SWRI_CONSOLE_ROSOUT_SOURCE_H_
 
-#include <ros/ros.h>
 #include <string>
 #include <QObject>
 #include <QList>
 #include <QFont>
 #include <rosgraph_msgs/Log.h>
 #include <swri_console/log_database.h>
+
+#include "ros_thread.h"
 
 namespace swri_console
 {
@@ -19,33 +20,25 @@ class ConsoleMaster : public QObject
   Q_OBJECT;
 
  public:  
-  ConsoleMaster(int argc, char** argv );
+  ConsoleMaster();
   virtual ~ConsoleMaster();
-  
-  virtual void timerEvent(QTimerEvent *event);
-                                             
+
  public Q_SLOTS:
   void createNewWindow();
+  void fontSelectionChanged(const QFont &font);
   void selectFont();
 
-  void fontSelectionChanged(const QFont &font);
-  
  Q_SIGNALS:
-  void connected(bool);
-  void rosShutdown();  
   void fontChanged(const QFont &font);
-  
+
  private:
-  void startRos();
-  void stopRos();
-  void processNewData();
-  
-  int update_timer_;
+
+  // All ROS operations are done on a separate thread to ensure they do not
+  // cause the GUI thread to block.
+  RosThread ros_thread_;
   
   bool connected_;
-  ros::Subscriber rosout_sub_;
-  void handleRosout(const rosgraph_msgs::LogConstPtr &msg);
-  
+
   QList<ConsoleWindow*> windows_;
 
   LogDatabase db_;

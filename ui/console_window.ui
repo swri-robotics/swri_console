@@ -154,7 +154,7 @@
         <item>
          <layout class="QGridLayout" name="gridLayout">
           <item row="0" column="0">
-           <widget class="QLabel" name="label">
+           <widget class="QLabel" name="includeLabel">
             <property name="text">
              <string>Include</string>
             </property>
@@ -171,7 +171,7 @@
            </widget>
           </item>
           <item row="1" column="0">
-           <widget class="QLabel" name="label_2">
+           <widget class="QLabel" name="excludeLabel">
             <property name="text">
              <string>Exclude</string>
             </property>
@@ -215,6 +215,7 @@
     </property>
     <addaction name="action_ShowTimestamps"/>
     <addaction name="action_AbsoluteTimestamps"/>
+    <addaction name="action_RegularExpressions"/>
     <addaction name="action_SelectFont"/>
    </widget>
    <addaction name="menu_File"/>
@@ -265,6 +266,17 @@
   <action name="action_SelectFont">
    <property name="text">
     <string>Select Font...</string>
+   </property>
+  </action>
+  <action name="action_RegularExpressions">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Allow regular expressions in Include/Exclude</string>
    </property>
   </action>
  </widget>
