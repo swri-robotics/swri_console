@@ -31,6 +31,8 @@ class ConsoleWindow : public QMainWindow {
 
   void includeFilterUpdated(const QString &);
   void excludeFilterUpdated(const QString &);
+  void updateIncludeLabel();
+  void updateExcludeLabel();
 
   void setFont(const QFont &font);
   

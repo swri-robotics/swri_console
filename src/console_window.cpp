@@ -28,6 +28,15 @@ ConsoleWindow::ConsoleWindow(LogDatabase *db)
   QObject::connect(ui.action_ShowTimestamps, SIGNAL(toggled(bool)),
                    db_proxy_, SLOT(setDisplayTime(bool)));
 
+  QObject::connect(ui.action_RegularExpressions, SIGNAL(toggled(bool)),
+                   db_proxy_, SLOT(setUseRegularExpressions(bool)));
+
+  QObject::connect(ui.action_RegularExpressions, SIGNAL(toggled(bool)),
+                   this, SLOT(updateIncludeLabel()));
+
+  QObject::connect(ui.action_RegularExpressions, SIGNAL(toggled(bool)),
+                   this, SLOT(updateExcludeLabel()));
+
   QObject::connect(ui.action_SelectFont, SIGNAL(triggered(bool)),
                    this, SIGNAL(selectFont()));
   
@@ -174,6 +183,8 @@ void ConsoleWindow::includeFilterUpdated(const QString &text)
   }
 
   db_proxy_->setIncludeFilters(filtered);
+  db_proxy_->setIncludeRegexpPattern(text);
+  updateIncludeLabel();
 }
 
 void ConsoleWindow::excludeFilterUpdated(const QString &text)
@@ -189,6 +200,27 @@ void ConsoleWindow::excludeFilterUpdated(const QString &text)
   }
 
   db_proxy_->setExcludeFilters(filtered);
+  db_proxy_->setExcludeRegexpPattern(text);
+  updateExcludeLabel();
+}
+
+
+void ConsoleWindow::updateIncludeLabel()
+{
+  if (db_proxy_->isIncludeValid()) {
+    ui.includeLabel->setText("Include");
+  } else {
+    ui.includeLabel->setText("<font color='red'>Include</font>");
+  }
+}
+
+void ConsoleWindow::updateExcludeLabel()
+{
+  if (db_proxy_->isExcludeValid()) {
+    ui.excludeLabel->setText("Exclude");
+  } else {
+    ui.excludeLabel->setText("<font color='red'>Exclude</font>");
+  }
 }
 
 void ConsoleWindow::setFont(const QFont &font)
