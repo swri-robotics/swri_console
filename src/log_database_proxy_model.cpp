@@ -63,8 +63,7 @@ void LogDatabaseProxyModel::setDisplayTime(bool display)
 
 void LogDatabaseProxyModel::setUseRegularExpressions(bool useRegexps)
 {
-  if (useRegexps == use_regular_expressions_)
-  {
+  if (useRegexps == use_regular_expressions_) {
     return;
   }
 
@@ -111,8 +110,7 @@ int LogDatabaseProxyModel::rowCount(const QModelIndex &parent) const
 
 bool LogDatabaseProxyModel::isIncludeValid() const
 {
-  if (use_regular_expressions_ && !include_regexp_.isValid())
-  {
+  if (use_regular_expressions_ && !include_regexp_.isValid()) {
     return false;
   }
   return true;
@@ -120,8 +118,7 @@ bool LogDatabaseProxyModel::isIncludeValid() const
 
 bool LogDatabaseProxyModel::isExcludeValid() const
 {
-  if (use_regular_expressions_ && !exclude_regexp_.isValid())
-  {
+  if (use_regular_expressions_ && !exclude_regexp_.isValid()) {
     return false;
   }
   return true;
@@ -305,17 +302,12 @@ bool LogDatabaseProxyModel::acceptLogEntry(const LogEntry &item)
     return false;
   }
 
-  if (use_regular_expressions_)
-  {
+  if (use_regular_expressions_) {
     // Don't let an empty regexp filter out everything
     return exclude_regexp_.isEmpty() || exclude_regexp_.indexIn(item.msg) < 0;
-  }
-  else
-  {
-    for (int i = 0; i < exclude_strings_.size(); i++)
-    {
-      if (item.msg.contains(exclude_strings_[i], Qt::CaseInsensitive))
-      {
+  } else {
+    for (int i = 0; i < exclude_strings_.size(); i++) {
+      if (item.msg.contains(exclude_strings_[i], Qt::CaseInsensitive)) {
         return false;
       }
     }
@@ -329,21 +321,15 @@ bool LogDatabaseProxyModel::acceptLogEntry(const LogEntry &item)
 // include strings.
 bool LogDatabaseProxyModel::testIncludeFilter(const LogEntry &item)
 {
-  if (use_regular_expressions_)
-  {
+  if (use_regular_expressions_) {
     return include_regexp_.indexIn(item.msg) >= 0;
-  }
-  else
-  {
-    if (include_strings_.empty())
-    {
+  } else {
+    if (include_strings_.empty()) {
       return true;
     }
 
-    for (int i = 0; i < include_strings_.size(); i++)
-    {
-      if (item.msg.contains(include_strings_[i], Qt::CaseInsensitive))
-      {
+    for (int i = 0; i < include_strings_.size(); i++) {
+      if (item.msg.contains(include_strings_[i], Qt::CaseInsensitive)) {
         return true;
       }
     }

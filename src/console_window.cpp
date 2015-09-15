@@ -207,24 +207,18 @@ void ConsoleWindow::excludeFilterUpdated(const QString &text)
 
 void ConsoleWindow::updateIncludeLabel()
 {
-  if (db_proxy_->isIncludeValid())
-  {
+  if (db_proxy_->isIncludeValid()) {
     ui.includeLabel->setText("Include");
-  }
-  else
-  {
+  } else {
     ui.includeLabel->setText("<font color='red'>Include</font>");
   }
 }
 
 void ConsoleWindow::updateExcludeLabel()
 {
-  if (db_proxy_->isExcludeValid())
-  {
+  if (db_proxy_->isExcludeValid()) {
     ui.excludeLabel->setText("Exclude");
-  }
-  else
-  {
+  } else {
     ui.excludeLabel->setText("<font color='red'>Exclude</font>");
   }
 }
