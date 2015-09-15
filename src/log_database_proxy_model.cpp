@@ -61,6 +61,16 @@ void LogDatabaseProxyModel::setDisplayTime(bool display)
   }
 }
 
+void LogDatabaseProxyModel::setUseRegularExpressions(bool useRegexps)
+{
+  if (useRegexps == use_regular_expressions_) {
+    return;
+  }
+
+  use_regular_expressions_ = useRegexps;
+  reset();
+}
+
 void LogDatabaseProxyModel::setIncludeFilters(
   const QStringList &list)
 {
@@ -75,6 +85,19 @@ void LogDatabaseProxyModel::setExcludeFilters(
   reset();
 }
 
+
+void LogDatabaseProxyModel::setIncludeRegexpPattern(const QString& pattern)
+{
+  include_regexp_.setPattern(pattern);
+  reset();
+}
+
+void LogDatabaseProxyModel::setExcludeRegexpPattern(const QString& pattern)
+{
+  exclude_regexp_.setPattern(pattern);
+  reset();
+}
+
 int LogDatabaseProxyModel::rowCount(const QModelIndex &parent) const
 {
   if (parent.isValid()) {
@@ -83,6 +106,24 @@ int LogDatabaseProxyModel::rowCount(const QModelIndex &parent) const
 
   return msg_mapping_.size();
 }
+
+
+bool LogDatabaseProxyModel::isIncludeValid() const
+{
+  if (use_regular_expressions_ && !include_regexp_.isValid()) {
+    return false;
+  }
+  return true;
+}
+
+bool LogDatabaseProxyModel::isExcludeValid() const
+{
+  if (use_regular_expressions_ && !exclude_regexp_.isValid()) {
+    return false;
+  }
+  return true;
+}
+
 
 QVariant LogDatabaseProxyModel::data(
   const QModelIndex &index, int role) const
@@ -260,10 +301,15 @@ bool LogDatabaseProxyModel::acceptLogEntry(const LogEntry &item)
   if (!testIncludeFilter(item)) {
     return false;
   }
-  
-  for (int i = 0; i < exclude_strings_.size(); i++) {
-    if (item.msg.contains(exclude_strings_[i], Qt::CaseInsensitive)) {
-      return false;
+
+  if (use_regular_expressions_) {
+    // Don't let an empty regexp filter out everything
+    return exclude_regexp_.isEmpty() || exclude_regexp_.indexIn(item.msg) < 0;
+  } else {
+    for (int i = 0; i < exclude_strings_.size(); i++) {
+      if (item.msg.contains(exclude_strings_[i], Qt::CaseInsensitive)) {
+        return false;
+      }
     }
   }
   
@@ -275,13 +321,17 @@ bool LogDatabaseProxyModel::acceptLogEntry(const LogEntry &item)
 // include strings.
 bool LogDatabaseProxyModel::testIncludeFilter(const LogEntry &item)
 {
-  if (include_strings_.empty()) {
-    return true;
-  }
-  
-  for (int i = 0; i < include_strings_.size(); i++) {
-    if (item.msg.contains(include_strings_[i], Qt::CaseInsensitive)) {
+  if (use_regular_expressions_) {
+    return include_regexp_.indexIn(item.msg) >= 0;
+  } else {
+    if (include_strings_.empty()) {
       return true;
+    }
+
+    for (int i = 0; i < include_strings_.size(); i++) {
+      if (item.msg.contains(include_strings_[i], Qt::CaseInsensitive)) {
+        return true;
+      }
     }
   }
 
