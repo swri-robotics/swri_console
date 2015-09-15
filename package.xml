@@ -13,9 +13,10 @@
 
 
   <buildtool_depend>catkin</buildtool_depend>
-  <depend>qt_build</depend>
-  <depend>roscpp</depend>
+  <buildtool_depend>qt_build</buildtool_depend>
   <depend>libqt4-dev</depend>
+  <depend>roscpp</depend>
   <depend>rosgraph_msgs</depend>
+  <exec_depend>libqt4</exec_depend>
  
 </package>

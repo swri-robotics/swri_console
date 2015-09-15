@@ -15,11 +15,14 @@ LogDatabase::~LogDatabase()
 void LogDatabase::clear()
 {
   std::map<std::string, size_t>::iterator iter;
+  // Set the log count for the node list to 0.
   for (iter = nodes_.begin(); iter != nodes_.end(); iter++)
   {
     (*iter).second = 0;
   }
+  // Tell the node list model to also clear out its internal storage.
   node_list_model_.clearLogs();
+  // Finally, remove all of the logs we've stored.
   log_.clear();
 }
 
