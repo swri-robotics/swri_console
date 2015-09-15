@@ -218,7 +218,7 @@ void LogDatabaseProxyModel::processOldMessages()
     if (!acceptLogEntry(item)) {
       continue;
     }    
-    early_mapping_.push_back(earliest_index_-1);
+    early_mapping_.push_front(earliest_index_-1);
   }
  
   if ((earliest_index_ == 0 && early_mapping_.size()) ||
