@@ -8,8 +8,11 @@ namespace swri_console
 {
 LogDatabaseProxyModel::LogDatabaseProxyModel(LogDatabase *db)
   :
-  db_(db)
-{  
+  db_(db),
+  display_time_(true),
+  display_absolute_time_(false),
+  use_regular_expressions_(false)
+{
   QObject::connect(db_, SIGNAL(messagesAdded()),
                    this, SLOT(processNewMessages()));
 
