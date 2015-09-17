@@ -28,6 +28,9 @@ class ConsoleWindow : public QMainWindow {
   void setSeverityFilter();
   void nodeSelectionChanged();
   void messagesAdded();
+  void showLogContextMenu(const QPoint& point);
+  void selectAllLogs();
+  void copyLogs();
 
   void userScrolled(int);
 
