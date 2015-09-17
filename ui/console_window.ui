@@ -265,7 +265,7 @@
   </action>
   <action name="action_SelectAll">
    <property name="text">
-    <string>Select All</string>
+    <string>Select &amp;All</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+A</string>
