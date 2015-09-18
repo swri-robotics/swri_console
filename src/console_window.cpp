@@ -5,6 +5,8 @@
 #include <swri_console/log_database.h>
 #include <swri_console/log_database_proxy_model.h>
 #include <rosgraph_msgs/Log.h>
+#include <QColorDialog>
+#include <QRegExp>
 #include <QScrollBar>
 
 using namespace Qt;
@@ -39,11 +41,25 @@ ConsoleWindow::ConsoleWindow(LogDatabase *db)
 
   QObject::connect(ui.action_SelectFont, SIGNAL(triggered(bool)),
                    this, SIGNAL(selectFont()));
-  
+
+  QObject::connect(ui.action_ColorizeLogs, SIGNAL(triggered(bool)),
+                   db_proxy_, SLOT(setColorizeLogs(bool)));
+
+  QObject::connect(ui.debugColorWidget, SIGNAL(clicked(bool)),
+                   this, SLOT(setDebugColor()));
+  QObject::connect(ui.infoColorWidget, SIGNAL(clicked(bool)),
+                   this, SLOT(setInfoColor()));
+  QObject::connect(ui.warnColorWidget, SIGNAL(clicked(bool)),
+                   this, SLOT(setWarnColor()));
+  QObject::connect(ui.errorColorWidget, SIGNAL(clicked(bool)),
+                   this, SLOT(setErrorColor()));
+  QObject::connect(ui.fatalColorWidget, SIGNAL(clicked(bool)),
+                   this, SLOT(setFatalColor()));
+
   ui.nodeList->setModel(db_->nodeListModel());
   ui.messageList->setModel(db_proxy_);
   ui.messageList->setUniformItemSizes(true);
-  
+
   QObject::connect(
     ui.nodeList->selectionModel(),
     SIGNAL(selectionChanged(const QItemSelection &,
@@ -94,6 +110,13 @@ ConsoleWindow::ConsoleWindow(LogDatabase *db)
 
   db_proxy_->setDisplayTime(true);
   setSeverityFilter();
+
+  // TODO pjreed Read these from the settings after user settings are implemented.
+  updateButtonColor(ui.debugColorWidget, Qt::gray);
+  updateButtonColor(ui.infoColorWidget, Qt::black);
+  updateButtonColor(ui.warnColorWidget, Qt::yellow);
+  updateButtonColor(ui.errorColorWidget, Qt::red);
+  updateButtonColor(ui.fatalColorWidget, Qt::magenta);
 }
 
 ConsoleWindow::~ConsoleWindow()
@@ -244,6 +267,74 @@ void ConsoleWindow::setFont(const QFont &font)
 {
   ui.messageList->setFont(font);
   ui.nodeList->setFont(font);
+}
+
+void ConsoleWindow::setDebugColor()
+{
+  chooseButtonColor(ui.debugColorWidget);
+}
+
+void ConsoleWindow::setInfoColor()
+{
+  chooseButtonColor(ui.infoColorWidget);
+}
+
+void ConsoleWindow::setWarnColor()
+{
+  chooseButtonColor(ui.warnColorWidget);
+}
+
+void ConsoleWindow::setErrorColor()
+{
+  chooseButtonColor(ui.errorColorWidget);
+}
+
+void ConsoleWindow::setFatalColor()
+{
+  chooseButtonColor(ui.fatalColorWidget);
+}
+
+void ConsoleWindow::chooseButtonColor(QPushButton* widget)
+{
+  QString ss = widget->styleSheet();
+  QRegExp re("background: (#\\w*);");
+  QColor old_color;
+  if (re.indexIn(ss) >= 0) {
+    old_color = QColor(re.cap(1));
+  }
+  QColor color = QColorDialog::getColor(old_color, this);
+  if (color.isValid()) {
+    updateButtonColor(widget, color);
+  }
+}
+
+void ConsoleWindow::updateButtonColor(QPushButton* widget, const QColor& color)
+{
+  QString s("background: #"
+            + QString(color.red() < 16? "0" : "") + QString::number(color.red(),16)
+            + QString(color.green() < 16? "0" : "") + QString::number(color.green(),16)
+            + QString(color.blue() < 16? "0" : "") + QString::number(color.blue(),16) + ";");
+  widget->setStyleSheet(s);
+  widget->update();
+
+  if (widget == ui.debugColorWidget) {
+    db_proxy_->setDebugColor(color);
+  }
+  else if (widget == ui.infoColorWidget) {
+    db_proxy_->setInfoColor(color);
+  }
+  else if (widget == ui.warnColorWidget) {
+    db_proxy_->setWarnColor(color);
+  }
+  else if (widget == ui.errorColorWidget) {
+    db_proxy_->setErrorColor(color);
+  }
+  else if (widget == ui.fatalColorWidget) {
+    db_proxy_->setFatalColor(color);
+  }
+  else {
+    qWarning("Unexpected widget passed to ConsoleWindow::updateButtonColor.");
+  }
 }
 }  // namespace swri_console
 

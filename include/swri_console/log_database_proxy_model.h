@@ -2,6 +2,7 @@
 #define SWRI_CONSOLE_LOG_DATABASE_PROXY_MODEL_H_
 
 #include <QAbstractListModel>
+#include <QColor>
 #include <stdint.h>
 #include <set>
 #include <string>
@@ -27,8 +28,14 @@ class LogDatabaseProxyModel : public QAbstractListModel
   void setExcludeFilters(const QStringList &list);
   void setIncludeRegexpPattern(const QString& pattern);
   void setExcludeRegexpPattern(const QString& pattern);
+  void setDebugColor(const QColor& debug_color);
+  void setInfoColor(const QColor& info_color);
+  void setWarnColor(const QColor& warn_color);
+  void setErrorColor(const QColor& error_color);
+  void setFatalColor(const QColor& fatal_color);
   bool isIncludeValid() const;
   bool isExcludeValid() const;
+
 
   virtual int rowCount(const QModelIndex &parent) const;
   virtual QVariant data(const QModelIndex &index, int role) const;
@@ -46,6 +53,7 @@ class LogDatabaseProxyModel : public QAbstractListModel
   void minTimeUpdated();
   void setDisplayTime(bool display);
   void setAbsoluteTime(bool absolute);
+  void setColorizeLogs(bool colorize_logs);
   void setUseRegularExpressions(bool useRegexps);
 
  private:
@@ -61,6 +69,7 @@ class LogDatabaseProxyModel : public QAbstractListModel
   
   std::set<std::string> names_;
   uint8_t severity_mask_;
+  bool colorize_logs_;
   bool display_time_;
   bool display_absolute_time_;
   bool use_regular_expressions_;
@@ -72,6 +81,12 @@ class LogDatabaseProxyModel : public QAbstractListModel
   QRegExp exclude_regexp_;
   QStringList include_strings_;
   QStringList exclude_strings_;
+
+  QColor debug_color_;
+  QColor info_color_;
+  QColor warn_color_;
+  QColor error_color_;
+  QColor fatal_color_;
 };
 }  // swri_console
 #endif  // SWRI_CONSOLE_LOG_DATABASE_PROXY_MODEL_H_

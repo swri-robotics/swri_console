@@ -1,5 +1,6 @@
 #include <swri_console/log_database_proxy_model.h>
 #include <swri_console/log_database.h>
+#include <QColor>
 #include <QTimer>
 #include <stdio.h>
 #include <ros/time.h>
@@ -8,7 +9,13 @@ namespace swri_console
 {
 LogDatabaseProxyModel::LogDatabaseProxyModel(LogDatabase *db)
   :
-  db_(db)
+  colorize_logs_(true),
+  db_(db),
+  debug_color_(Qt::gray),
+  info_color_(Qt::black),
+  warn_color_(Qt::yellow),
+  error_color_(Qt::red),
+  fatal_color_(Qt::magenta)
 {  
   QObject::connect(db_, SIGNAL(messagesAdded()),
                    this, SLOT(processNewMessages()));
@@ -42,6 +49,20 @@ void LogDatabaseProxyModel::setAbsoluteTime(bool absolute)
   display_absolute_time_ = absolute;
 
   if (display_time_ && msg_mapping_.size()) {
+    Q_EMIT dataChanged(index(0),
+                       index(msg_mapping_.size()));
+  }
+}
+
+
+void LogDatabaseProxyModel::setColorizeLogs(bool colorize_logs)
+{
+  if (colorize_logs == colorize_logs_) {
+    return;
+  }
+
+  colorize_logs_ = colorize_logs;
+  if (msg_mapping_.size()) {
     Q_EMIT dataChanged(index(0),
                        index(msg_mapping_.size()));
   }
@@ -98,6 +119,36 @@ void LogDatabaseProxyModel::setExcludeRegexpPattern(const QString& pattern)
   reset();
 }
 
+void LogDatabaseProxyModel::setDebugColor(const QColor& debug_color)
+{
+  debug_color_ = debug_color;
+  reset();
+}
+
+void LogDatabaseProxyModel::setInfoColor(const QColor& info_color)
+{
+  info_color_ = info_color;
+  reset();
+}
+
+void LogDatabaseProxyModel::setWarnColor(const QColor& warn_color)
+{
+  warn_color_ = warn_color;
+  reset();
+}
+
+void LogDatabaseProxyModel::setErrorColor(const QColor& error_color)
+{
+  error_color_ = error_color;
+  reset();
+}
+
+void LogDatabaseProxyModel::setFatalColor(const QColor& fatal_color)
+{
+  fatal_color_ = fatal_color;
+  reset();
+}
+
 int LogDatabaseProxyModel::rowCount(const QModelIndex &parent) const
 {
   if (parent.isValid()) {
@@ -128,11 +179,26 @@ bool LogDatabaseProxyModel::isExcludeValid() const
 QVariant LogDatabaseProxyModel::data(
   const QModelIndex &index, int role) const
 {
+  switch (role)
+  {
+    // Currently we're only returning data for these roles, so return immediately
+    // if we're being queried for anything else.
+    case Qt::DisplayRole:
+    case Qt::ToolTipRole:
+      break;
+    case Qt::ForegroundRole:
+      if (colorize_logs_) {
+        break;
+      }
+    default:
+      return QVariant();
+  }
+
   if (index.parent().isValid() &&
       index.row() >= msg_mapping_.size()) {
     return QVariant();
   }
-    
+
   const LogEntry &item = db_->log()[msg_mapping_[index.row()]];
 
   if (role == Qt::DisplayRole) {
@@ -179,7 +245,24 @@ QVariant LogDatabaseProxyModel::data(
     }
       
     return QVariant(QString(header) + item.msg);
-  } else if (role == Qt::ToolTipRole) {
+  }
+  else if (role == Qt::ForegroundRole && colorize_logs_) {
+    switch (item.level) {
+      case rosgraph_msgs::Log::DEBUG:
+        return QVariant(debug_color_);
+      case rosgraph_msgs::Log::INFO:
+        return QVariant(info_color_);
+      case rosgraph_msgs::Log::WARN:
+        return QVariant(warn_color_);
+      case rosgraph_msgs::Log::ERROR:
+        return QVariant(error_color_);
+      case rosgraph_msgs::Log::FATAL:
+        return QVariant(fatal_color_);
+      default:
+        return QVariant(info_color_);
+    }
+  }
+  else if (role == Qt::ToolTipRole) {
     char buffer[4096];
     snprintf(buffer, sizeof(buffer),
              "<p style='white-space:pre'>"
@@ -352,4 +435,6 @@ void LogDatabaseProxyModel::minTimeUpdated()
     Q_EMIT dataChanged(index(0), index(msg_mapping_.size()));
   }  
 }
+
+
 }  // namespace swri_console

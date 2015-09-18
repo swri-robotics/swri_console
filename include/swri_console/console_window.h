@@ -2,6 +2,7 @@
 #define SWRI_CONSOLE_CONSOLE_WINDOW_H_
 
 #include <QtGui/QMainWindow>
+#include <QPushButton>
 #include "ui_console_window.h"
 
 namespace swri_console
@@ -37,8 +38,17 @@ class ConsoleWindow : public QMainWindow {
   void updateExcludeLabel();
 
   void setFont(const QFont &font);
-  
-private:  
+
+  void setDebugColor();
+  void setInfoColor();
+  void setWarnColor();
+  void setErrorColor();
+  void setFatalColor();
+
+private:
+  void chooseButtonColor(QPushButton* widget);
+  void updateButtonColor(QPushButton* widget, const QColor& color);
+
   Ui::ConsoleWindow ui;
   LogDatabase *db_;
   LogDatabaseProxyModel *db_proxy_;
