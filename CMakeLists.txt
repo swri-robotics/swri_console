@@ -1,13 +1,13 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(swri_console)
 
-find_package(catkin REQUIRED COMPONENTS roscpp rosgraph_msgs)
+find_package(catkin REQUIRED COMPONENTS rosbag_storage roscpp rosgraph_msgs)
 find_package(Qt4 REQUIRED)
 
 catkin_package(
   INCLUDE_DIRS include
   DEPENDS Qt4
-  CATKIN_DEPENDS roscpp rosgraph_msgs
+  CATKIN_DEPENDS rosbag_storage roscpp rosgraph_msgs
 )
 
 include(${QT_USE_FILE})
@@ -26,6 +26,7 @@ include_directories(src)
 file (GLOB UI_FILES
   ui/console_window.ui)
 file (GLOB HEADER_FILES
+  include/swri_console/bag_reader.h
   include/swri_console/console_master.h
   include/swri_console/console_window.h
   include/swri_console/log_database.h
@@ -33,6 +34,7 @@ file (GLOB HEADER_FILES
   include/swri_console/log_database_proxy_model.h
   include/swri_console/ros_thread.h)
 file (GLOB SRC_FILES
+  src/bag_reader.cpp
   src/console_master.cpp
   src/console_window.cpp
   src/log_database.cpp

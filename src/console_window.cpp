@@ -22,6 +22,9 @@ ConsoleWindow::ConsoleWindow(LogDatabase *db)
   QObject::connect(ui.action_NewWindow, SIGNAL(triggered(bool)),
                    this, SIGNAL(createNewWindow()));
 
+  QObject::connect(ui.action_ReadBagFile, SIGNAL(triggered(bool)),
+                   this, SIGNAL(readBagFile()));
+
   QObject::connect(ui.action_AbsoluteTimestamps, SIGNAL(toggled(bool)),
                    db_proxy_, SLOT(setAbsoluteTime(bool)));
 

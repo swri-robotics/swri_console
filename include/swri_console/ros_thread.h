@@ -48,6 +48,4 @@ namespace swri_console
   };
 }
 
-Q_DECLARE_METATYPE(rosgraph_msgs::LogConstPtr);
-
 #endif //SWRI_CONSOLE_ROS_THREAD_H

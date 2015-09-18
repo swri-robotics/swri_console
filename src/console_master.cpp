@@ -14,6 +14,11 @@ ConsoleMaster::ConsoleMaster()
   // In order for that to work, we have to manually register the message type with
   // Qt's QMetaType system.
   qRegisterMetaType<rosgraph_msgs::LogConstPtr>("rosgraph_msgs::LogConstPtr");
+
+  QObject::connect(&bag_reader_, SIGNAL(logReceived(const rosgraph_msgs::LogConstPtr& )),
+                   &db_, SLOT(queueMessage(const rosgraph_msgs::LogConstPtr&) ));
+  QObject::connect(&bag_reader_, SIGNAL(finishedReading()),
+                   &db_, SLOT(processQueue()));
 }
 
 ConsoleMaster::~ConsoleMaster()
@@ -40,6 +45,9 @@ void ConsoleMaster::createNewWindow()
 
   QObject::connect(win, SIGNAL(selectFont()),
                    this, SLOT(selectFont()));
+
+  QObject::connect(win, SIGNAL(readBagFile()),
+                   &bag_reader_, SLOT(promptForBagFile()));
 
 
   if (!ros_thread_.isRunning())

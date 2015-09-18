@@ -19,6 +19,7 @@ class ConsoleWindow : public QMainWindow {
 
  Q_SIGNALS:
   void createNewWindow();
+  void readBagFile();
   void selectFont();
                                        
  public Q_SLOTS:
