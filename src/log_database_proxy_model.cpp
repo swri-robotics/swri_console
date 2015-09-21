@@ -6,6 +6,8 @@
 #include <swri_console/log_database_proxy_model.h>
 #include <swri_console/log_database.h>
 
+#include <QFile>
+#include <QTextStream>
 #include <QTimer>
 
 namespace swri_console
@@ -188,6 +190,7 @@ QVariant LogDatabaseProxyModel::data(
     snprintf(buffer, sizeof(buffer),
              "<p style='white-space:pre'>"
              "Timestamp: %d.%09d\n"
+             "Seq: %d\n"
              "Node: %s\n"
              "Function: %s\n"
              "File: %s\n"
@@ -195,6 +198,7 @@ QVariant LogDatabaseProxyModel::data(
              "\n",
              item.stamp.sec,
              item.stamp.nsec,
+             item.seq,
              item.node.c_str(),
              item.function.c_str(),
              item.file.c_str(),
@@ -240,12 +244,44 @@ void LogDatabaseProxyModel::saveToFile(const QString& filename) const
 
 void LogDatabaseProxyModel::saveBagFile(const QString& filename) const
 {
-
+  rosbag::Bag bag(filename.toStdString().c_str(), rosbag::bagmode::Write);
+  std::deque<LogEntry>::const_iterator iter;
+  for (iter = db_->log().begin(); iter != db_->log().end(); ++iter)
+  {
+    rosgraph_msgs::Log log;
+    log.file = iter->file;
+    log.function = iter->function;
+    log.header.seq = iter->seq;
+    if (iter->stamp < ros::TIME_MIN) {
+      log.header.stamp = ros::Time::now();
+      qWarning("Msg with seq %d had time (%d); it's less than ros::TIME_MIN, which is invalid.  Writing 'now' instead.",
+               log.header.seq, iter->stamp.sec);
+    }
+    else
+    {
+      log.header.stamp = iter->stamp;
+    }
+    log.level = iter->level;
+    log.line = iter->line;
+    log.msg = iter->msg.toStdString();
+    log.name = iter->node;
+    bag.write("/rosout", log.header.stamp, log);
+  }
+  bag.close();
 }
 
 void LogDatabaseProxyModel::saveTextFile(const QString& filename) const
 {
-
+  QFile outFile(filename);
+  outFile.open(QFile::WriteOnly);
+  QTextStream outstream(&outFile);
+  for(int i = 0; i < msg_mapping_.size(); i++)
+  {
+    QString line = data(index(i), Qt::DisplayRole).toString();
+    outstream << line << '\n';
+  }
+  outstream.flush();
+  outFile.close();
 }
 
 void LogDatabaseProxyModel::processNewMessages()
