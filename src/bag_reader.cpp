@@ -19,7 +19,7 @@ void BagReader::readBagFile(const QString& filename)
   rosbag::View view(bag, rosbag::TopicQuery(topics));
   rosbag::View::const_iterator iter;
 
-  for(iter = view.begin(); iter != view.end(); iter++)
+  for(iter = view.begin(); iter != view.end(); ++iter)
   {
     rosgraph_msgs::LogConstPtr log = iter->instantiate<rosgraph_msgs::Log>();
     if (log != NULL ) {
