@@ -24,6 +24,7 @@ class ConsoleWindow : public QMainWindow {
                                        
  public Q_SLOTS:
   void clearLogs();
+  void saveLogs();
   void clearNodes();
   void connected(bool);
   void setSeverityFilter();

@@ -37,6 +37,8 @@ class LogDatabaseProxyModel : public QAbstractListModel
 
   void reset();
 
+  void saveToFile(const QString& filename) const;
+
  Q_SIGNALS:
   void messagesAdded();
                       
@@ -51,6 +53,8 @@ class LogDatabaseProxyModel : public QAbstractListModel
  private:
   LogDatabase *db_;
 
+  void saveBagFile(const QString& filename) const;
+  void saveTextFile(const QString& filename) const;
   void scheduleIdleProcessing();
   
   bool acceptLogEntry(const LogEntry &item);

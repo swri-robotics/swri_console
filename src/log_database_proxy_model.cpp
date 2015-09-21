@@ -1,8 +1,12 @@
+#include <stdio.h>
+
+#include <ros/time.h>
+#include <rosbag/bag.h>
+
 #include <swri_console/log_database_proxy_model.h>
 #include <swri_console/log_database.h>
+
 #include <QTimer>
-#include <stdio.h>
-#include <ros/time.h>
 
 namespace swri_console
 {
@@ -221,6 +225,27 @@ void LogDatabaseProxyModel::reset()
   latest_index_ = earliest_index_;
   endResetModel();
   scheduleIdleProcessing();
+}
+
+
+void LogDatabaseProxyModel::saveToFile(const QString& filename) const
+{
+  if (filename.endsWith(".bag", Qt::CaseInsensitive)) {
+    saveBagFile(filename);
+  }
+  else {
+    saveTextFile(filename);
+  }
+}
+
+void LogDatabaseProxyModel::saveBagFile(const QString& filename) const
+{
+
+}
+
+void LogDatabaseProxyModel::saveTextFile(const QString& filename) const
+{
+
 }
 
 void LogDatabaseProxyModel::processNewMessages()
