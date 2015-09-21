@@ -16,7 +16,7 @@ void LogDatabase::clear()
 {
   std::map<std::string, size_t>::iterator iter;
   // Set the log count for the node list to 0.
-  for (iter = nodes_.begin(); iter != nodes_.end(); iter++)
+  for (iter = nodes_.begin(); iter != nodes_.end(); ++iter)
   {
     (*iter).second = 0;
   }

@@ -240,7 +240,7 @@ void LogDatabaseProxyModel::processNewMessages()
     new_items.push_back(latest_index_);
   }
   
-  if (new_items.size()) {
+  if (!new_items.empty()) {
     beginInsertRows(QModelIndex(),
                     msg_mapping_.size(),
                     msg_mapping_.size() + new_items.size() - 1);

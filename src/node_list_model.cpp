@@ -81,7 +81,7 @@ void NodeListModel::clear()
 void NodeListModel::clearLogs()
 {
   std::map<std::string, size_t>::iterator iter;
-  for (iter = data_.begin(); iter != data_.end(); iter++)
+  for (iter = data_.begin(); iter != data_.end(); ++iter)
   {
     (*iter).second = 0;
   }
