@@ -28,6 +28,9 @@ ConsoleWindow::ConsoleWindow(LogDatabase *db)
   QObject::connect(ui.action_Copy, SIGNAL(triggered()),
                    this, SLOT(copyLogs()));
 
+  QObject::connect(ui.action_CopyExtended, SIGNAL(triggered()),
+                   this, SLOT(copyExtendedLogs()));
+  
   QObject::connect(ui.action_SelectAll, SIGNAL(triggered()),
                    this, SLOT(selectAllLogs()));
 
@@ -199,9 +202,12 @@ void ConsoleWindow::showLogContextMenu(const QPoint& point)
   connect(&selectAll, SIGNAL(triggered()), this, SLOT(selectAllLogs()));
   QAction copy(tr("Copy"), ui.messageList);
   connect(&copy, SIGNAL(triggered()), this, SLOT(copyLogs()));
-
+  QAction copy_extended(tr("Copy Extended"), ui.messageList);
+  connect(&copy_extended, SIGNAL(triggered()), this, SLOT(copyExtendedLogs()));
+  
   contextMenu.addAction(&selectAll);
   contextMenu.addAction(&copy);
+  contextMenu.addAction(&copy_extended);
 
   contextMenu.exec(ui.messageList->mapToGlobal(point));
 }
@@ -229,6 +235,16 @@ void ConsoleWindow::copyLogs()
     buffer << db_proxy_->data(index, Qt::DisplayRole).toString();
   }
   QApplication::clipboard()->setText(buffer.join(tr("\n")));
+}
+
+void ConsoleWindow::copyExtendedLogs()
+{
+  QStringList buffer;
+  foreach(const QModelIndex &index, ui.messageList->selectionModel()->selectedIndexes())
+  {
+    buffer << db_proxy_->data(index, LogDatabaseProxyModel::ExtendedLogRole).toString();
+  }
+  QApplication::clipboard()->setText(buffer.join(tr("\n\n")));
 }
 
 void ConsoleWindow::includeFilterUpdated(const QString &text)
