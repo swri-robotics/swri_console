@@ -114,7 +114,7 @@ ConsoleWindow::ConsoleWindow(LogDatabase *db)
   // TODO pjreed Read these from the settings after user settings are implemented.
   updateButtonColor(ui.debugColorWidget, Qt::gray);
   updateButtonColor(ui.infoColorWidget, Qt::black);
-  updateButtonColor(ui.warnColorWidget, Qt::yellow);
+  updateButtonColor(ui.warnColorWidget, QColor(255, 127, 0));
   updateButtonColor(ui.errorColorWidget, Qt::red);
   updateButtonColor(ui.fatalColorWidget, Qt::magenta);
 }
