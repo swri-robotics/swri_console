@@ -73,58 +73,134 @@
           <property name="title">
            <string>Severity</string>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout">
-           <item>
-            <widget class="QCheckBox" name="checkDebug">
-             <property name="text">
-              <string>Debug</string>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="checkInfo">
-             <property name="text">
-              <string>Info</string>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="checkWarn">
-             <property name="text">
-              <string>Warn</string>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="checkError">
-             <property name="text">
-              <string>Error</string>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="checkFatal">
-             <property name="text">
-              <string>Fatal</string>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-          </layout>
+             <layout class="QVBoxLayout" name="verticalLayout">
+                 <item>
+                     <widget class="QWidget" name="debugOptionPanel">
+                         <layout class="QHBoxLayout" name="debugOptionLayout">
+                             <item>
+                                 <widget class="QCheckBox" name="checkDebug">
+                                     <property name="text">
+                                         <string>Debug</string>
+                                     </property>
+                                     <property name="checked">
+                                         <bool>true</bool>
+                                     </property>
+                                     <property name="sizePolicy">
+                                         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                                             <horstretch>2</horstretch>
+                                             <verstretch>0</verstretch>
+                                         </sizepolicy>
+                                     </property>
+                                 </widget>
+                             </item>
+                             <item>
+                                 <widget class="QPushButton" name="debugColorWidget">
+                                 </widget>
+                             </item>
+                         </layout>
+                     </widget>
+                 </item>
+                 <item>
+                     <widget class="QWidget" name="infoOptionPanel">
+                         <layout class="QHBoxLayout" name="infoOptionLayout">
+                             <item>
+                                 <widget class="QCheckBox" name="checkInfo">
+                                     <property name="text">
+                                         <string>Info</string>
+                                     </property>
+                                     <property name="checked">
+                                         <bool>true</bool>
+                                     </property>
+                                     <property name="sizePolicy">
+                                         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                                             <horstretch>2</horstretch>
+                                             <verstretch>0</verstretch>
+                                         </sizepolicy>
+                                     </property>
+                                 </widget>
+                             </item>
+                             <item>
+                                 <widget class="QPushButton" name="infoColorWidget"/>
+                             </item>
+                         </layout>
+                     </widget>
+                 </item>
+                 <item>
+                     <widget class="QWidget" name="warnOptionPanel">
+                         <layout class="QHBoxLayout" name="warnOptionLayout">
+                             <item>
+                                 <widget class="QCheckBox" name="checkWarn">
+                                     <property name="text">
+                                         <string>Warn</string>
+                                     </property>
+                                     <property name="checked">
+                                         <bool>true</bool>
+                                     </property>
+                                     <property name="sizePolicy">
+                                         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                                             <horstretch>2</horstretch>
+                                             <verstretch>0</verstretch>
+                                         </sizepolicy>
+                                     </property>
+                                 </widget>
+                             </item>
+                             <item>
+                                 <widget class="QPushButton" name="warnColorWidget"/>
+                             </item>
+                         </layout>
+                     </widget>
+                 </item>
+                 <item>
+                     <widget class="QWidget" name="errorOptionPanel">
+                         <layout class="QHBoxLayout" name="errorOptionLayout">
+                             <item>
+                                 <widget class="QCheckBox" name="checkError">
+                                     <property name="text">
+                                         <string>Error</string>
+                                     </property>
+                                     <property name="checked">
+                                         <bool>true</bool>
+                                     </property>
+                                     <property name="sizePolicy">
+                                         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                                             <horstretch>2</horstretch>
+                                             <verstretch>0</verstretch>
+                                         </sizepolicy>
+                                     </property>
+                                 </widget>
+                             </item>
+                             <item>
+                                 <widget class="QPushButton" name="errorColorWidget"/>
+                             </item>
+                         </layout>
+                     </widget>
+                 </item>
+                 <item>
+                     <widget class="QWidget" name="fatalOptionPanel">
+                         <layout class="QHBoxLayout" name="fatalOptionLayout">
+                             <item>
+                                 <widget class="QCheckBox" name="checkFatal">
+                                     <property name="text">
+                                         <string>Fatal</string>
+                                     </property>
+                                     <property name="checked">
+                                         <bool>true</bool>
+                                     </property>
+                                     <property name="sizePolicy">
+                                         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                                             <horstretch>2</horstretch>
+                                             <verstretch>0</verstretch>
+                                         </sizepolicy>
+                                     </property>
+                                 </widget>
+                             </item>
+                             <item>
+                                 <widget class="QPushButton" name="fatalColorWidget"/>
+                             </item>
+                         </layout>
+                     </widget>
+                 </item>
+             </layout>
          </widget>
         </item>
         <item>
@@ -216,6 +292,7 @@
     <addaction name="action_ShowTimestamps"/>
     <addaction name="action_AbsoluteTimestamps"/>
     <addaction name="action_RegularExpressions"/>
+    <addaction name="action_ColorizeLogs"/>
     <addaction name="action_SelectFont"/>
    </widget>
    <addaction name="menu_File"/>
@@ -261,6 +338,17 @@
    </property>
    <property name="text">
     <string>Show Timestamps</string>
+   </property>
+  </action>
+  <action name="action_ColorizeLogs">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Colorize Logs</string>
    </property>
   </action>
   <action name="action_SelectFont">
