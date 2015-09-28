@@ -9,11 +9,14 @@ namespace swri_console
 {
 LogDatabaseProxyModel::LogDatabaseProxyModel(LogDatabase *db)
   :
-  colorize_logs_(true),
   db_(db),
+  colorize_logs_(true),
+  display_time_(true),
+  display_absolute_time_(false),
+  use_regular_expressions_(false),
   debug_color_(Qt::gray),
   info_color_(Qt::black),
-  warn_color_(Qt::yellow),
+  warn_color_(QColor(255,127,0)),
   error_color_(Qt::red),
   fatal_color_(Qt::magenta)
 {  
