@@ -7,7 +7,10 @@
 #include <rosgraph_msgs/Log.h>
 #include <QColorDialog>
 #include <QRegExp>
+#include <QApplication>
+#include <QClipboard>
 #include <QScrollBar>
+#include <QMenu>
 
 using namespace Qt;
 
@@ -23,6 +26,15 @@ ConsoleWindow::ConsoleWindow(LogDatabase *db)
 
   QObject::connect(ui.action_NewWindow, SIGNAL(triggered(bool)),
                    this, SIGNAL(createNewWindow()));
+
+  QObject::connect(ui.action_Copy, SIGNAL(triggered()),
+                   this, SLOT(copyLogs()));
+
+  QObject::connect(ui.action_CopyExtended, SIGNAL(triggered()),
+                   this, SLOT(copyExtendedLogs()));
+  
+  QObject::connect(ui.action_SelectAll, SIGNAL(triggered()),
+                   this, SLOT(selectAllLogs()));
 
   QObject::connect(ui.action_AbsoluteTimestamps, SIGNAL(toggled(bool)),
                    db_proxy_, SLOT(setAbsoluteTime(bool)));
@@ -86,9 +98,12 @@ ConsoleWindow::ConsoleWindow(LogDatabase *db)
     db_proxy_, SIGNAL(messagesAdded()),
     this, SLOT(messagesAdded()));
 
-  QObject::connect( ui.clearLogsButton, SIGNAL(clicked()),
+  // Right-click menu for the message list
+  QObject::connect(ui.messageList, SIGNAL(customContextMenuRequested(const QPoint&)),
+                    this, SLOT(showLogContextMenu(const QPoint&)));
+  QObject::connect(ui.clearLogsButton, SIGNAL(clicked()),
                     this, SLOT(clearLogs()));
-  QObject::connect( ui.clearNodeListButton, SIGNAL(clicked()),
+  QObject::connect(ui.clearNodeListButton, SIGNAL(clicked()),
                     this, SLOT(clearNodes()));
 
   QObject::connect(
@@ -201,6 +216,25 @@ void ConsoleWindow::messagesAdded()
   }
 }
 
+
+void ConsoleWindow::showLogContextMenu(const QPoint& point)
+{
+  QMenu contextMenu(tr("Context menu"), ui.messageList);
+
+  QAction selectAll(tr("Select All"), ui.messageList);
+  connect(&selectAll, SIGNAL(triggered()), this, SLOT(selectAllLogs()));
+  QAction copy(tr("Copy"), ui.messageList);
+  connect(&copy, SIGNAL(triggered()), this, SLOT(copyLogs()));
+  QAction copy_extended(tr("Copy Extended"), ui.messageList);
+  connect(&copy_extended, SIGNAL(triggered()), this, SLOT(copyExtendedLogs()));
+  
+  contextMenu.addAction(&selectAll);
+  contextMenu.addAction(&copy);
+  contextMenu.addAction(&copy_extended);
+
+  contextMenu.exec(ui.messageList->mapToGlobal(point));
+}
+
 void ConsoleWindow::userScrolled(int value)
 {
   if (value != ui.messageList->verticalScrollBar()->maximum()) {
@@ -208,6 +242,32 @@ void ConsoleWindow::userScrolled(int value)
   } else {
     ui.checkFollowNewest->setChecked(true);
   }
+}
+
+
+void ConsoleWindow::selectAllLogs()
+{
+  ui.messageList->selectAll();
+}
+
+void ConsoleWindow::copyLogs()
+{
+  QStringList buffer;
+  foreach(const QModelIndex &index, ui.messageList->selectionModel()->selectedIndexes())
+  {
+    buffer << db_proxy_->data(index, Qt::DisplayRole).toString();
+  }
+  QApplication::clipboard()->setText(buffer.join(tr("\n")));
+}
+
+void ConsoleWindow::copyExtendedLogs()
+{
+  QStringList buffer;
+  foreach(const QModelIndex &index, ui.messageList->selectionModel()->selectedIndexes())
+  {
+    buffer << db_proxy_->data(index, LogDatabaseProxyModel::ExtendedLogRole).toString();
+  }
+  QApplication::clipboard()->setText(buffer.join(tr("\n\n")));
 }
 
 void ConsoleWindow::includeFilterUpdated(const QString &text)

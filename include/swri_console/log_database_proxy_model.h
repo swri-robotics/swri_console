@@ -12,13 +12,18 @@
 
 namespace swri_console
 {
+
 class LogDatabase;
 class LogEntry;
 class LogDatabaseProxyModel : public QAbstractListModel
 {
   Q_OBJECT
-  
+ 
  public:
+  enum {
+    ExtendedLogRole = Qt::UserRole + 0
+  };
+
   LogDatabaseProxyModel(LogDatabase *db);
   ~LogDatabaseProxyModel();
 

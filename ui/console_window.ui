@@ -43,24 +43,22 @@
          </widget>
         </item>
         <item>
-         <widget class="QWidget" name="clearButtonPanel">
-          <layout class="QHBoxLayout" name="clearButtonHboxLayout">
-           <item>
-            <widget class="QPushButton" name="clearNodeListButton">
-             <property name="text">
-              <string>Clear Node List</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="clearLogsButton">
-             <property name="text">
-              <string>Clear Logs</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
+         <layout class="QHBoxLayout" name="clearButtonHboxLayout">
+          <item>
+           <widget class="QPushButton" name="clearNodeListButton">
+            <property name="text">
+             <string>Clear Node List</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="clearLogsButton">
+            <property name="text">
+             <string>Clear Logs</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
         <item>
          <widget class="QGroupBox" name="groupBox">
@@ -225,6 +223,12 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <property name="contextMenuPolicy">
+           <enum>Qt::CustomContextMenu</enum>
+          </property>
+          <property name="selectionMode">
+           <enum>QAbstractItemView::ExtendedSelection</enum>
+          </property>
          </widget>
         </item>
         <item>
@@ -285,6 +289,14 @@
     <addaction name="separator"/>
     <addaction name="action_Quit"/>
    </widget>
+   <widget class="QMenu" name="menu_Edit">
+    <property name="title">
+     <string>&amp;Edit</string>
+    </property>
+    <addaction name="action_Copy"/>
+    <addaction name="action_CopyExtended"/>
+    <addaction name="action_SelectAll"/>
+   </widget>
    <widget class="QMenu" name="menuOptions">
     <property name="title">
      <string>Options</string>
@@ -296,6 +308,7 @@
     <addaction name="action_SelectFont"/>
    </widget>
    <addaction name="menu_File"/>
+   <addaction name="menu_Edit"/>
    <addaction name="menuOptions"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -316,6 +329,22 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+N</string>
+   </property>
+  </action>
+  <action name="action_Copy">
+   <property name="text">
+    <string>&amp;Copy</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+C</string>
+   </property>
+  </action>
+  <action name="action_SelectAll">
+   <property name="text">
+    <string>Select &amp;All</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
    </property>
   </action>
   <action name="action_AbsoluteTimestamps">
@@ -365,6 +394,17 @@
    </property>
    <property name="text">
     <string>Allow regular expressions in Include/Exclude</string>
+   </property>
+  </action>
+  <action name="action_CopyExtended">
+   <property name="text">
+    <string>Copy &amp;Extended</string>
+   </property>
+   <property name="toolTip">
+    <string>Copy Extended Log</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+E</string>
    </property>
   </action>
  </widget>

@@ -284,7 +284,28 @@ QVariant LogDatabaseProxyModel::data(
                     QString("</p>"));
                             
     return QVariant(text);
+  } else if (role == LogDatabaseProxyModel::ExtendedLogRole) {
+    char buffer[4096];
+    snprintf(buffer, sizeof(buffer),
+             "Timestamp: %d.%09d\n"
+             "Node: %s\n"
+             "Function: %s\n"
+             "File: %s\n"
+             "Line: %d\n"
+             "Message: ",
+             item.stamp.sec,
+             item.stamp.nsec,
+             item.node.c_str(),
+             item.function.c_str(),
+             item.file.c_str(),
+             item.line);
+    
+    QString text = (QString(buffer) +
+                    item.msg); 
+                            
+    return QVariant(text);
   }
+    
   
   return QVariant();
 }
