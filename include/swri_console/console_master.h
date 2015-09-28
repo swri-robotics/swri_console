@@ -7,6 +7,7 @@
 #include <QFont>
 #include <rosgraph_msgs/Log.h>
 #include <swri_console/log_database.h>
+#include <swri_console/bag_reader.h>
 
 #include "ros_thread.h"
 
@@ -32,6 +33,7 @@ class ConsoleMaster : public QObject
   void fontChanged(const QFont &font);
 
  private:
+  BagReader bag_reader_;
 
   // All ROS operations are done on a separate thread to ensure they do not
   // cause the GUI thread to block.

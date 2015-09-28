@@ -286,6 +286,8 @@
      <string>&amp;File</string>
     </property>
     <addaction name="action_NewWindow"/>
+    <addaction name="action_ReadBagFile"/>
+    <addaction name="action_SaveLogs"/>
     <addaction name="separator"/>
     <addaction name="action_Quit"/>
    </widget>
@@ -346,6 +348,22 @@
    <property name="shortcut">
     <string>Ctrl+A</string>
    </property>
+  </action>
+  <action name="action_ReadBagFile">
+   <property name="text">
+    <string>&amp;Read Bag File...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
+   </property>
+  </action>
+  <action name="action_SaveLogs">
+    <property name="text">
+      <string>&amp;Save Logs...</string>
+    </property>
+    <property name="shortcut">
+      <string>Ctrl+S</string>
+    </property>
   </action>
   <action name="action_AbsoluteTimestamps">
    <property name="checkable">

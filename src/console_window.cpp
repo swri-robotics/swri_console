@@ -1,14 +1,22 @@
-#include <swri_console/console_window.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <set>
+
+#include <rosgraph_msgs/Log.h>
+
+#include <swri_console/console_window.h>
 #include <swri_console/log_database.h>
 #include <swri_console/log_database_proxy_model.h>
+
 #include <rosgraph_msgs/Log.h>
+
 #include <QColorDialog>
 #include <QRegExp>
 #include <QApplication>
 #include <QClipboard>
+#include <QDateTime>
+#include <QFileDialog>
+#include <QDir>
 #include <QScrollBar>
 #include <QMenu>
 
@@ -35,6 +43,12 @@ ConsoleWindow::ConsoleWindow(LogDatabase *db)
   
   QObject::connect(ui.action_SelectAll, SIGNAL(triggered()),
                    this, SLOT(selectAllLogs()));
+
+  QObject::connect(ui.action_ReadBagFile, SIGNAL(triggered(bool)),
+                   this, SIGNAL(readBagFile()));
+
+  QObject::connect(ui.action_SaveLogs, SIGNAL(triggered(bool)),
+                   this, SLOT(saveLogs()));
 
   QObject::connect(ui.action_AbsoluteTimestamps, SIGNAL(toggled(bool)),
                    db_proxy_, SLOT(setAbsoluteTime(bool)));
@@ -144,6 +158,17 @@ void ConsoleWindow::clearLogs()
   db_proxy_->clear();
 }
 
+void ConsoleWindow::saveLogs()
+{
+  QString defaultname = QDateTime::currentDateTime().toString(Qt::ISODate) + ".bag";
+  QString filename = QFileDialog::getSaveFileName(this,
+                                                  "Save Logs",
+                                                  QDir::homePath() + QDir::separator() + defaultname,
+                                                  tr("Bag Files (*.bag);;Text Files (*.txt)"));
+  if (filename != NULL && !filename.isEmpty()) {
+    db_proxy_->saveToFile(filename);
+  }
+}
 
 void ConsoleWindow::clearNodes()
 {

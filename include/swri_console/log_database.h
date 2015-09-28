@@ -19,6 +19,7 @@ struct LogEntry
   std::string function;
   uint32_t line;
   QString msg;
+  uint32_t seq;
 };
 
 class LogDatabase : public QObject

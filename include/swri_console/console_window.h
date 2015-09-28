@@ -20,10 +20,12 @@ class ConsoleWindow : public QMainWindow {
 
  Q_SIGNALS:
   void createNewWindow();
+  void readBagFile();
   void selectFont();
                                        
  public Q_SLOTS:
   void clearLogs();
+  void saveLogs();
   void clearNodes();
   void connected(bool);
   void setSeverityFilter();
