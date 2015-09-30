@@ -41,9 +41,9 @@ file (GLOB SRC_FILES
   src/node_list_model.cpp
   src/log_database_proxy_model.cpp
   src/ros_thread.cpp)
-QT4_ADD_RESOURCES(RCC_SRCS resources/images.qrc)
-QT4_WRAP_UI(SRC_FILES ${UI_FILES})
-QT4_WRAP_CPP(SRC_FILES ${HEADER_FILES})
+qt4_add_resources(RCC_SRCS resources/images.qrc)
+qt4_wrap_ui(SRC_FILES ${UI_FILES})
+qt4_wrap_cpp(SRC_FILES ${HEADER_FILES})
 
 add_executable(swri_console ${HEADER_FILES} ${SRC_FILES} ${RCC_SRCS} src/main.cpp)
 target_link_libraries(${PROJECT_NAME} 
