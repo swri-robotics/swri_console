@@ -4,13 +4,13 @@
   <version>0.1.0</version>
   <description>
 
-     swri_console - An alternative rosout viewer.
+     A rosout GUI viewer developed at Southwest Research Insititute as an
+     alternative to rqt_console.
 
   </description>
-  <maintainer email="elliotjo@gmail.com">elliotjo</maintainer>
-  <author>elliotjo</author>
-  <license>?</license>
-
+  <maintainer email="elliotjo@gmail.com">Elliot Johnson</maintainer>
+  <author email="elliotjo@gmail.com">Elliot Johnson</author>
+  <license>BSD</license>
 
   <buildtool_depend>catkin</buildtool_depend>
   <exec_depend>libqt4</exec_depend>
