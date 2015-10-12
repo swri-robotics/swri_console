@@ -30,10 +30,11 @@
 
 #include <QtGui>
 #include <QApplication>
-#include <swri_console/console_master.h>
-
-#include <QStringList>
+#include <QCoreApplication>
 #include <QDirIterator>
+#include <QStringList>
+
+#include <swri_console/console_master.h>
 
 void loadFonts()
 {
@@ -76,6 +77,10 @@ int main(int argc, char **argv)
 {
   QApplication app(argc, argv);
   loadFonts();
+
+  QCoreApplication::setOrganizationName("Southwest Research Institute");
+  QCoreApplication::setOrganizationDomain("swri.org");
+  QCoreApplication::setApplicationName("SwRI Console");
   
   swri_console::ConsoleMaster master;
   master.createNewWindow();
