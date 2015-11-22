@@ -37,8 +37,7 @@
 #include <swri_console/console_window.h>
 #include <swri_console/log_database.h>
 #include <swri_console/log_database_proxy_model.h>
-
-#include <rosgraph_msgs/Log.h>
+#include <swri_console/settings_keys.h>
 
 #include <QColorDialog>
 #include <QRegExp>
@@ -49,6 +48,7 @@
 #include <QDir>
 #include <QScrollBar>
 #include <QMenu>
+#include <QSettings>
 
 using namespace Qt;
 
@@ -98,7 +98,7 @@ ConsoleWindow::ConsoleWindow(LogDatabase *db)
   QObject::connect(ui.action_SelectFont, SIGNAL(triggered(bool)),
                    this, SIGNAL(selectFont()));
 
-  QObject::connect(ui.action_ColorizeLogs, SIGNAL(triggered(bool)),
+  QObject::connect(ui.action_ColorizeLogs, SIGNAL(toggled(bool)),
                    db_proxy_, SLOT(setColorizeLogs(bool)));
 
   QObject::connect(ui.debugColorWidget, SIGNAL(clicked(bool)),
@@ -141,6 +141,8 @@ ConsoleWindow::ConsoleWindow(LogDatabase *db)
   QObject::connect(
     db_proxy_, SIGNAL(messagesAdded()),
     this, SLOT(messagesAdded()));
+  QObject::connect(ui.checkFollowNewest, SIGNAL(toggled(bool)),
+                   this, SLOT(setFollowNewest(bool)));
 
   // Right-click menu for the message list
   QObject::connect(ui.messageList, SIGNAL(customContextMenuRequested(const QPoint&)),
@@ -167,15 +169,7 @@ ConsoleWindow::ConsoleWindow(LogDatabase *db)
   sizes.append(1000);
   ui.splitter->setSizes(sizes);
 
-  db_proxy_->setDisplayTime(true);
-  setSeverityFilter();
-
-  // TODO pjreed Read these from the settings after user settings are implemented.
-  updateButtonColor(ui.debugColorWidget, Qt::gray);
-  updateButtonColor(ui.infoColorWidget, Qt::black);
-  updateButtonColor(ui.warnColorWidget, QColor(255, 127, 0));
-  updateButtonColor(ui.errorColorWidget, Qt::red);
-  updateButtonColor(ui.fatalColorWidget, Qt::magenta);
+  loadSettings();
 }
 
 ConsoleWindow::~ConsoleWindow()
@@ -261,6 +255,13 @@ void ConsoleWindow::setSeverityFilter()
     mask |= rosgraph_msgs::Log::FATAL;
   }
 
+  QSettings settings;
+  settings.setValue(SettingsKeys::SHOW_DEBUG, ui.checkDebug->isChecked());
+  settings.setValue(SettingsKeys::SHOW_INFO, ui.checkInfo->isChecked());
+  settings.setValue(SettingsKeys::SHOW_WARN, ui.checkWarn->isChecked());
+  settings.setValue(SettingsKeys::SHOW_ERROR, ui.checkError->isChecked());
+  settings.setValue(SettingsKeys::SHOW_FATAL, ui.checkFatal->isChecked());
+
   db_proxy_->setSeverityFilter(mask);
 }
 
@@ -323,6 +324,12 @@ void ConsoleWindow::copyExtendedLogs()
     buffer << db_proxy_->data(index, LogDatabaseProxyModel::ExtendedLogRole).toString();
   }
   QApplication::clipboard()->setText(buffer.join(tr("\n\n")));
+}
+
+void ConsoleWindow::setFollowNewest(bool follow)
+{
+  QSettings settings;
+  settings.setValue(SettingsKeys::FOLLOW_NEWEST, follow);
 }
 
 void ConsoleWindow::includeFilterUpdated(const QString &text)
@@ -411,16 +418,22 @@ void ConsoleWindow::setFatalColor()
 
 void ConsoleWindow::chooseButtonColor(QPushButton* widget)
 {
-  QString ss = widget->styleSheet();
+  QColor old_color = getButtonColor(widget);
+  QColor color = QColorDialog::getColor(old_color, this);
+  if (color.isValid()) {
+    updateButtonColor(widget, color);
+  }
+}
+
+QColor ConsoleWindow::getButtonColor(const QPushButton* button) const
+{
+  QString ss = button->styleSheet();
   QRegExp re("background: (#\\w*);");
   QColor old_color;
   if (re.indexIn(ss) >= 0) {
     old_color = QColor(re.cap(1));
   }
-  QColor color = QColorDialog::getColor(old_color, this);
-  if (color.isValid()) {
-    updateButtonColor(widget, color);
-  }
+  return old_color;
 }
 
 void ConsoleWindow::updateButtonColor(QPushButton* widget, const QColor& color)
@@ -450,6 +463,70 @@ void ConsoleWindow::updateButtonColor(QPushButton* widget, const QColor& color)
   else {
     qWarning("Unexpected widget passed to ConsoleWindow::updateButtonColor.");
   }
+}
+
+void ConsoleWindow::loadColorButtonSetting(const QString& key, QPushButton* button)
+{
+  QSettings settings;
+  QColor defaultColor;
+  // The color buttons don't have a default value set in the .ui file, so we need to
+  // supply defaults for them here in case the appropriate setting isn't found.
+  if (button == ui.debugColorWidget) {
+    defaultColor = Qt::gray;
+  }
+  else if (button == ui.infoColorWidget) {
+    defaultColor = Qt::black;
+  }
+  else if (button == ui.warnColorWidget) {
+    defaultColor = QColor(255, 127, 0);
+  }
+  else if (button == ui.errorColorWidget) {
+    defaultColor = Qt::red;
+  }
+  else if (button == ui.fatalColorWidget) {
+    defaultColor = Qt::magenta;
+  }
+  QColor color = settings.value(key, defaultColor).value<QColor>();
+  updateButtonColor(button, color);
+}
+
+void ConsoleWindow::loadSettings()
+{
+  // First, load all the boolean settings...
+  loadBooleanSetting(SettingsKeys::DISPLAY_TIMESTAMPS, ui.action_ShowTimestamps);
+  loadBooleanSetting(SettingsKeys::ABSOLUTE_TIMESTAMPS, ui.action_AbsoluteTimestamps);
+  loadBooleanSetting(SettingsKeys::USE_REGEXPS, ui.action_RegularExpressions);
+  loadBooleanSetting(SettingsKeys::COLORIZE_LOGS, ui.action_ColorizeLogs);
+  loadBooleanSetting(SettingsKeys::FOLLOW_NEWEST, ui.checkFollowNewest);
+
+  // The severity level has to be handled a little differently, since they're all combined
+  // into a single integer mask under the hood.  First they have to be loaded from the settings,
+  // then set in the UI, then the mask has to actually be applied.
+  QSettings settings;
+  bool showDebug = settings.value(SettingsKeys::SHOW_DEBUG, true).toBool();
+  bool showInfo = settings.value(SettingsKeys::SHOW_INFO, true).toBool();
+  bool showWarn = settings.value(SettingsKeys::SHOW_WARN, true).toBool();
+  bool showError = settings.value(SettingsKeys::SHOW_ERROR, true).toBool();
+  bool showFatal = settings.value(SettingsKeys::SHOW_FATAL, true).toBool();
+  ui.checkDebug->setChecked(showDebug);
+  ui.checkInfo->setChecked(showInfo);
+  ui.checkWarn->setChecked(showWarn);
+  ui.checkError->setChecked(showError);
+  ui.checkFatal->setChecked(showFatal);
+  setSeverityFilter();
+
+  // Load button colors.
+  loadColorButtonSetting(SettingsKeys::DEBUG_COLOR, ui.debugColorWidget);
+  loadColorButtonSetting(SettingsKeys::INFO_COLOR, ui.infoColorWidget);
+  loadColorButtonSetting(SettingsKeys::WARN_COLOR, ui.warnColorWidget);
+  loadColorButtonSetting(SettingsKeys::ERROR_COLOR, ui.errorColorWidget);
+  loadColorButtonSetting(SettingsKeys::FATAL_COLOR, ui.fatalColorWidget);
+
+  // Finally, load the filter contents.
+  QString includeFilter = settings.value(SettingsKeys::INCLUDE_FILTER, "").toString();
+  ui.includeText->setText(includeFilter);
+  QString excludeFilter = settings.value(SettingsKeys::EXCLUDE_FILTER, "").toString();
+  ui.excludeText->setText(excludeFilter);
 }
 }  // namespace swri_console
 

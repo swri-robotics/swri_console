@@ -32,7 +32,8 @@ file (GLOB HEADER_FILES
   include/swri_console/log_database.h
   include/swri_console/node_list_model.h
   include/swri_console/log_database_proxy_model.h
-  include/swri_console/ros_thread.h)
+  include/swri_console/ros_thread.h
+  include/swri_console/settings_keys.h)
 file (GLOB SRC_FILES
   src/bag_reader.cpp
   src/console_master.cpp
@@ -40,7 +41,8 @@ file (GLOB SRC_FILES
   src/log_database.cpp
   src/node_list_model.cpp
   src/log_database_proxy_model.cpp
-  src/ros_thread.cpp)
+  src/ros_thread.cpp
+  src/settings_keys.cpp)
 qt4_add_resources(RCC_SRCS resources/images.qrc)
 qt4_wrap_ui(SRC_FILES ${UI_FILES})
 qt4_wrap_cpp(SRC_FILES ${HEADER_FILES})

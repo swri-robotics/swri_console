@@ -32,7 +32,9 @@
 #define SWRI_CONSOLE_CONSOLE_WINDOW_H_
 
 #include <QtGui/QMainWindow>
+#include <QColor>
 #include <QPushButton>
+#include <QSettings>
 #include "ui_console_window.h"
 
 namespace swri_console
@@ -65,6 +67,7 @@ class ConsoleWindow : public QMainWindow {
   void selectAllLogs();
   void copyLogs();
   void copyExtendedLogs();
+  void setFollowNewest(bool);
   
   void userScrolled(int);
 
@@ -83,7 +86,19 @@ class ConsoleWindow : public QMainWindow {
 
 private:
   void chooseButtonColor(QPushButton* widget);
+  QColor getButtonColor(const QPushButton* button) const;
   void updateButtonColor(QPushButton* widget, const QColor& color);
+
+  template <typename T>
+  void loadBooleanSetting(const QString& key, T* element){
+    QSettings settings;
+    bool val = settings.value(key, element->isChecked()).toBool();
+    if (val != element->isChecked()) {
+      element->setChecked(val);
+    }
+  };
+  void loadColorButtonSetting(const QString& key, QPushButton* button);
+  void loadSettings();
 
   Ui::ConsoleWindow ui;
   LogDatabase *db_;

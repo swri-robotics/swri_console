@@ -30,7 +30,10 @@
 
 #include <swri_console/console_master.h>
 #include <swri_console/console_window.h>
+#include <swri_console/settings_keys.h>
+
 #include <QFontDialog>
+#include <QSettings>
 
 namespace swri_console
 {
@@ -62,6 +65,8 @@ void ConsoleMaster::createNewWindow()
   ConsoleWindow* win = new ConsoleWindow(&db_);
   windows_.append(win);
 
+  QSettings settings;
+  window_font_ = settings.value(SettingsKeys::FONT, QFont("Ubuntu Mono", 9)).value<QFont>();
   win->setFont(window_font_);
   QObject::connect(win, SIGNAL(createNewWindow()),
                    this, SLOT(createNewWindow()));
@@ -100,6 +105,8 @@ void ConsoleMaster::createNewWindow()
 void ConsoleMaster::fontSelectionChanged(const QFont &font)
 {
   window_font_ = font;
+  QSettings settings;
+  settings.setValue(SettingsKeys::FONT, font);
   Q_EMIT fontChanged(window_font_);
 }
 

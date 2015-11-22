@@ -40,6 +40,8 @@
 #include <QFile>
 #include <QTextStream>
 #include <QTimer>
+#include <QSettings>
+#include <swri_console/settings_keys.h>
 
 namespace swri_console
 {
@@ -87,6 +89,9 @@ void LogDatabaseProxyModel::setAbsoluteTime(bool absolute)
 
   display_absolute_time_ = absolute;
 
+  QSettings settings;
+  settings.setValue(SettingsKeys::ABSOLUTE_TIMESTAMPS, display_absolute_time_);
+
   if (display_time_ && msg_mapping_.size()) {
     Q_EMIT dataChanged(index(0),
                        index(msg_mapping_.size()));
@@ -101,6 +106,9 @@ void LogDatabaseProxyModel::setColorizeLogs(bool colorize_logs)
   }
 
   colorize_logs_ = colorize_logs;
+  QSettings settings;
+  settings.setValue(SettingsKeys::COLORIZE_LOGS, colorize_logs_);
+
   if (msg_mapping_.size()) {
     Q_EMIT dataChanged(index(0),
                        index(msg_mapping_.size()));
@@ -115,6 +123,9 @@ void LogDatabaseProxyModel::setDisplayTime(bool display)
 
   display_time_ = display;
 
+  QSettings settings;
+  settings.setValue(SettingsKeys::DISPLAY_TIMESTAMPS, display_time_);
+
   if (msg_mapping_.size()) {
     Q_EMIT dataChanged(index(0),
                        index(msg_mapping_.size()));
@@ -128,6 +139,9 @@ void LogDatabaseProxyModel::setUseRegularExpressions(bool useRegexps)
   }
 
   use_regular_expressions_ = useRegexps;
+  QSettings settings;
+  settings.setValue(SettingsKeys::USE_REGEXPS, useRegexps);
+
   reset();
 }
 
@@ -135,6 +149,8 @@ void LogDatabaseProxyModel::setIncludeFilters(
   const QStringList &list)
 {
   include_strings_ = list;
+  // The text and regexp filters are always updated at the same time, so this
+  // value will be saved by setIncludeRegexpPattern.
   reset();
 }
 
@@ -142,6 +158,8 @@ void LogDatabaseProxyModel::setExcludeFilters(
   const QStringList &list)
 {
   exclude_strings_ = list;
+  // The text and regexp filters are always updated at the same time, so this
+  // value will be saved by setExcludeRegexpPattern.
   reset();
 }
 
@@ -149,42 +167,56 @@ void LogDatabaseProxyModel::setExcludeFilters(
 void LogDatabaseProxyModel::setIncludeRegexpPattern(const QString& pattern)
 {
   include_regexp_.setPattern(pattern);
+  QSettings settings;
+  settings.setValue(SettingsKeys::INCLUDE_FILTER, pattern);
   reset();
 }
 
 void LogDatabaseProxyModel::setExcludeRegexpPattern(const QString& pattern)
 {
   exclude_regexp_.setPattern(pattern);
+  QSettings settings;
+  settings.setValue(SettingsKeys::EXCLUDE_FILTER, pattern);
   reset();
 }
 
 void LogDatabaseProxyModel::setDebugColor(const QColor& debug_color)
 {
   debug_color_ = debug_color;
+  QSettings settings;
+  settings.setValue(SettingsKeys::DEBUG_COLOR, debug_color);
   reset();
 }
 
 void LogDatabaseProxyModel::setInfoColor(const QColor& info_color)
 {
   info_color_ = info_color;
+  QSettings settings;
+  settings.setValue(SettingsKeys::INFO_COLOR, info_color);
   reset();
 }
 
 void LogDatabaseProxyModel::setWarnColor(const QColor& warn_color)
 {
   warn_color_ = warn_color;
+  QSettings settings;
+  settings.setValue(SettingsKeys::WARN_COLOR, warn_color);
   reset();
 }
 
 void LogDatabaseProxyModel::setErrorColor(const QColor& error_color)
 {
   error_color_ = error_color;
+  QSettings settings;
+  settings.setValue(SettingsKeys::ERROR_COLOR, error_color);
   reset();
 }
 
 void LogDatabaseProxyModel::setFatalColor(const QColor& fatal_color)
 {
   fatal_color_ = fatal_color;
+  QSettings settings;
+  settings.setValue(SettingsKeys::FATAL_COLOR, fatal_color);
   reset();
 }
 

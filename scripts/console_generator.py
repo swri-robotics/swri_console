@@ -42,7 +42,7 @@ log_templates = [
     LogT('order_processing/src/obedience.cpp', 'process_orders', 12,
          '/behavior/mission', Log.ERROR, 'implement me!'),
     LogT('joint_control/src/joint_trajectory.cpp', 'iteration', 348,
-         '/mobility/knee_controller', Log.WARN, 'low stability margin detected')
+         '/mobility/knee_controller', Log.WARN, 'low stability margin detected'),
     LogT('laser/src/safety_lock.cpp', 'activate_lock', 921,
          '/weapons/laser_eyes', Log.FATAL, 'segmentation fault')
     ]
