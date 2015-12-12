@@ -78,7 +78,7 @@ void RosThread::startRos()
   is_connected_ = true;
 
   ros::NodeHandle nh;
-  rosout_sub_ = nh.subscribe("/rosout", 10000,
+  rosout_sub_ = nh.subscribe("/rosout_agg", 10000,
                              &RosThread::handleRosout,
                              this);
   Q_EMIT connected(true);
