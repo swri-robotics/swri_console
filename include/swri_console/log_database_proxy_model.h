@@ -75,16 +75,15 @@ class LogDatabaseProxyModel : public QAbstractListModel
   virtual int rowCount(const QModelIndex &parent) const;
   virtual QVariant data(const QModelIndex &index, int role) const;
 
-  void clear();
-
   void reset();
 
   void saveToFile(const QString& filename) const;
 
  Q_SIGNALS:
   void messagesAdded();
-                      
+
  public Q_SLOTS:
+  void handleDatabaseCleared();
   void processNewMessages();
   void processOldMessages();
   void minTimeUpdated();

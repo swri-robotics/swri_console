@@ -41,6 +41,7 @@ namespace swri_console
 {
 class LogDatabase;
 class LogDatabaseProxyModel;
+class NodeListModel;
 class ConsoleWindow : public QMainWindow {
   Q_OBJECT
   
@@ -56,9 +57,9 @@ class ConsoleWindow : public QMainWindow {
   void selectFont();
                                        
  public Q_SLOTS:
-  void clearLogs();
+  void clearAll();
+  void clearMessages();
   void saveLogs();
-  void clearNodes();
   void connected(bool);
   void setSeverityFilter();
   void nodeSelectionChanged();
@@ -103,6 +104,7 @@ private:
   Ui::ConsoleWindow ui;
   LogDatabase *db_;
   LogDatabaseProxyModel *db_proxy_;
+  NodeListModel *node_list_model_;
 };  // class ConsoleWindow
 }  // namespace swri_console
 

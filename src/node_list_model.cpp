@@ -29,13 +29,21 @@
 // *****************************************************************************
 
 #include <stdio.h>
-#include <swri_console/node_list_model.h>
 #include <vector>
+
+#include <swri_console/node_list_model.h>
+#include <swri_console/log_database.h>
 
 namespace swri_console
 {
-NodeListModel::NodeListModel()
+NodeListModel::NodeListModel(LogDatabase *db)
+  :
+  db_(db)
 {
+  QObject::connect(db_, SIGNAL(databaseCleared()),
+                   this, SLOT(handleDatabaseCleared()));
+  QObject::connect(db_, SIGNAL(messagesAdded()),
+                   this, SLOT(handleMessagesAdded()));
 }
 
 NodeListModel::~NodeListModel()
@@ -77,11 +85,39 @@ QVariant NodeListModel::data(const QModelIndex &index, int role) const
   return QVariant();
 }
 
-void NodeListModel::update(const std::map<std::string, size_t> &updated_counts)  
+void NodeListModel::clear()
 {
+  if (ordering_.empty()) {
+    return;
+  }
+  beginRemoveRows(QModelIndex(), 0, ordering_.size()-1);
+  data_.clear();
+  ordering_.clear();
+  endRemoveRows();
+}
+
+void NodeListModel::handleDatabaseCleared()
+{
+  // When the database is cleared, we reset all of the counts to zero
+  // instead of deleting them from the list.  This allows a user to
+  // clear out the logs while retaining their node selection so that
+  // they can easily reset the data without having to choose the
+  // selection again.  
+  std::map<std::string, size_t>::iterator iter;
+  for (iter = data_.begin(); iter != data_.end(); ++iter) {
+    (*iter).second = 0;
+  }
+
+  Q_EMIT dataChanged(index(0), index(data_.size()-1));
+}
+
+void NodeListModel::handleMessagesAdded()
+{
+  const std::map<std::string, size_t> &msg_counts = db_->messageCounts();
+  
   size_t i = 0;
-  for (std::map<std::string, size_t>::const_iterator it = updated_counts.begin();
-       it != updated_counts.end();
+  for (std::map<std::string, size_t>::const_iterator it = msg_counts.begin();
+       it != msg_counts.end();
        ++it)
   {
     if (!data_.count(it->first)) {
@@ -97,25 +133,5 @@ void NodeListModel::update(const std::map<std::string, size_t> &updated_counts)
   
   Q_EMIT dataChanged(index(0),
                      index(ordering_.size()-1));
-}
-
-void NodeListModel::clear()
-{
-  unsigned long size = data_.size();
-  beginRemoveRows(index(0), 0, size-1);
-  data_.clear();
-  ordering_.clear();
-  endRemoveRows();
-}
-
-void NodeListModel::clearLogs()
-{
-  std::map<std::string, size_t>::iterator iter;
-  for (iter = data_.begin(); iter != data_.end(); ++iter)
-  {
-    (*iter).second = 0;
-  }
-
-  Q_EMIT dataChanged(index(0), index(data_.size()-1));
 }
 }  // namespace swri_console

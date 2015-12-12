@@ -34,7 +34,6 @@
 #include <QObject>
 #include <QAbstractListModel>
 #include <rosgraph_msgs/Log.h>
-#include <swri_console/node_list_model.h>
 #include <deque>
 #include <ros/time.h>
 
@@ -60,12 +59,14 @@ public:
   LogDatabase();
   ~LogDatabase();
   
-  NodeListModel *nodeListModel() { return &node_list_model_; }
   void clear();
   const std::deque<LogEntry>& log() { return log_; }
   const ros::Time& minTime() const { return min_time_; }
 
+  const std::map<std::string, size_t>& messageCounts() const { return msg_counts_; }
+
  Q_SIGNALS:
+  void databaseCleared();
   void messagesAdded();
   void minTimeUpdated();
 
@@ -74,13 +75,11 @@ public Q_SLOTS:
   void processQueue();
 
 private:  
-  std::map<std::string, size_t> nodes_;
+  std::map<std::string, size_t> msg_counts_;
   std::deque<LogEntry> log_;
   std::deque<LogEntry> new_msgs_;
 
   ros::Time min_time_;
-  
-  NodeListModel node_list_model_;
 };  // class LogDatabase
 }  // namespace swri_console 
 #endif  // SWRI_CONSOLE_LOG_DATABASE_H_

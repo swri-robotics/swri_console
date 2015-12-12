@@ -57,7 +57,9 @@ LogDatabaseProxyModel::LogDatabaseProxyModel(LogDatabase *db)
   warn_color_(QColor(255,127,0)),
   error_color_(Qt::red),
   fatal_color_(Qt::magenta)
-{  
+{
+  QObject::connect(db_, SIGNAL(databaseCleared()),
+                   this, SLOT(handleDatabaseCleared()));
   QObject::connect(db_, SIGNAL(messagesAdded()),
                    this, SLOT(processNewMessages()));
 
@@ -383,12 +385,6 @@ QVariant LogDatabaseProxyModel::data(
   return QVariant();
 }
 
-void LogDatabaseProxyModel::clear()
-{
-  db_->clear();
-  reset();
-}
-
 void LogDatabaseProxyModel::reset()
 {
   beginResetModel();
@@ -451,6 +447,11 @@ void LogDatabaseProxyModel::saveTextFile(const QString& filename) const
   }
   outstream.flush();
   outFile.close();
+}
+
+void LogDatabaseProxyModel::handleDatabaseCleared()
+{
+  reset();
 }
 
 void LogDatabaseProxyModel::processNewMessages()

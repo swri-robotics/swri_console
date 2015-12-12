@@ -37,6 +37,7 @@
 #include <swri_console/console_window.h>
 #include <swri_console/log_database.h>
 #include <swri_console/log_database_proxy_model.h>
+#include <swri_console/node_list_model.h>
 #include <swri_console/settings_keys.h>
 
 #include <QColorDialog>
@@ -58,7 +59,8 @@ ConsoleWindow::ConsoleWindow(LogDatabase *db)
   :
   QMainWindow(),
   db_(db),
-  db_proxy_(new LogDatabaseProxyModel(db))
+  db_proxy_(new LogDatabaseProxyModel(db)),
+  node_list_model_(new NodeListModel(db))
 {
   ui.setupUi(this); 
 
@@ -112,7 +114,7 @@ ConsoleWindow::ConsoleWindow(LogDatabase *db)
   QObject::connect(ui.fatalColorWidget, SIGNAL(clicked(bool)),
                    this, SLOT(setFatalColor()));
 
-  ui.nodeList->setModel(db_->nodeListModel());
+  ui.nodeList->setModel(node_list_model_);
   ui.messageList->setModel(db_proxy_);
   ui.messageList->setUniformItemSizes(true);
 
@@ -147,10 +149,11 @@ ConsoleWindow::ConsoleWindow(LogDatabase *db)
   // Right-click menu for the message list
   QObject::connect(ui.messageList, SIGNAL(customContextMenuRequested(const QPoint&)),
                     this, SLOT(showLogContextMenu(const QPoint&)));
-  QObject::connect(ui.clearLogsButton, SIGNAL(clicked()),
-                    this, SLOT(clearLogs()));
-  QObject::connect(ui.clearNodeListButton, SIGNAL(clicked()),
-                    this, SLOT(clearNodes()));
+
+  QObject::connect(ui.clearAllButton, SIGNAL(clicked()),
+                    this, SLOT(clearAll()));
+  QObject::connect(ui.clearMessagesButton, SIGNAL(clicked()),
+                    this, SLOT(clearMessages()));
 
   QObject::connect(
     ui.messageList->verticalScrollBar(), SIGNAL(valueChanged(int)),
@@ -177,9 +180,15 @@ ConsoleWindow::~ConsoleWindow()
   delete db_proxy_;
 }
 
-void ConsoleWindow::clearLogs()
+void ConsoleWindow::clearAll()
 {
-  db_proxy_->clear();
+  db_->clear();
+  node_list_model_->clear();
+}
+
+void ConsoleWindow::clearMessages()
+{
+  db_->clear();
 }
 
 void ConsoleWindow::saveLogs()
@@ -192,12 +201,6 @@ void ConsoleWindow::saveLogs()
   if (filename != NULL && !filename.isEmpty()) {
     db_proxy_->saveToFile(filename);
   }
-}
-
-void ConsoleWindow::clearNodes()
-{
-  db_proxy_->clear();
-  db_->nodeListModel()->clear();
 }
 
 void ConsoleWindow::connected(bool connected)
@@ -221,7 +224,7 @@ void ConsoleWindow::nodeSelectionChanged()
   QStringList node_names;
 
   for (size_t i = 0; i < selection.size(); i++) {
-    std::string name = db_->nodeListModel()->nodeName(selection[i]);
+    std::string name = node_list_model_->nodeName(selection[i]);
     nodes.insert(name);
     node_names.append(name.c_str());
   }

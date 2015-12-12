@@ -38,24 +38,30 @@
 
 namespace swri_console
 {
+class LogDatabase;
 class NodeListModel : public QAbstractListModel
 {
   Q_OBJECT
   
  public:
-  NodeListModel();
+  NodeListModel(LogDatabase* db);
   ~NodeListModel();
 
   std::string nodeName(const QModelIndex &index) const;
   
   virtual int rowCount(const QModelIndex &parent) const;
   virtual QVariant data(const QModelIndex &index, int role) const;
-  
-  void clear();
-  void clearLogs();
-  void update(const std::map<std::string, size_t> &updated_counts);
 
+ public Q_SLOTS:
+  void clear();
+                                                                 
+ private Q_SLOTS:
+  void handleDatabaseCleared();
+  void handleMessagesAdded();
+  
  private:
+  LogDatabase *db_;
+  
   std::map<std::string, size_t> data_;
   std::vector<std::string> ordering_;
 };

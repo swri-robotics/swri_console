@@ -45,15 +45,9 @@ LogDatabase::~LogDatabase()
 void LogDatabase::clear()
 {
   std::map<std::string, size_t>::iterator iter;
-  // Set the log count for the node list to 0.
-  for (iter = nodes_.begin(); iter != nodes_.end(); ++iter)
-  {
-    (*iter).second = 0;
-  }
-  // Tell the node list model to also clear out its internal storage.
-  node_list_model_.clearLogs();
-  // Finally, remove all of the logs we've stored.
+  msg_counts_.clear();
   log_.clear();
+  Q_EMIT databaseCleared();
 }
 
 void LogDatabase::queueMessage(const rosgraph_msgs::LogConstPtr msg)
@@ -63,7 +57,7 @@ void LogDatabase::queueMessage(const rosgraph_msgs::LogConstPtr msg)
     Q_EMIT minTimeUpdated();
   }
   
-  nodes_[msg->name]++;
+  msg_counts_[msg->name]++;
 
   LogEntry log;
   log.stamp = msg->header.stamp;
@@ -83,7 +77,6 @@ void LogDatabase::processQueue()
     return;
   }
   
-  node_list_model_.update(nodes_);
   log_.insert(log_.end(),
               new_msgs_.begin(),
               new_msgs_.end());
