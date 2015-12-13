@@ -417,27 +417,38 @@ void LogDatabaseProxyModel::saveToFile(const QString& filename) const
 void LogDatabaseProxyModel::saveBagFile(const QString& filename) const
 {
   rosbag::Bag bag(filename.toStdString().c_str(), rosbag::bagmode::Write);
-  std::deque<LogEntry>::const_iterator iter;
-  for (iter = db_->log().begin(); iter != db_->log().end(); ++iter)
-  {
+
+  size_t idx = 0;
+  while (idx < msg_mapping_.size()) {
+    const LineMap line_map = msg_mapping_[idx];    
+    const LogEntry &item = db_->log()[line_map.log_index];
+    
     rosgraph_msgs::Log log;
-    log.file = iter->file;
-    log.function = iter->function;
-    log.header.seq = iter->seq;
-    if (iter->stamp < ros::TIME_MIN) {
+    log.file = item.file;
+    log.function = item.function;
+    log.header.seq = item.seq;
+    if (item.stamp < ros::TIME_MIN) {
+      // Note: I think TIME_MIN is the minimum representation of
+      // ros::Time, so this branch should be impossible.  Nonetheless,
+      // it doesn't hurt.
       log.header.stamp = ros::Time::now();
-      qWarning("Msg with seq %d had time (%d); it's less than ros::TIME_MIN, which is invalid.  Writing 'now' instead.",
-               log.header.seq, iter->stamp.sec);
+      qWarning("Msg with seq %d had time (%d); it's less than ros::TIME_MIN, which is invalid. "
+               "Writing 'now' instead.",
+               log.header.seq, item.stamp.sec);
+    } else {
+      log.header.stamp = item.stamp;
     }
-    else
-    {
-      log.header.stamp = iter->stamp;
-    }
-    log.level = iter->level;
-    log.line = iter->line;
-    log.msg = iter->text.join("\n").toStdString();
-    log.name = iter->node;
+    log.level = item.level;
+    log.line = item.line;
+    log.msg = item.text.join("\n").toStdString();
+    log.name = item.node;
     bag.write("/rosout", log.header.stamp, log);
+
+    // Advance to the next line with a different log index.
+    idx++;
+    while (idx < msg_mapping_.size() && msg_mapping_[idx].log_index == line_map.log_index) {
+      idx++;
+    }
   }
   bag.close();
 }
