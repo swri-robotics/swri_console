@@ -66,7 +66,7 @@ void LogDatabase::queueMessage(const rosgraph_msgs::LogConstPtr msg)
   log.file = msg->file;
   log.function = msg->function;
   log.line = msg->line;
-  log.msg = QString(msg->msg.c_str());
+  log.text = QString(msg->msg.c_str()).split('\n');
   log.seq = msg->header.seq;
   new_msgs_.push_back(log);
 }

@@ -95,8 +95,7 @@ void LogDatabaseProxyModel::setAbsoluteTime(bool absolute)
   settings.setValue(SettingsKeys::ABSOLUTE_TIMESTAMPS, display_absolute_time_);
 
   if (display_time_ && msg_mapping_.size()) {
-    Q_EMIT dataChanged(index(0),
-                       index(msg_mapping_.size()));
+    Q_EMIT dataChanged(index(0), index(msg_mapping_.size()));
   }
 }
 
@@ -112,8 +111,7 @@ void LogDatabaseProxyModel::setColorizeLogs(bool colorize_logs)
   settings.setValue(SettingsKeys::COLORIZE_LOGS, colorize_logs_);
 
   if (msg_mapping_.size()) {
-    Q_EMIT dataChanged(index(0),
-                       index(msg_mapping_.size()));
+    Q_EMIT dataChanged(index(0), index(msg_mapping_.size()));
   }
 }
 
@@ -129,8 +127,7 @@ void LogDatabaseProxyModel::setDisplayTime(bool display)
   settings.setValue(SettingsKeys::DISPLAY_TIMESTAMPS, display_time_);
 
   if (msg_mapping_.size()) {
-    Q_EMIT dataChanged(index(0),
-                       index(msg_mapping_.size()));
+    Q_EMIT dataChanged(index(0), index(msg_mapping_.size()));
   }
 }
 
@@ -143,7 +140,6 @@ void LogDatabaseProxyModel::setUseRegularExpressions(bool useRegexps)
   use_regular_expressions_ = useRegexps;
   QSettings settings;
   settings.setValue(SettingsKeys::USE_REGEXPS, useRegexps);
-
   reset();
 }
 
@@ -272,7 +268,8 @@ QVariant LogDatabaseProxyModel::data(
     return QVariant();
   }
 
-  const LogEntry &item = db_->log()[msg_mapping_[index.row()]];
+  const LineMap line_idx = msg_mapping_[index.row()];
+  const LogEntry &item = db_->log()[line_idx.log_index];
 
   if (role == Qt::DisplayRole) {
     char level = '?';
@@ -316,8 +313,19 @@ QVariant LogDatabaseProxyModel::data(
       snprintf(header, sizeof(header),
                "[%c] ", level);
     }
-      
-    return QVariant(QString(header) + item.msg);
+
+    // For multiline messages, we only want to display the header for
+    // the first line.  For the subsequent lines, we generate a header
+    // and then fill it with blank lines so that the messages are
+    // aligned properly (assuming monospaced font).  
+    if (line_idx.line_index != 0) {
+      size_t len = strnlen(header, sizeof(header));
+      for (size_t i = 0; i < len; i++) {
+        header[i] = ' ';
+      }
+    }
+    
+    return QVariant(QString(header) + item.text[line_idx.line_index]);
   }
   else if (role == Qt::ForegroundRole && colorize_logs_) {
     switch (item.level) {
@@ -355,7 +363,7 @@ QVariant LogDatabaseProxyModel::data(
              item.line);
     
     QString text = (QString(buffer) +
-                    item.msg + 
+                    item.text.join("\n") + 
                     QString("</p>"));
                             
     return QVariant(text);
@@ -376,12 +384,11 @@ QVariant LogDatabaseProxyModel::data(
              item.line);
     
     QString text = (QString(buffer) +
-                    item.msg); 
+                    item.text.join("\n")); 
                             
     return QVariant(text);
   }
-    
-  
+      
   return QVariant();
 }
 
@@ -390,8 +397,8 @@ void LogDatabaseProxyModel::reset()
   beginResetModel();
   msg_mapping_.clear();
   early_mapping_.clear();
-  earliest_index_ = db_->log().size();
-  latest_index_ = earliest_index_;
+  earliest_log_index_ = db_->log().size();
+  latest_log_index_ = earliest_log_index_;
   endResetModel();
   scheduleIdleProcessing();
 }
@@ -428,7 +435,7 @@ void LogDatabaseProxyModel::saveBagFile(const QString& filename) const
     }
     log.level = iter->level;
     log.line = iter->line;
-    log.msg = iter->msg.toStdString();
+    log.msg = iter->text.join("\n").toStdString();
     log.name = iter->node;
     bag.write("/rosout", log.header.stamp, log);
   }
@@ -456,19 +463,22 @@ void LogDatabaseProxyModel::handleDatabaseCleared()
 
 void LogDatabaseProxyModel::processNewMessages()
 {
-  std::deque<size_t> new_items;
+  std::deque<LineMap> new_items;
  
-  // Process all messages from latest_index_ to the end of the
+  // Process all messages from latest_log_index_ to the end of the
   // log.
-  for (; 
-       latest_index_ < db_->log().size();
-       latest_index_++)
+  for (;
+       latest_log_index_ < db_->log().size();
+       latest_log_index_++)
   {
-    const LogEntry &item = db_->log()[latest_index_];    
+    const LogEntry &item = db_->log()[latest_log_index_];    
     if (!acceptLogEntry(item)) {
       continue;
     }    
-    new_items.push_back(latest_index_);
+
+    for (int i = 0; i < item.text.size(); i++) {
+      new_items.push_back(LineMap(latest_log_index_, i));
+    }
   }
   
   if (!new_items.empty()) {
@@ -486,20 +496,31 @@ void LogDatabaseProxyModel::processNewMessages()
 
 void LogDatabaseProxyModel::processOldMessages()
 {
-  //std::deque<size_t> new_items;
+  // We process old messages in two steps.  First, we process the
+  // remaining messages in chunks and store them in the early_mapping_
+  // buffer if they pass all the filters.  When the early mapping
+  // buffer is large enough (or we have processed everything), then we
+  // merge the early_mapping buffer in the main buffer.  This approach
+  // allows us to process very large logs without causing major lag
+  // for the user.
   
   for (size_t i = 0;
-       earliest_index_ != 0 && i < 100;
-       earliest_index_--, i++)
+       earliest_log_index_ != 0 && i < 100;
+       earliest_log_index_--, i++)
   {
-    const LogEntry &item = db_->log()[earliest_index_-1];
+    const LogEntry &item = db_->log()[earliest_log_index_-1];
     if (!acceptLogEntry(item)) {
       continue;
-    }    
-    early_mapping_.push_front(earliest_index_-1);
+    }
+
+    for (int i = 0; i < item.text.size(); i++) {
+      // Note that we have to add the lines backwards to maintain the proper order.
+      early_mapping_.push_front(
+        LineMap(earliest_log_index_-1, item.text.size()-1-i));
+    }
   }
  
-  if ((earliest_index_ == 0 && early_mapping_.size()) ||
+  if ((earliest_log_index_ == 0 && early_mapping_.size()) ||
       (early_mapping_.size() > 200)) {
     beginInsertRows(QModelIndex(),
                     0,
@@ -520,7 +541,7 @@ void LogDatabaseProxyModel::scheduleIdleProcessing()
 {
   // If we have older logs that still need to be processed, schedule a
   // callback at the next idle time.
-  if (earliest_index_ > 0) {
+  if (earliest_log_index_ > 0) {
     QTimer::singleShot(0, this, SLOT(processOldMessages()));
   }
 }
@@ -540,11 +561,15 @@ bool LogDatabaseProxyModel::acceptLogEntry(const LogEntry &item)
   }
 
   if (use_regular_expressions_) {
+    // For multi-line messages, we join the lines together with a
+    // space to make it easy for users to use filters that spread
+    // across the new lines.
+    
     // Don't let an empty regexp filter out everything
-    return exclude_regexp_.isEmpty() || exclude_regexp_.indexIn(item.msg) < 0;
+    return exclude_regexp_.isEmpty() || exclude_regexp_.indexIn(item.text.join(" ")) < 0;
   } else {
     for (int i = 0; i < exclude_strings_.size(); i++) {
-      if (item.msg.contains(exclude_strings_[i], Qt::CaseInsensitive)) {
+      if (item.text.join(" ").contains(exclude_strings_[i], Qt::CaseInsensitive)) {
         return false;
       }
     }
@@ -559,14 +584,14 @@ bool LogDatabaseProxyModel::acceptLogEntry(const LogEntry &item)
 bool LogDatabaseProxyModel::testIncludeFilter(const LogEntry &item)
 {
   if (use_regular_expressions_) {
-    return include_regexp_.indexIn(item.msg) >= 0;
+    return include_regexp_.indexIn(item.text.join(" ")) >= 0;
   } else {
     if (include_strings_.empty()) {
       return true;
     }
 
     for (int i = 0; i < include_strings_.size(); i++) {
-      if (item.msg.contains(include_strings_[i], Qt::CaseInsensitive)) {
+      if (item.text.join(" ").contains(include_strings_[i], Qt::CaseInsensitive)) {
         return true;
       }
     }
@@ -583,6 +608,4 @@ void LogDatabaseProxyModel::minTimeUpdated()
     Q_EMIT dataChanged(index(0), index(msg_mapping_.size()));
   }  
 }
-
-
 }  // namespace swri_console

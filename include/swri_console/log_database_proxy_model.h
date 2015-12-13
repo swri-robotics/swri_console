@@ -101,9 +101,6 @@ class LogDatabaseProxyModel : public QAbstractListModel
   
   bool acceptLogEntry(const LogEntry &item);
   bool testIncludeFilter(const LogEntry &item);
-
-  size_t earliest_index_;
-  size_t latest_index_;
   
   std::set<std::string> names_;
   uint8_t severity_mask_;
@@ -112,8 +109,23 @@ class LogDatabaseProxyModel : public QAbstractListModel
   bool display_absolute_time_;
   bool use_regular_expressions_;
 
-  std::deque<size_t> early_mapping_;
-  std::deque<size_t> msg_mapping_;
+  // For performance reasons, the proxy model presents single line
+  // items, while the underlying log database stores multi-line
+  // messages.  The LineMap struct is used to map our item indices to
+  // the log & line that it represents.
+  struct LineMap {
+    size_t log_index;
+    int line_index;
+
+    LineMap() : log_index(0), line_index(0) {}
+    LineMap(size_t log, int line) : log_index(log), line_index(line) {}
+  };
+  
+  size_t latest_log_index_;
+  std::deque<LineMap> msg_mapping_;
+
+  size_t earliest_log_index_;
+  std::deque<LineMap> early_mapping_;
 
   QRegExp include_regexp_;
   QRegExp exclude_regexp_;

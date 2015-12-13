@@ -33,6 +33,7 @@
 
 #include <QObject>
 #include <QAbstractListModel>
+#include <QStringList>
 #include <rosgraph_msgs/Log.h>
 #include <deque>
 #include <ros/time.h>
@@ -47,7 +48,7 @@ struct LogEntry
   std::string file;
   std::string function;
   uint32_t line;
-  QString msg;
+  QStringList text;
   uint32_t seq;
 };
 
