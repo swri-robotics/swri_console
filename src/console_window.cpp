@@ -306,7 +306,11 @@ void ConsoleWindow::userScrolled(int value)
 
 void ConsoleWindow::selectAllLogs()
 {
-  ui.messageList->selectAll();
+  if (ui.nodeList->hasFocus()) {
+    ui.nodeList->selectAll();
+  } else {
+    ui.messageList->selectAll();
+  }
 }
 
 void ConsoleWindow::copyLogs()
