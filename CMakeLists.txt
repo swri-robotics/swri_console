@@ -48,7 +48,7 @@ qt4_wrap_ui(SRC_FILES ${UI_FILES})
 qt4_wrap_cpp(SRC_FILES ${HEADER_FILES})
 
 add_executable(swri_console ${HEADER_FILES} ${SRC_FILES} ${RCC_SRCS} src/main.cpp)
-target_link_libraries(${PROJECT_NAME} 
+target_link_libraries(swri_console
   ${QT_LIBRARIES}
   ${catkin_LIBRARIES})
 
