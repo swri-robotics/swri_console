@@ -28,8 +28,8 @@
 //
 // *****************************************************************************
 
-#ifndef SWRI_CONSOLE_ROSOUT_SOURCE_H_
-#define SWRI_CONSOLE_ROSOUT_SOURCE_H_
+#ifndef SWRI_CONSOLE_CONSOLE_MASTER_H_
+#define SWRI_CONSOLE_CONSOLE_MASTER_H_
 
 #include <string>
 #include <QObject>
@@ -76,7 +76,6 @@ class ConsoleMaster : public QObject
   LogDatabase db_;
 
   QFont window_font_;
-};
+};  // class ConsoleMaster
 }  // namespace swri_console
-
-#endif  // SWRI_CONSOLE_ROSOUT_SOURCE_H_
+#endif  // SWRI_CONSOLE_CONSOLE_MASTER_H_
