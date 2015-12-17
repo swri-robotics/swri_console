@@ -69,6 +69,7 @@ class ConsoleWindow : public QMainWindow {
   void copyLogs();
   void copyExtendedLogs();
   void setFollowNewest(bool);
+  void toggleAlternateRowColors(bool);
   
   void userScrolled(int);
 

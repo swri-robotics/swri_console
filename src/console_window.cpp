@@ -114,7 +114,7 @@ ConsoleWindow::ConsoleWindow(LogDatabase *db)
   QObject::connect(ui.fatalColorWidget, SIGNAL(clicked(bool)),
                    this, SLOT(setFatalColor()));
 
-  ui.nodeList->setModel(node_list_model_);
+  ui.nodeList->setModel(node_list_model_);  
   ui.messageList->setModel(db_proxy_);
   ui.messageList->setUniformItemSizes(true);
 
@@ -280,16 +280,25 @@ void ConsoleWindow::showLogContextMenu(const QPoint& point)
 {
   QMenu contextMenu(tr("Context menu"), ui.messageList);
 
-  QAction selectAll(tr("Select All"), ui.messageList);
-  connect(&selectAll, SIGNAL(triggered()), this, SLOT(selectAllLogs()));
+  QAction select_all(tr("Select All"), ui.messageList);
+  connect(&select_all, SIGNAL(triggered()), this, SLOT(selectAllLogs()));
+
   QAction copy(tr("Copy"), ui.messageList);
   connect(&copy, SIGNAL(triggered()), this, SLOT(copyLogs()));
+
   QAction copy_extended(tr("Copy Extended"), ui.messageList);
   connect(&copy_extended, SIGNAL(triggered()), this, SLOT(copyExtendedLogs()));
-  
-  contextMenu.addAction(&selectAll);
+
+  QAction alternate_row_colors(tr("Alternate Row Colors"), ui.messageList);
+  alternate_row_colors.setCheckable(true);
+  alternate_row_colors.setChecked(ui.messageList->alternatingRowColors());
+  connect(&alternate_row_colors, SIGNAL(toggled(bool)),
+          this, SLOT(toggleAlternateRowColors(bool)));
+            
+  contextMenu.addAction(&select_all);
   contextMenu.addAction(&copy);
   contextMenu.addAction(&copy_extended);
+  contextMenu.addAction(&alternate_row_colors);
 
   contextMenu.exec(ui.messageList->mapToGlobal(point));
 }
@@ -497,6 +506,14 @@ void ConsoleWindow::loadColorButtonSetting(const QString& key, QPushButton* butt
   updateButtonColor(button, color);
 }
 
+void ConsoleWindow::toggleAlternateRowColors(bool checked)
+{
+  ui.messageList->setAlternatingRowColors(checked);
+
+  QSettings settings;
+  settings.setValue(SettingsKeys::ALTERNATE_LOG_ROW_COLORS, checked);
+}
+
 void ConsoleWindow::loadSettings()
 {
   // First, load all the boolean settings...
@@ -534,6 +551,9 @@ void ConsoleWindow::loadSettings()
   ui.includeText->setText(includeFilter);
   QString excludeFilter = settings.value(SettingsKeys::EXCLUDE_FILTER, "").toString();
   ui.excludeText->setText(excludeFilter);
+
+  bool alternate_row_colors = settings.value(SettingsKeys::ALTERNATE_LOG_ROW_COLORS, true).toBool();
+  ui.messageList->setAlternatingRowColors(alternate_row_colors);
 }
 }  // namespace swri_console
 
