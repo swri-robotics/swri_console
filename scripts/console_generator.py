@@ -19,6 +19,7 @@ class LogT(object):
         self.log.level = level
         self.log.name = name
         self.log.file = '/home/tallest/workspaces/gir/src/' + filename
+        self.log.line = line
         self.log.function = function
 
     def generate(self):
@@ -33,6 +34,8 @@ class LogT(object):
 
 
 log_templates = [
+    LogT('typewriter/src/linebreak.cpp', 'break_lines', 50,
+         '/typewriter/output', Log.DEBUG, "Breaking\nLines."),
     LogT('taco_system/src/taste_evaluator.cpp', 'calc_spicy', 225,
          '/taste/taco_manager', Log.WARN, lambda : ('sample exceeds max capsaicin levels (%.2f)' % random.uniform(12, 19))),
     LogT('squirrel_observer/src/distraction.cpp', 'handle_distraction', 891,
@@ -51,6 +54,6 @@ rospy.init_node('console_pub')
 rosout = rospy.Publisher('/rosout', Log, queue_size=0)
 
 while not rospy.is_shutdown():
-    rospy.sleep(random.uniform(0.01, 1.0))
+    rospy.sleep(random.uniform(0.001, 0.1))
     msg = random.choice(log_templates).generate()
     rosout.publish(msg)

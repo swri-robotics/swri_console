@@ -254,6 +254,7 @@ QVariant LogDatabaseProxyModel::data(
     // if we're being queried for anything else.
     case Qt::DisplayRole:
     case Qt::ToolTipRole:
+    case ExtendedLogRole:
       break;
     case Qt::ForegroundRole:
       if (colorize_logs_) {
