@@ -32,8 +32,7 @@ file (GLOB HEADER_FILES
   include/swri_console/log_database.h
   include/swri_console/node_list_model.h
   include/swri_console/log_database_proxy_model.h
-  include/swri_console/ros_thread.h
-  include/swri_console/settings_keys.h)
+  include/swri_console/ros_thread.h)
 file (GLOB SRC_FILES
   src/bag_reader.cpp
   src/console_master.cpp
