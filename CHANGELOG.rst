@@ -2,8 +2,8 @@
 Changelog for package swri_console
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.0 (2016-05-28)
+------------------
 * Remove settings_keys.h from qt4_wrap_cpp to suppress warning
   There are no QT-wrappable classes in this header, so the QT build emits a
   warning that it's doing nothing on the file. Since it's doing nothing,
