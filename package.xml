@@ -14,8 +14,10 @@
   <license>BSD</license>
 
   <buildtool_depend>catkin</buildtool_depend>
-  <exec_depend>libqt4</exec_depend>
-  <depend>libqt4-dev</depend>
+  <build_depend>libqt5-opengl-dev</build_depend>
+  <depend>libqt5-core</depend>
+  <depend>libqt5-gui</depend>
+  <depend>libqt5-widgets</depend>
   <depend>rosbag_storage</depend>
   <depend>roscpp</depend>
   <depend>rosgraph_msgs</depend>
