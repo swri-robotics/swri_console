@@ -51,7 +51,7 @@ class ConsoleMaster : public QObject
   Q_OBJECT;
 
  public:  
-  ConsoleMaster();
+  ConsoleMaster(int argc, char** argv);
   virtual ~ConsoleMaster();
 
  public Q_SLOTS:

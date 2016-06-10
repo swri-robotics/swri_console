@@ -43,7 +43,7 @@ namespace swri_console
   {
     Q_OBJECT
   public:
-    RosThread();
+    RosThread(int argc, char** argv);
     /*
      * Shuts down ROS and causes the thread to exit.
      */

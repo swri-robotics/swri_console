@@ -82,7 +82,7 @@ int main(int argc, char **argv)
   QCoreApplication::setOrganizationDomain("swri.org");
   QCoreApplication::setApplicationName("SwRI Console");
   
-  swri_console::ConsoleMaster master;
+  swri_console::ConsoleMaster master(argc, argv);
   master.createNewWindow();
   app.connect(&app, SIGNAL(lastWindowClosed()), &app, SLOT(quit()));
   int result = app.exec();
