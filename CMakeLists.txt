@@ -14,11 +14,20 @@ catkin_package(
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 include_directories(include 
   ${catkin_INCLUDE_DIRS} 
-  ${QT_INCLUDE_DIR} )
-add_definitions(${QT_DEFINITIONS})
+  ${Qt5Core_INCLUDE_DIRS}
+  ${Qt5Gui_INCLUDE_DIRS}
+  ${Qt5Widgets_INCLUDE_DIRS}
+)
+add_definitions(
+  ${Qt5Core_DEFINITIONS}
+  ${Qt5Gui_DEFINITIONS}
+  ${Qt5Widgets_DEFINITIONS}
+)
 
 set(QT_USE_QTCORE TRUE)
 set(QT_USE_QTGUI TRUE)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
 
 # Build mapviz node
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
@@ -49,7 +58,9 @@ qt5_wrap_cpp(SRC_FILES ${HEADER_FILES})
 
 add_executable(swri_console ${HEADER_FILES} ${SRC_FILES} ${RCC_SRCS} src/main.cpp)
 target_link_libraries(swri_console
-  ${QT_LIBRARIES}
+  ${Qt5Core_LIBRARIES}
+  ${Qt5Gui_LIBRARIES}
+  ${Qt5Widgets_LIBRARIES}
   ${catkin_LIBRARIES})
 
 install(DIRECTORY include/${PROJECT_NAME}/
