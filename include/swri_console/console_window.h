@@ -31,7 +31,7 @@
 #ifndef SWRI_CONSOLE_CONSOLE_WINDOW_H_
 #define SWRI_CONSOLE_CONSOLE_WINDOW_H_
 
-#include <QtGui/QMainWindow>
+#include <QtWidgets/QMainWindow>
 #include <QColor>
 #include <QPushButton>
 #include <QSettings>

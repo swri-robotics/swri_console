@@ -37,8 +37,8 @@
 
 namespace swri_console
 {
-ConsoleMaster::ConsoleMaster()
-  :
+ConsoleMaster::ConsoleMaster(int argc, char** argv):
+  ros_thread_(argc, argv),
   connected_(false),
   window_font_(QFont("Ubuntu Mono", 9))
 {

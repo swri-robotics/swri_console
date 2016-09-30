@@ -33,12 +33,11 @@
 
 using namespace swri_console;
 
-RosThread::RosThread() :
+RosThread::RosThread(int argc, char** argv) :
   is_connected_(false),
   is_running_(true)
 {
-  int argc = QCoreApplication::argc();
-  ros::init(argc, QCoreApplication::argv(), "swri_console",
+  ros::init(argc, argv, "swri_console",
             ros::init_options::AnonymousName |
             ros::init_options::NoRosout);
 }

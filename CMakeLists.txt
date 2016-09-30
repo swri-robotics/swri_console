@@ -2,22 +2,32 @@ cmake_minimum_required(VERSION 2.8.3)
 project(swri_console)
 
 find_package(catkin REQUIRED COMPONENTS rosbag_storage roscpp rosgraph_msgs)
-find_package(Qt4 REQUIRED)
+find_package(Qt5Core REQUIRED)
+find_package(Qt5Gui REQUIRED)
+find_package(Qt5Widgets REQUIRED)
 
 catkin_package(
   INCLUDE_DIRS include
-  DEPENDS Qt4
   CATKIN_DEPENDS rosbag_storage roscpp rosgraph_msgs
 )
 
-include(${QT_USE_FILE})
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 include_directories(include 
   ${catkin_INCLUDE_DIRS} 
-  ${QT_INCLUDE_DIR} )
-add_definitions(${QT_DEFINITIONS})
+  ${Qt5Core_INCLUDE_DIRS}
+  ${Qt5Gui_INCLUDE_DIRS}
+  ${Qt5Widgets_INCLUDE_DIRS}
+)
+add_definitions(
+  ${Qt5Core_DEFINITIONS}
+  ${Qt5Gui_DEFINITIONS}
+  ${Qt5Widgets_DEFINITIONS}
+)
 
 set(QT_USE_QTCORE TRUE)
 set(QT_USE_QTGUI TRUE)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
 
 # Build mapviz node
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
@@ -42,13 +52,15 @@ file (GLOB SRC_FILES
   src/log_database_proxy_model.cpp
   src/ros_thread.cpp
   src/settings_keys.cpp)
-qt4_add_resources(RCC_SRCS resources/images.qrc)
-qt4_wrap_ui(SRC_FILES ${UI_FILES})
-qt4_wrap_cpp(SRC_FILES ${HEADER_FILES})
+qt5_add_resources(RCC_SRCS resources/images.qrc)
+qt5_wrap_ui(SRC_FILES ${UI_FILES})
+qt5_wrap_cpp(SRC_FILES ${HEADER_FILES})
 
 add_executable(swri_console ${HEADER_FILES} ${SRC_FILES} ${RCC_SRCS} src/main.cpp)
 target_link_libraries(swri_console
-  ${QT_LIBRARIES}
+  ${Qt5Core_LIBRARIES}
+  ${Qt5Gui_LIBRARIES}
+  ${Qt5Widgets_LIBRARIES}
   ${catkin_LIBRARIES})
 
 install(DIRECTORY include/${PROJECT_NAME}/
