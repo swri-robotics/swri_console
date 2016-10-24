@@ -2,8 +2,8 @@
 Changelog for package swri_console
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.2.0 (2016-10-23)
+------------------
 * Port to Qt5 `#16 <https://github.com/swri-robotics/swri_console/issues/16>`_
 * Contributors: Edward Venator, P. J. Reed
 
