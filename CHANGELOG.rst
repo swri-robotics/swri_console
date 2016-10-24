@@ -2,6 +2,11 @@
 Changelog for package swri_console
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Port to Qt5 `#16 <https://github.com/swri-robotics/swri_console/issues/16>`_
+* Contributors: Edward Venator, P. J. Reed
+
 0.1.0 (2016-05-28)
 ------------------
 * Remove settings_keys.h from qt4_wrap_cpp to suppress warning
