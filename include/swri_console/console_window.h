@@ -37,6 +37,8 @@
 #include <QSettings>
 #include "ui_console_window.h"
 
+#include "node_click_handler.h"
+
 namespace swri_console
 {
 class LogDatabase;
@@ -106,6 +108,7 @@ private:
   LogDatabase *db_;
   LogDatabaseProxyModel *db_proxy_;
   NodeListModel *node_list_model_;
+  NodeClickHandler *node_click_handler_;
 };  // class ConsoleWindow
 }  // namespace swri_console
 
