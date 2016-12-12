@@ -1,6 +1,6 @@
 // *****************************************************************************
 //
-// Copyright (c) 2015, Southwest Research Institute® (SwRI®)
+// Copyright (c) 2016, Southwest Research Institute® (SwRI®)
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -34,14 +34,23 @@
 #include <QObject>
 #include <QEvent>
 
+#include <ros/ros.h>
+
 namespace swri_console
 {
   class NodeClickHandler : public QObject
   {
     Q_OBJECT
 
+  public Q_SLOTS:
+    void logLevelClicked();
+
   protected:
     bool eventFilter(QObject* obj, QEvent* event);
+
+  private:
+    ros::NodeHandle nh_;
+    std::string node_name_;
   };
 }
 
