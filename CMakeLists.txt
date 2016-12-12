@@ -5,6 +5,7 @@ find_package(catkin REQUIRED COMPONENTS rosbag_storage roscpp rosgraph_msgs)
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Gui REQUIRED)
 find_package(Qt5Widgets REQUIRED)
+find_package(Boost COMPONENTS chrono REQUIRED)
 
 catkin_package(
   INCLUDE_DIRS include
@@ -17,6 +18,7 @@ include_directories(include
   ${Qt5Core_INCLUDE_DIRS}
   ${Qt5Gui_INCLUDE_DIRS}
   ${Qt5Widgets_INCLUDE_DIRS}
+  ${Boost_INCLUDE_DIRS}
 )
 add_definitions(
   ${Qt5Core_DEFINITIONS}
@@ -64,7 +66,9 @@ target_link_libraries(swri_console
   ${Qt5Core_LIBRARIES}
   ${Qt5Gui_LIBRARIES}
   ${Qt5Widgets_LIBRARIES}
-  ${catkin_LIBRARIES})
+  ${catkin_LIBRARIES}
+  ${Boost_LIBRARIES}
+)
 
 install(DIRECTORY include/${PROJECT_NAME}/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
