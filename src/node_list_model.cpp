@@ -58,7 +58,7 @@ int NodeListModel::rowCount(const QModelIndex &parent) const
 std::string NodeListModel::nodeName(const QModelIndex &index) const
 {
   if (index.parent().isValid() ||
-      index.row() > ordering_.size()) {
+      static_cast<size_t>(index.row()) > ordering_.size()) {
     return "";
   }
 
@@ -68,7 +68,7 @@ std::string NodeListModel::nodeName(const QModelIndex &index) const
 QVariant NodeListModel::data(const QModelIndex &index, int role) const
 {
   if (index.parent().isValid() ||
-      index.row() > ordering_.size()) {
+      static_cast<size_t>(index.row()) > ordering_.size()) {
     return QVariant();
   } 
 
