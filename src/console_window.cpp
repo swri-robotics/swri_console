@@ -223,7 +223,7 @@ void ConsoleWindow::nodeSelectionChanged()
   std::set<std::string> nodes;
   QStringList node_names;
 
-  for (size_t i = 0; i < selection.size(); i++) {
+  for (int i = 0; i < selection.size(); i++) {
     std::string name = node_list_model_->nodeName(selection[i]);
     nodes.insert(name);
     node_names.append(name.c_str());
@@ -231,7 +231,7 @@ void ConsoleWindow::nodeSelectionChanged()
 
   db_proxy_->setNodeFilter(nodes);
 
-  for (size_t i = 0; i < node_names.size(); i++) {
+  for (int i = 0; i < node_names.size(); i++) {
     node_names[i] = node_names[i].split("/", QString::SkipEmptyParts).last();
   }
     

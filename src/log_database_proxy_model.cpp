@@ -265,7 +265,7 @@ QVariant LogDatabaseProxyModel::data(
   }
 
   if (index.parent().isValid() &&
-      index.row() >= msg_mapping_.size()) {
+      static_cast<size_t>(index.row()) >= msg_mapping_.size()) {
     return QVariant();
   }
 
@@ -459,7 +459,7 @@ void LogDatabaseProxyModel::saveTextFile(const QString& filename) const
   QFile outFile(filename);
   outFile.open(QFile::WriteOnly);
   QTextStream outstream(&outFile);
-  for(int i = 0; i < msg_mapping_.size(); i++)
+  for(size_t i = 0; i < msg_mapping_.size(); i++)
   {
     QString line = data(index(i), Qt::DisplayRole).toString();
     outstream << line << '\n';

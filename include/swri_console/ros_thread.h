@@ -72,8 +72,8 @@ namespace swri_console
     void startRos();
     void stopRos();
 
-    volatile bool is_running_;
     bool is_connected_;
+    volatile bool is_running_;
     ros::Subscriber rosout_sub_;
   };
 }
