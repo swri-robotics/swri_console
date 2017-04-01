@@ -2,8 +2,8 @@
 Changelog for package swri_console
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.0 (2017-04-01)
+------------------
 * Add kinetic and lunar and simplify CI
   - Remove cruft from CI configuration
   - Add ROS kinetic to CI configuration
