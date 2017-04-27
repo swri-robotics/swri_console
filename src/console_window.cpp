@@ -50,6 +50,10 @@
 #include <QScrollBar>
 #include <QMenu>
 #include <QSettings>
+#include <ros/master.h>//required for getURI, VCM 12 April 2017
+
+
+QString searchString;
 
 using namespace Qt;
 
@@ -167,6 +171,11 @@ ConsoleWindow::ConsoleWindow(LogDatabase *db)
     ui.excludeText, SIGNAL(textChanged(const QString &)),
     this, SLOT(excludeFilterUpdated(const QString &)));
 
+  //Connect 'Search' text modification to searchFilterUpdated, VCM 13 April 2017
+  QObject::connect(
+    ui.searchText, SIGNAL(textChanged(const QString &)),
+    this, SLOT(searchFilterUpdated(const QString &)));
+
   QList<int> sizes;
   sizes.append(100);
   sizes.append(1000);
@@ -184,11 +193,13 @@ void ConsoleWindow::clearAll()
 {
   db_->clear();
   node_list_model_->clear();
+  db_proxy_->clearSearchFailure();//resets failed search variables, VCM 27 April 2017
 }
 
 void ConsoleWindow::clearMessages()
 {
   db_->clear();
+  db_proxy_->clearSearchFailure();//resets failed search variables, VCM 27 April 2017
 }
 
 void ConsoleWindow::saveLogs()
@@ -205,10 +216,13 @@ void ConsoleWindow::saveLogs()
 
 void ConsoleWindow::connected(bool connected)
 {
-  if (connected) {
-    statusBar()->showMessage("Connected to ROS Master");
+
+	if (connected) {
+		//When connected, display current URL along with status in the status bar, VCM 4/12/2017
+		QString currentUrl = QString::fromStdString(ros::master::getURI());
+		statusBar()->showMessage("Connected to ROS Master.  URL: "+currentUrl);
   } else {
-    statusBar()->showMessage("Disconnected from ROS Master");
+    statusBar()->showMessage("Disconnected from ROS Master.");
   }
 }
 
@@ -219,6 +233,7 @@ void ConsoleWindow::closeEvent(QCloseEvent *event)
 
 void ConsoleWindow::nodeSelectionChanged()
 {
+  db_proxy_->clearSearchFailure();//clear search failure criteria, VCM 26 April 2017
   QModelIndexList selection = ui.nodeList->selectionModel()->selectedIndexes();
   std::set<std::string> nodes;
   QStringList node_names;
@@ -266,6 +281,7 @@ void ConsoleWindow::setSeverityFilter()
   settings.setValue(SettingsKeys::SHOW_FATAL, ui.checkFatal->isChecked());
 
   db_proxy_->setSeverityFilter(mask);
+  db_proxy_->clearSearchFailure();//resets search failure variables, VCM 27 April 2017
 }
 
 void ConsoleWindow::messagesAdded()
@@ -362,6 +378,7 @@ void ConsoleWindow::includeFilterUpdated(const QString &text)
 
   db_proxy_->setIncludeFilters(filtered);
   db_proxy_->setIncludeRegexpPattern(text);
+  db_proxy_->clearSearchFailure();//resets failed search variables, VCM 27 April 2017
   updateIncludeLabel();
 }
 
@@ -379,7 +396,76 @@ void ConsoleWindow::excludeFilterUpdated(const QString &text)
 
   db_proxy_->setExcludeFilters(filtered);
   db_proxy_->setExcludeRegexpPattern(text);
+  db_proxy_->clearSearchFailure();//resets failed search variables, VCM 27 April 2017
   updateExcludeLabel();
+}
+
+//Slot called when 'Search' text modified, 13 April 2017 VCM
+void ConsoleWindow::searchFilterUpdated(const QString &text)
+{
+	ConsoleWindow::updateSearchIndex("search");
+}
+//Slot called when 'Previous' button pushed, 13 April 2017 VCM
+void ConsoleWindow::on_pushPrev_clicked()
+{
+	ConsoleWindow::updateSearchIndex("prev");
+}
+//Slot called when 'Next' button pushed,  13 April 2017 VCM
+void ConsoleWindow::on_pushNext_clicked()
+{
+	ConsoleWindow::updateSearchIndex("next");
+}
+
+//        Search Function Definitions:
+//          1)search - user modified 'Search' text
+//          2)next   - user pressed 'Next' button
+//          3)prev   - user pressed 'Previous' button
+//			Locates and selects the next item based on search criteria, VCM 26 April 2017
+void ConsoleWindow::updateSearchIndex(QString function)
+{
+	int rowSearchStart = ui.messageList->currentIndex().row();//retrieve current index
+	int increment = 1; //used for search/next/prev; prev(ious) increment will change to -1
+	QString searchText = ui.searchText->text();//actual text to search for
+	searchText = searchText.toUpper().trimmed();//remove lowercase and lead/trailing spaces.
+	//next button pushed
+	if(function == "next"){
+		rowSearchStart++;//start search row after current.
+	}
+	//Previous button pushed
+	else if(function== "prev"){
+		rowSearchStart--;//start search row before current
+		increment=-1; //-1 to move search up instead of down
+	}
+	//search text modified
+	else if(function=="search" )
+	{
+		if (rowSearchStart==-1){
+			rowSearchStart =0;//for search, no selection (-1) index change to 0
+		}
+	}
+	else
+	{
+		//should not end up here
+		printf("Invalid string passed to ConsoleWindow::nextIndex");
+		return;
+	}
+	//calls getItemIndex in log_database_proxy_m, returns new index
+	int newRowIndex = db_proxy_->getItemIndex(searchText,rowSearchStart, increment);
+	ui.messageList->clearSelection();//clear current selection
+	if(newRowIndex == -1)  //indicates no match.
+	{
+		return;
+	}
+
+	QModelIndex index = ui.messageList->model()->index(newRowIndex,0);//defines desired index
+	ui.messageList->setCurrentIndex(index);//sets desired index, re-centers screen on new index
+	ui.checkFollowNewest->setChecked(false);//stops scrolling if search found
+
+	//attempt to paint row color
+	//index = ui.messageList->model()->index(1,0);
+	//ui.messageList->model()->setData(index,QBrush(QColor("red")), Qt::BackgroundRole);
+	//bool x = ui.messageList->model()->submit();
+	//printf("Result %d\n",x);
 }
 
 
@@ -554,6 +640,7 @@ void ConsoleWindow::loadSettings()
 
   bool alternate_row_colors = settings.value(SettingsKeys::ALTERNATE_LOG_ROW_COLORS, true).toBool();
   ui.messageList->setAlternatingRowColors(alternate_row_colors);
+
 }
 }  // namespace swri_console
 

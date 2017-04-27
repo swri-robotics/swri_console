@@ -39,6 +39,7 @@
 #include <deque>
 #include <QStringList>
 #include <QRegExp>
+//#include <QListWidget>
 
 namespace swri_console
 {
@@ -70,7 +71,8 @@ class LogDatabaseProxyModel : public QAbstractListModel
   void setFatalColor(const QColor& fatal_color);
   bool isIncludeValid() const;
   bool isExcludeValid() const;
-
+  int getItemIndex(const QString text, int index, int increment);
+  void clearSearchFailure();
 
   virtual int rowCount(const QModelIndex &parent) const;
   virtual QVariant data(const QModelIndex &index, int role) const;
@@ -93,7 +95,7 @@ class LogDatabaseProxyModel : public QAbstractListModel
   void setUseRegularExpressions(bool useRegexps);
 
  private:
-  LogDatabase *db_;
+  LogDatabase *Log;
 
   void saveBagFile(const QString& filename) const;
   void saveTextFile(const QString& filename) const;
@@ -137,6 +139,8 @@ class LogDatabaseProxyModel : public QAbstractListModel
   QColor warn_color_;
   QColor error_color_;
   QColor fatal_color_;
+
+  LogDatabase *db_;
 };
 }  // swri_console
 #endif  // SWRI_CONSOLE_LOG_DATABASE_PROXY_MODEL_H_

@@ -1,6 +1,11 @@
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Changelog for package swri_console
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+1.0.1 (2017-04-27)
+------------------ 
+* Added packet search functionality
+* Added URL to status bar
+* Contributors: Victor Murray
 
 1.0.0 (2017-04-01)
 ------------------

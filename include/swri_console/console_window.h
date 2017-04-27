@@ -75,6 +75,7 @@ class ConsoleWindow : public QMainWindow {
 
   void includeFilterUpdated(const QString &);
   void excludeFilterUpdated(const QString &);
+  void searchFilterUpdated(const QString &);//VM 4/13/2017
   void updateIncludeLabel();
   void updateExcludeLabel();
 
@@ -85,6 +86,9 @@ class ConsoleWindow : public QMainWindow {
   void setWarnColor();
   void setErrorColor();
   void setFatalColor();
+  void on_pushPrev_clicked();
+  void on_pushNext_clicked();
+  void updateSearchIndex(QString function);
 
 private:
   void chooseButtonColor(QPushButton* widget);
@@ -101,6 +105,7 @@ private:
   };
   void loadColorButtonSetting(const QString& key, QPushButton* button);
   void loadSettings();
+
 
   Ui::ConsoleWindow ui;
   LogDatabase *db_;
