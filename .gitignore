@@ -164,3 +164,4 @@ crashlytics-build.properties
 *.dSYM/
 
 # Created by .ignore support plugin (hsz.mobi)
+cmake-build-debug/
