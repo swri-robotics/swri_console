@@ -88,6 +88,7 @@ namespace swri_console
       {
         return success;
       }
+      svc_thread.interrupt();
       return false;
     }
 
