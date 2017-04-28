@@ -2,6 +2,16 @@
 Changelog for package swri_console
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.0.0 (2017-04-01)
+------------------
+* Add kinetic and lunar and simplify CI
+  - Remove cruft from CI configuration
+  - Add ROS kinetic to CI configuration
+  - Add ROS lunar to CI configuration
+  - Remove shadow-fixed builds from CI configuration. Since this repository has very few catkin dependencies, there's no reason to build for both shadow-fixed and released.
+* Fix compiler warnings
+* Contributors: Edward Venator, P. J. Reed, elliotjo
+
 0.2.0 (2016-10-23)
 ------------------
 * Port to Qt5 `#16 <https://github.com/swri-robotics/swri_console/issues/16>`_
