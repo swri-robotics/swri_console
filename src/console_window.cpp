@@ -33,7 +33,7 @@
 #include <set>
 
 #include <rosgraph_msgs/Log.h>
-#include <ros/master.h>// required for getURI, VCM 12 April 2017
+#include <ros/master.h>  // required for getURI, VCM 12 April 2017
 
 
 #include <swri_console/console_window.h>
@@ -425,7 +425,7 @@ void ConsoleWindow::nextIndex()
 //   2)next   - user pressed 'Next' button
 //   3)prev   - user pressed 'Previous' button
 // Locates and selects the next item based on search criteria, VCM 26 April 2017
-void ConsoleWindow::updateCurrentIndex(function sF)//function sF)
+void ConsoleWindow::updateCurrentIndex(function sF)
 {
   int rowSearchStart = ui.messageList->currentIndex().row();  // retrieve current index
   int increment = 1;  // used for search/next/prev; prev(ious) increment will change to -1
@@ -438,7 +438,7 @@ void ConsoleWindow::updateCurrentIndex(function sF)//function sF)
   // Previous button pushed
   else if(sF== PREV){
     rowSearchStart--;  // start search row before current
-    increment=-1; // -1 to move search up instead of down
+    increment=-1;  // -1 to move search up instead of down
   }
   // search text modified
   else if(sF==SEARCH )
@@ -455,15 +455,15 @@ void ConsoleWindow::updateCurrentIndex(function sF)//function sF)
   }
   // calls getItemIndex in log_database_proxy_m, returns new index
   int newRowIndex = db_proxy_->getItemIndex(searchText,rowSearchStart, increment);
-  ui.messageList->clearSelection();// clear current selection
+  ui.messageList->clearSelection();  // clear current selection
   if(newRowIndex == -1)  // indicates no match.
   {
     return;
   }
 
-  QModelIndex index = ui.messageList->model()->index(newRowIndex,0);// defines desired index
-  ui.messageList->setCurrentIndex(index);// sets desired index, re-centers screen on new index
-  ui.checkFollowNewest->setChecked(false);// stops scrolling if search found
+  QModelIndex index = ui.messageList->model()->index(newRowIndex,0);  // defines desired index
+  ui.messageList->setCurrentIndex(index);  // sets desired index, re-centers screen on new index
+  ui.checkFollowNewest->setChecked(false);  // stops scrolling if search found
 
 
 }
@@ -640,7 +640,6 @@ void ConsoleWindow::loadSettings()
 
   bool alternate_row_colors = settings.value(SettingsKeys::ALTERNATE_LOG_ROW_COLORS, true).toBool();
   ui.messageList->setAlternatingRowColors(alternate_row_colors);
-
 }
 }  // namespace swri_console
 

@@ -48,7 +48,6 @@
 
 namespace swri_console
 {
-
 LogDatabaseProxyModel::LogDatabaseProxyModel(LogDatabase *db)
   :
   db_(db),
