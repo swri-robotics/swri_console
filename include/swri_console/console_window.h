@@ -49,7 +49,7 @@ class ConsoleWindow : public QMainWindow {
   ConsoleWindow(LogDatabase *db);
   ~ConsoleWindow();
   
-  void closeEvent(QCloseEvent *event); // Overloaded function
+  void closeEvent(QCloseEvent *event);  // Overloaded function
 
  Q_SIGNALS:
   void createNewWindow();
@@ -75,7 +75,7 @@ class ConsoleWindow : public QMainWindow {
 
   void includeFilterUpdated(const QString &);
   void excludeFilterUpdated(const QString &);
-  void searchFilterUpdated(const QString &);//VM 4/13/2017
+  void searchIndex();  // VM 4/13/2017
   void updateIncludeLabel();
   void updateExcludeLabel();
 
@@ -86,11 +86,13 @@ class ConsoleWindow : public QMainWindow {
   void setWarnColor();
   void setErrorColor();
   void setFatalColor();
-  void on_pushPrev_clicked();
-  void on_pushNext_clicked();
-  void updateSearchIndex(QString function);
+  void prevIndex();
+  void nextIndex();
 
 private:
+  enum function{NEXT,PREV,SEARCH};
+  function searchFunction_;
+  void updateCurrentIndex(function sF);
   void chooseButtonColor(QPushButton* widget);
   QColor getButtonColor(const QPushButton* button) const;
   void updateButtonColor(QPushButton* widget, const QColor& color);
@@ -114,4 +116,4 @@ private:
 };  // class ConsoleWindow
 }  // namespace swri_console
 
-#endif // SWRI_CONSOLE_CONSOLE_WINDOW_H_
+#endif  // SWRI_CONSOLE_CONSOLE_WINDOW_H_

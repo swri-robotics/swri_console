@@ -29,28 +29,25 @@
 // *****************************************************************************
 
 #include <stdio.h>
+#include <algorithm>
+#include <iterator>
 
 #include <ros/time.h>
 #include <rosbag/bag.h>
 
 #include <swri_console/log_database_proxy_model.h>
 #include <swri_console/log_database.h>
+#include <swri_console/settings_keys.h>
 
 #include <QColor>
 #include <QFile>
 #include <QTextStream>
 #include <QTimer>
 #include <QSettings>
-#include <swri_console/settings_keys.h>
 #include <QtGlobal>
-#include <algorithm>
-#include <iterator>
-
 
 namespace swri_console
 {
-QString failedSearchText="";//stores last failed search text, used to minimize looping through full data set, VCM 26 April 2017
-int failedSearchIndex = 0;//stores last index of failed search text, VCM 26 April 2017
 
 LogDatabaseProxyModel::LogDatabaseProxyModel(LogDatabase *db)
   :
@@ -63,7 +60,9 @@ LogDatabaseProxyModel::LogDatabaseProxyModel(LogDatabase *db)
   info_color_(Qt::black),
   warn_color_(QColor(255,127,0)),
   error_color_(Qt::red),
-  fatal_color_(Qt::magenta)
+  fatal_color_(Qt::magenta),
+  failedSearchText_(""),
+  failedSearchIndex_(0)
 {
   QObject::connect(db_, SIGNAL(databaseCleared()),
                    this, SLOT(handleDatabaseCleared()));
@@ -251,82 +250,82 @@ bool LogDatabaseProxyModel::isExcludeValid() const
   return true;
 }
 
-//Locates the next index based on search criteria, VCM 25 April 2017
-//searchText_ - string from searchText, all upper case and trimmed spaces
-//index - currently selected item in messageList
-//increment - +1 = next||search(i.e. down), -1 = prev (i.e. up)
-int LogDatabaseProxyModel::getItemIndex(const QString searchText_, int index, int increment)
+// Locates the next index based on search criteria, VCM 25 April 2017
+// searchText_ - string from searchText, all upper case and trimmed spaces
+// index - currently selected item in messageList
+// increment - +1 = next||search(i.e. down), -1 = prev (i.e. up)
+int LogDatabaseProxyModel::getItemIndex(const QString searchText, int index, int increment)
 {
-	int searchNotFound = -1;//indicates search not found
-	int counter=0;//used to stop loop once full list has been searched
-	bool partialSearch = false;//tells main loop to run a partial search, triggered by prior failed search
-	if(searchText_==""||msg_mapping_.size()==0)//skip search for 1)empty string 2)empty set
-	{
-		clearSearchFailure(); //reset failed search variables
-		return searchNotFound;
-	}
+  int searchNotFound = -1;  // indicates search not found
+  int counter=0;  // used to stop loop once full list has been searched
+  bool partialSearch = false;  // tells main loop to run a partial search, triggered by prior failed search
+  if(searchText==""||msg_mapping_.size()==0)  // skip search for 1)empty string 2)empty set
+  {
+    clearSearchFailure();  // reset failed search variables
+    return searchNotFound;
+  }
 
-	//round corners for searches
-	if(index<0)//if index < 0, set to size()-1;
-	{
-		index = msg_mapping_.size()-1;
-	}
-	else if(index>=msg_mapping_.size())//if index >size(), set to 0;
-	{
-		index = 0;
-	}
+  // round corners for searches
+  if(index<0)  // if index < 0, set to size()-1;
+  {
+    index = msg_mapping_.size()-1;
+  }
+  else if(index>=msg_mapping_.size())  // if index >size(), set to 0;
+  {
+    index = 0;
+  }
 
-//trigger partial search if:
-	//searchText_ conaints prior failed text
-	//prior failed text is not empty
-	//failed index is not 0
-	//failed search index isn't greater than current index, this could happen through user interface message selection. Software should clear the variables when UI is adjusted.
-	if(searchText_.contains(failedSearchText) && failedSearchText != "" && failedSearchIndex !=0 && failedSearchIndex <= msg_mapping_.size() )
-	{
-		partialSearch = true;
-		index = failedSearchIndex-1;
-		counter = failedSearchIndex;
-	}
-
-	while(true)//loop through all messages until end or match is found
-		{
-			const LineMap line_idx = msg_mapping_[index];
-			const LogEntry &item = db_->log()[line_idx.log_index];
-			QString tempString = item.text.join("|");//concatenate strings
-			if(tempString.toUpper().contains(searchText_))//search match found
-			{
-				clearSearchFailure(); //reset failed search variables
-				return index;//match found, return location and exit loop
-			}
-			counter++;//used to track total search length
-			if(counter>=msg_mapping_.size())//exit if all messages have been scanned
-			{
-				if((!partialSearch)||(failedSearchText == ""))//store failed text if one isn't already stored
-				{
-					failedSearchText = searchText_;
-				}
-				failedSearchIndex = msg_mapping_.size();
-
-				return searchNotFound;//match not found, return -1 and exit loop
-			}
-			//increment index then address corner rounding
-			index = index + increment;
-			if(index<0)//less than 0 set to max
-			{
-				index = msg_mapping_.size()-1;
-			}
-			else if(index>=msg_mapping_.size())//greater than max, set to 0
-			{
-				index = 0;
-			}
-		}
+  // trigger partial search if:
+  //   searchText_ conaints prior failed text
+  //   prior failed text is not empty
+  //   failed index is not 0
+  //   failed search index isn't greater than current index, this could happen through user
+  //     interface message selection. Software should clear the variables when UI is adjusted.
+  if(searchText.contains(failedSearchText_) && failedSearchText_ != "" && failedSearchIndex_ !=0 && failedSearchIndex_ <= msg_mapping_.size() )
+  {
+    partialSearch = true;
+    index = failedSearchIndex_-1;
+    counter = failedSearchIndex_;
+  }
+  int i;
+  for(i=0; i<msg_mapping_.size();i++)  // loop through all messages until end or match is found
+  {
+    const LineMap line_idx = msg_mapping_[index];
+    const LogEntry &item = db_->log()[line_idx.log_index];
+    QString tempString = item.text.join("|");  // concatenate strings
+    if(tempString.toUpper().contains(searchText))  // search match found
+    {
+      clearSearchFailure();  // reset failed search variables
+      return index;  // match found, return location and exit loop
+    }
+    counter++;  // used to track total search length
+    if(counter>=msg_mapping_.size())  // exit if all messages have been scanned
+    {
+      if((!partialSearch)||(failedSearchText_ == ""))  // store failed text if one isn't already stored
+      {
+        failedSearchText_ = searchText;
+      }
+      failedSearchIndex_ = msg_mapping_.size();
+      return searchNotFound;  // match not found, return -1 and exit loop
+    }
+    // increment (next/search) or decrement (prev) index then address corner rounding
+    index = index + increment;
+    if(index<0)  // less than 0 set to max
+    {
+      index = msg_mapping_.size()-1;
+    }
+    else if(index>=msg_mapping_.size())  // greater than max, set to 0
+    {
+      index = 0;
+    }
+  }
 }
 
 void LogDatabaseProxyModel::clearSearchFailure()
 {
-	//reset failed search variables, VCM 27 April 2017
-	failedSearchIndex = 0;
-	failedSearchText = "";
+  // reset failed search variables, VCM 27 April 2017
+  failedSearchIndex_ = 0;
+  failedSearchText_ = "";
 }
 
 QVariant LogDatabaseProxyModel::data(
@@ -555,7 +554,7 @@ void LogDatabaseProxyModel::saveTextFile(const QString& filename) const
 void LogDatabaseProxyModel::handleDatabaseCleared()
 {
   reset();
-  clearSearchFailure(); //reset failed search variables, VCM 26 April 2017
+  clearSearchFailure();  // reset failed search variables, VCM 26 April 2017
 }
 
 void LogDatabaseProxyModel::processNewMessages()
