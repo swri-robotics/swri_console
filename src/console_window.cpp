@@ -175,10 +175,10 @@ ConsoleWindow::ConsoleWindow(LogDatabase *db)
     this, SLOT(searchIndex()));
   // Connect pushPrev to prevIndex()
   QObject::connect(ui.pushPrev, SIGNAL(clicked()),
-                    this, SLOT(prevIndex()));
+    this, SLOT(prevIndex()));
   // Connect pushNext to nextIndex()
   QObject::connect(ui.pushNext, SIGNAL(clicked()),
-                    this, SLOT(nextIndex()));
+    this, SLOT(nextIndex()));
 
 
   QList<int> sizes;
