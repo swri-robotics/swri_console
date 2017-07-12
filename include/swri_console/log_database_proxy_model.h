@@ -33,12 +33,13 @@
 
 #include <QAbstractListModel>
 #include <QColor>
+#include <QStringList>
+#include <QRegExp>
+
 #include <stdint.h>
 #include <set>
 #include <string>
 #include <deque>
-#include <QStringList>
-#include <QRegExp>
 
 namespace swri_console
 {
@@ -70,7 +71,8 @@ class LogDatabaseProxyModel : public QAbstractListModel
   void setFatalColor(const QColor& fatal_color);
   bool isIncludeValid() const;
   bool isExcludeValid() const;
-
+  int getItemIndex(const QString searchText, int index, int increment);
+  void clearSearchFailure();
 
   virtual int rowCount(const QModelIndex &parent) const;
   virtual QVariant data(const QModelIndex &index, int role) const;
@@ -93,8 +95,6 @@ class LogDatabaseProxyModel : public QAbstractListModel
   void setUseRegularExpressions(bool useRegexps);
 
  private:
-  LogDatabase *db_;
-
   void saveBagFile(const QString& filename) const;
   void saveTextFile(const QString& filename) const;
   void scheduleIdleProcessing();
@@ -137,6 +137,11 @@ class LogDatabaseProxyModel : public QAbstractListModel
   QColor warn_color_;
   QColor error_color_;
   QColor fatal_color_;
+  LogDatabase *db_;
+
+  QString failedSearchText_;  // stores last failed search text, used to minimize looping through full data set, VCM 26 April 2017
+  int failedSearchIndex_;  // stores last index of failed search text, VCM 26 April 2017
+
 };
 }  // swri_console
 #endif  // SWRI_CONSOLE_LOG_DATABASE_PROXY_MODEL_H_
