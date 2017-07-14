@@ -55,7 +55,6 @@ msg/_*.py
 /cfg/*.py
 
 # Ignore generated docs
-*.dox
 *.wikidoc
 
 # eclipse stuff

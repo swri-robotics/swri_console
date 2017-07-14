@@ -84,8 +84,7 @@ namespace swri_console
       bool success = false;
       boost::thread svc_thread(&NodeClickHandler::callServiceWorker<T>, this, client, &service, &success);
 
-      if (svc_thread.try_join_for(boost::chrono::seconds(timeout_secs)))
-      {
+      if (svc_thread.try_join_for(boost::chrono::seconds(timeout_secs))) {
         return success;
       }
       svc_thread.interrupt();
