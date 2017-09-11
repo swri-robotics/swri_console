@@ -45,7 +45,7 @@ namespace swri_console
 {
 
 class LogDatabase;
-class LogEntry;
+struct LogEntry;
 class LogDatabaseProxyModel : public QAbstractListModel
 {
   Q_OBJECT

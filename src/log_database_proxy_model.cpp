@@ -50,7 +50,6 @@ namespace swri_console
 {
 LogDatabaseProxyModel::LogDatabaseProxyModel(LogDatabase *db)
   :
-  db_(db),
   colorize_logs_(true),
   display_time_(true),
   display_absolute_time_(false),
@@ -60,6 +59,7 @@ LogDatabaseProxyModel::LogDatabaseProxyModel(LogDatabase *db)
   warn_color_(QColor(255,127,0)),
   error_color_(Qt::red),
   fatal_color_(Qt::magenta),
+  db_(db),
   failedSearchText_(""),
   failedSearchIndex_(0)
 {
@@ -318,6 +318,8 @@ int LogDatabaseProxyModel::getItemIndex(const QString searchText, int index, int
       index = 0;
     }
   }
+
+  return -1;
 }
 
 void LogDatabaseProxyModel::clearSearchFailure()
