@@ -42,6 +42,7 @@ file (GLOB HEADER_FILES
   include/swri_console/log_database.h
   include/swri_console/node_list_model.h
   include/swri_console/log_database_proxy_model.h
+  include/swri_console/rosout_log_loader.h
   include/swri_console/ros_thread.h)
 file (GLOB SRC_FILES
   src/bag_reader.cpp
@@ -51,6 +52,7 @@ file (GLOB SRC_FILES
   src/node_list_model.cpp
   src/log_database_proxy_model.cpp
   src/ros_thread.cpp
+  src/rosout_log_loader.cpp
   src/settings_keys.cpp)
 qt5_add_resources(RCC_SRCS resources/images.qrc)
 qt5_wrap_ui(SRC_FILES ${UI_FILES})

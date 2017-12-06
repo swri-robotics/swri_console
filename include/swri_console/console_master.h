@@ -38,6 +38,7 @@
 #include <rosgraph_msgs/Log.h>
 #include <swri_console/log_database.h>
 #include <swri_console/bag_reader.h>
+#include <swri_console/rosout_log_loader.h>
 
 #include "ros_thread.h"
 
@@ -64,6 +65,7 @@ class ConsoleMaster : public QObject
 
  private:
   BagReader bag_reader_;
+  RosoutLogLoader log_reader_;
 
   // All ROS operations are done on a separate thread to ensure they do not
   // cause the GUI thread to block.
