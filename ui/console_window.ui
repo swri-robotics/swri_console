@@ -298,7 +298,7 @@
      <x>0</x>
      <y>0</y>
      <width>1035</width>
-     <height>27</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -307,6 +307,8 @@
     </property>
     <addaction name="action_NewWindow"/>
     <addaction name="action_ReadBagFile"/>
+    <addaction name="action_ReadLogFile"/>
+    <addaction name="action_ReadLogDirectory"/>
     <addaction name="action_SaveLogs"/>
     <addaction name="separator"/>
     <addaction name="action_Quit"/>
@@ -443,6 +445,28 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+E</string>
+   </property>
+  </action>
+  <action name="action_ReadLogFile">
+   <property name="text">
+    <string>Read &amp;Log File...</string>
+   </property>
+   <property name="toolTip">
+    <string>Read a rosout.log file</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+L</string>
+   </property>
+  </action>
+  <action name="action_ReadLogDirectory">
+   <property name="text">
+    <string>Read Log &amp;Directory...</string>
+   </property>
+   <property name="toolTip">
+    <string>Read Log Directory</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D, Return</string>
    </property>
   </action>
  </widget>

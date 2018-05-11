@@ -82,6 +82,12 @@ ConsoleWindow::ConsoleWindow(LogDatabase *db)
   QObject::connect(ui.action_ReadBagFile, SIGNAL(triggered(bool)),
                    this, SIGNAL(readBagFile()));
 
+  QObject::connect(ui.action_ReadLogFile, SIGNAL(triggered(bool)),
+                   this, SIGNAL(readLogFile()));
+
+  QObject::connect(ui.action_ReadLogDirectory, SIGNAL(triggered(bool)),
+                   this, SIGNAL(readLogDirectory()));
+
   QObject::connect(ui.action_SaveLogs, SIGNAL(triggered(bool)),
                    this, SLOT(saveLogs()));
 
