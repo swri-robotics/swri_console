@@ -15,6 +15,7 @@
 
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>libqt5-opengl-dev</build_depend>
+  <depend>boost</depend>
   <depend>libqt5-core</depend>
   <depend>libqt5-gui</depend>
   <depend>libqt5-widgets</depend>

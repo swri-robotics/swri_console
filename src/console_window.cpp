@@ -62,7 +62,8 @@ ConsoleWindow::ConsoleWindow(LogDatabase *db)
   QMainWindow(),
   db_(db),
   db_proxy_(new LogDatabaseProxyModel(db)),
-  node_list_model_(new NodeListModel(db))
+  node_list_model_(new NodeListModel(db)),
+  node_click_handler_(new NodeClickHandler())
 {
   ui.setupUi(this); 
 
@@ -132,6 +133,8 @@ ConsoleWindow::ConsoleWindow(LogDatabase *db)
                                 const QItemSelection &)),
     this,
     SLOT(nodeSelectionChanged()));
+
+  ui.nodeList->installEventFilter(node_click_handler_);
 
   QObject::connect(
     ui.checkDebug, SIGNAL(toggled(bool)),
