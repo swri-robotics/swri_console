@@ -73,6 +73,9 @@ target_link_libraries(swri_console
   ${Boost_LIBRARIES}
 )
 
+catkin_install_python(PROGRAMS  scripts/rosout_agg_recorder
+                    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
 install(DIRECTORY include/${PROJECT_NAME}/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
   FILES_MATCHING PATTERN "*.h"
