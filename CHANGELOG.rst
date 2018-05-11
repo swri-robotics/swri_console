@@ -2,8 +2,8 @@
 Changelog for package swri_console
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.1.0 (2018-05-11)
+------------------
 * Added simple rosout_agg_recorder (`#15 <https://github.com/pjreed/swri_console/issues/15>`_)
 * Change logger levels from within swri_console (`#20 <https://github.com/pjreed/swri_console/issues/20>`_)
 * Load ROS logs and directories of ROS logs
