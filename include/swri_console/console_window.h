@@ -54,6 +54,8 @@ class ConsoleWindow : public QMainWindow {
  Q_SIGNALS:
   void createNewWindow();
   void readBagFile();
+  void readLogFile();
+  void readLogDirectory();
   void selectFont();
                                        
  public Q_SLOTS:

@@ -52,6 +52,10 @@ ConsoleMaster::ConsoleMaster(int argc, char** argv):
                    &db_, SLOT(queueMessage(const rosgraph_msgs::LogConstPtr&) ));
   QObject::connect(&bag_reader_, SIGNAL(finishedReading()),
                    &db_, SLOT(processQueue()));
+  QObject::connect(&log_reader_, SIGNAL(logReceived(const rosgraph_msgs::LogConstPtr& )),
+                   &db_, SLOT(queueMessage(const rosgraph_msgs::LogConstPtr&) ));
+  QObject::connect(&log_reader_, SIGNAL(finishedReading()),
+                   &db_, SLOT(processQueue()));
 }
 
 ConsoleMaster::~ConsoleMaster()
@@ -83,6 +87,12 @@ void ConsoleMaster::createNewWindow()
 
   QObject::connect(win, SIGNAL(readBagFile()),
                    &bag_reader_, SLOT(promptForBagFile()));
+
+  QObject::connect(win, SIGNAL(readLogFile()),
+                   &log_reader_, SLOT(promptForLogFile()));
+
+  QObject::connect(win, SIGNAL(readLogDirectory()),
+                   &log_reader_, SLOT(promptForLogDirectory()));
 
 
   if (!ros_thread_.isRunning())
