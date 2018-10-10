@@ -8,8 +8,8 @@
      alternative to rqt_console.
 
   </description>
-  <maintainer email="elliot.johnson@swri.org">Elliot Johnson</maintainer>
-  <author email="elliot.johnson@swri.org">Elliot Johnson</author>
+  <maintainer email="preed@swri.org">P. J. Reed</maintainer>
+  <maintainer email="jtowler@swri.org">Jerry Towler</maintainer>
   <url>http://ros.org/wiki/swri_console</url>
   <license>BSD</license>
 
