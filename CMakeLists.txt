@@ -1,20 +1,31 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.10)
+
+if(NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 14)
+endif()
+
+if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
+
 project(swri_console)
 
-find_package(catkin REQUIRED COMPONENTS rosbag_storage roscpp rosgraph_msgs)
+### ROS PACKAGES ###
+find_package(ament_cmake REQUIRED)
+# find_package(rosbag_storage REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(rosgraph_msgs REQUIRED)
+
+### QT PACKAGES ###
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Gui REQUIRED)
 find_package(Qt5Widgets REQUIRED)
+
 find_package(Boost COMPONENTS chrono REQUIRED)
 
-catkin_package(
-  INCLUDE_DIRS include
-  CATKIN_DEPENDS rosbag_storage roscpp rosgraph_msgs
-)
-
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
 include_directories(include 
-  ${catkin_INCLUDE_DIRS} 
   ${Qt5Core_INCLUDE_DIRS}
   ${Qt5Gui_INCLUDE_DIRS}
   ${Qt5Widgets_INCLUDE_DIRS}
@@ -69,21 +80,21 @@ target_link_libraries(swri_console
   ${Qt5Core_LIBRARIES}
   ${Qt5Gui_LIBRARIES}
   ${Qt5Widgets_LIBRARIES}
-  ${catkin_LIBRARIES}
+  # ${catkin_LIBRARIES}
   ${Boost_LIBRARIES}
 )
 
-catkin_install_python(PROGRAMS  scripts/rosout_agg_recorder
-                    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
-
 install(DIRECTORY include/${PROJECT_NAME}/
-  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  DESTINATION include/${PROJECT_NAME}
   FILES_MATCHING PATTERN "*.h"
 )
 
 install(TARGETS ${PROJECT_NAME}
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION lib/${PROJECT_NAME}
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
 )
 
+ament_export_dependencies(rosbag_storage rclcpp rosgraph_msgs)
+ament_export_include_directories(include)
+ament_package()
