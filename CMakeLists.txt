@@ -14,6 +14,7 @@ project(swri_console)
 find_package(ament_cmake REQUIRED)
 # find_package(rosbag_storage REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(rcl_interfaces REQUIRED)
 find_package(rosgraph_msgs REQUIRED)
 
 ### QT PACKAGES ###
@@ -87,6 +88,7 @@ target_link_libraries(swri_console
 ament_target_dependencies(${PROJECT_NAME}
   ament_cmake
   rclcpp
+  rcl_interfaces
 )
 
 install(DIRECTORY include/${PROJECT_NAME}/
