@@ -42,8 +42,7 @@
 #include <QListView>
 #include <QMenu>
 
-#include <ros/ros.h>
-#include <ros/service_client.h>
+#include <rclcpp/rclcpp.hpp>
 
 namespace swri_console
 {
@@ -61,7 +60,7 @@ namespace swri_console
     /**
      * Used by callService() to actually call the service in another thread.
      */
-    template <class T> void callServiceWorker(ros::ServiceClient& client, T* service, bool* success)
+    template <class T> void callServiceWorker(rclcpp::Client<T>::SharedPtr client, T* service, bool* success)
     {
       *success = client.call(*service);
     }
@@ -79,7 +78,7 @@ namespace swri_console
      * @param timeout_secs The number of seconds to wait before timing out
      * @return true if the service call completed successfully, otherwise false
      */
-    template <class T> bool callService(ros::ServiceClient& client, T& service, int timeout_secs = 5)
+    template <class T> bool callService(rclcpp::Client<T>::SharedPtr  client, T& service, int timeout_secs = 5)
     {
       bool success = false;
       boost::thread svc_thread(&NodeClickHandler::callServiceWorker<T>, this, client, &service, &success);
@@ -94,7 +93,7 @@ namespace swri_console
     bool showContextMenu(QListView* list, QContextMenuEvent* event);
     QMenu* createMenu(const QString& logger_name, const QString& current_level);
 
-    ros::NodeHandle nh_;
+    std::shared_ptr<rclcpp::Node> nh_;
     std::string node_name_;
     std::vector<std::string> all_loggers_;
 

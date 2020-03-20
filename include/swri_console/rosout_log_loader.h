@@ -35,7 +35,8 @@
 #include <QString>
 #include <QMetaType>
 
-#include <rosgraph_msgs/Log.h>
+#include <rclcpp/rclcpp.hpp>
+#include <rcl_interfaces/msg/log.h>
 
 namespace swri_console
 {

@@ -35,12 +35,14 @@
 #include <QObject>
 #include <QList>
 #include <QFont>
-#include <rosgraph_msgs/Log.h>
+
+#include <rclcpp/rclcpp.hpp>
+#include <rcl_interfaces/msg/log.h>
+
 #include <swri_console/log_database.h>
 #include <swri_console/bag_reader.h>
 #include <swri_console/rosout_log_loader.h>
-
-#include "ros_thread.h"
+#include <swri_console/ros_thread.h>
 
 namespace swri_console
 {
