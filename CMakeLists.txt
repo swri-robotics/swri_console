@@ -84,6 +84,11 @@ target_link_libraries(swri_console
   ${Boost_LIBRARIES}
 )
 
+ament_target_dependencies(${PROJECT_NAME}
+  ament_cmake
+  rclcpp
+)
+
 install(DIRECTORY include/${PROJECT_NAME}/
   DESTINATION include/${PROJECT_NAME}
   FILES_MATCHING PATTERN "*.h"
@@ -95,6 +100,8 @@ install(TARGETS ${PROJECT_NAME}
   ARCHIVE DESTINATION lib
 )
 
-ament_export_dependencies(rosbag_storage rclcpp rosgraph_msgs)
+ament_export_dependencies(${RUNTIME_DEPS}
+
+)
 ament_export_include_directories(include)
 ament_package()
