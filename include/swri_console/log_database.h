@@ -74,7 +74,7 @@ public:
   void minTimeUpdated();
 
 public Q_SLOTS:
-  void queueMessage(const rosgraph_msgs::LogConstPtr msg);
+  void queueMessage(const rcl_interfaces::msg::Log::SharedPtr msg);
   void processQueue();
 
 private:  

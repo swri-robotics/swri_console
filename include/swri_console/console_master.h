@@ -46,7 +46,7 @@
 
 namespace swri_console
 {
-typedef std::vector<rosgraph_msgs::LogConstPtr> MessageList;
+typedef std::vector<rcl_interfaces::msg::Log::SharedPtr> MessageList;
 
 class ConsoleWindow;
 class ConsoleMaster : public QObject
