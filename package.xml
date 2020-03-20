@@ -13,14 +13,16 @@
   <url>http://ros.org/wiki/swri_console</url>
   <license>BSD</license>
 
-  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>rosidl_default_generators</buildtool_depend> 
   <build_depend>libqt5-opengl-dev</build_depend>
   <depend>boost</depend>
   <depend>libqt5-core</depend>
   <depend>libqt5-gui</depend>
   <depend>libqt5-widgets</depend>
-  <depend>rosbag_storage</depend>
-  <depend>roscpp</depend>
+  <!-- <depend>rosbag_storage</depend>
+  <depend>roscpp</depend> -->
+  <depend>rclcpp</depend>
+  <depend>rcl_interfaces</depend>
   <depend>rosgraph_msgs</depend>
  
 </package>
