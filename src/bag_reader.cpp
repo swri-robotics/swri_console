@@ -31,10 +31,11 @@
 #include <QFileDialog>
 #include <QDir>
 
-#include "include/swri_console/bag_reader.h"
+#include "swri_console/bag_reader.h"
 
-#include <rosbag/bag.h>
-#include <rosbag/view.h>
+// #include <rosbag/bag.h>
+// #include <rosbag/view.h>
+#include <rclcpp/rclcpp.hpp>
 
 using namespace swri_console;
 

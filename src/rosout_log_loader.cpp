@@ -33,8 +33,9 @@
 #include <QDirIterator>
 
 #include <fstream>
-#include <ros/time.h>
-#include <rosbag/bag.h>
+// #include <ros/time.h>
+// #include <rosbag/bag.h>
+#include <rclcpp/rclcpp.hpp>
 #include <swri_console/rosout_log_loader.h>
 #include <time.h>
 #include <string>

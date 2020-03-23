@@ -32,9 +32,10 @@
 #include <stdio.h>
 #include <set>
 
-#include <rosgraph_msgs/Log.h>
-#include <ros/master.h>  // required for getURI, VCM 12 April 2017
-
+// #include <rosgraph_msgs/Log.h>
+// #include <ros/master.h>  // required for getURI, VCM 12 April 2017
+#include <rclcpp/rclcpp.hpp>
+#include <rcl_interfaces/msg/log.hpp>
 
 #include <swri_console/console_window.h>
 #include <swri_console/log_database.h>

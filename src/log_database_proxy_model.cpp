@@ -32,8 +32,9 @@
 #include <algorithm>
 #include <iterator>
 
-#include <ros/time.h>
-#include <rosbag/bag.h>
+// #include <ros/time.h>
+// #include <rosbag/bag.h>
+#include <rclcpp/rclcpp.hpp>
 
 #include <swri_console/log_database_proxy_model.h>
 #include <swri_console/log_database.h>

@@ -31,9 +31,11 @@
 #include <swri_console/node_click_handler.h>
 #include <swri_console/node_list_model.h>
 
-#include <ros/ros.h>
-#include <roscpp/GetLoggers.h>
-#include <roscpp/SetLoggerLevel.h>
+// #include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
+// #include <roscpp/GetLoggers.h>
+// #include <roscpp/SetLoggerLevel.h>
+#include <rclcpp/logger.hpp>
 
 #include <QMessageBox>
 #include <QTextStream>
@@ -79,26 +81,29 @@ namespace swri_console
     node_name_ = model->nodeName(index_list.first());
 
     std::string service_name = node_name_ + GET_LOGGERS_SVC;
-    ros::ServiceClient client = nh_.serviceClient<roscpp::GetLoggers>(service_name);
+    // ros::ServiceClient client = nh_.serviceClient<roscpp::GetLoggers>(service_name);
+    rclcpp::Client<rclcpp::Logger>::SharedPtr client = nh_->create_client<rclcpp::Logger>(service_name);
     /**
      * Normally this call should return very quickly, but we don't want the GUI to
      * hang if the roscore is stuck, so add a timeout.
      * The value is pretty arbitrary, but we also want to give enough time for this
      * to still respond over a slow network link, so it shouldn't be *too* small.
      */
-    if (!client.waitForExistence(ros::Duration(2.0))) {
-      ROS_WARN("Timed out while waiting for service at %s.", service_name.c_str());
+    // if (!client.waitForExistence(ros::Duration(2.0))) {
+    if (!client->wait_for_service(std::chrono::seconds(2)))
+      RCLCPP_WARN(nh_->get_logger(), "Timed out while waiting for service at %s.", service_name.c_str());
       QMessageBox::warning(list, "Error Getting Loggers", "Timed out waiting for get_loggers service.");
       return false;
     }
 
-    roscpp::GetLoggers srv;
+    // roscpp::GetLoggers srv;
+    rclcpp::Logger srv;
 
     QMenu menu(list);
     QAction* label = menu.addAction(QString::fromStdString(node_name_ + " loggers:"));
     label->setDisabled(true);
 
-    ROS_DEBUG("Getting loggers for %s...", node_name_.c_str());
+    RCLCPP_DEBUG(nh_->get_logger(), "Getting loggers for %s...", node_name_.c_str());
     if (callService(client, srv)) {
       all_loggers_.clear();
       menu.addMenu(createMenu(QString::fromStdString(ALL_LOGGERS), ""));
@@ -148,13 +153,13 @@ namespace swri_console
 
     std::string logger = action->data().toString().toStdString();
     std::string level = action->text().toStdString();
-    ROS_DEBUG("Setting log level for %s/%s to %s", node_name_.c_str(), logger.c_str(), level.c_str());
+    RCLCPP_DEBUG(nh_->get_logger(), "Setting log level for %s/%s to %s", node_name_.c_str(), logger.c_str(), level.c_str());
 
     std::string service_name = node_name_ + SET_LOGGER_LEVEL_SVC;
 
     ros::ServiceClient client = nh_.serviceClient<roscpp::SetLoggerLevel>(service_name);
     if (!client.waitForExistence(ros::Duration(2.0))) {
-      ROS_WARN("Timed out while waiting for service at %s.", service_name.c_str());
+      RCLCPP_WARN(nh_->get_logger(), "Timed out while waiting for service at %s.", service_name.c_str());
       QMessageBox::warning(NULL, "Error Getting Loggers", "Timed out waiting for set_logger_level service.");
       return;
     }
