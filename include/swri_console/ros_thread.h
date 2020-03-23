@@ -74,7 +74,8 @@ namespace swri_console
 
     bool is_connected_;
     volatile bool is_running_;
-    // ros::Subscriber rosout_sub_;
+
+    rclcpp::Node::SharedPtr nh_;
     rclcpp::Subscription<rcl_interfaces::msg::Log>::SharedPtr rosout_sub_;
   };
 }

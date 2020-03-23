@@ -29,7 +29,7 @@
 // *****************************************************************************
 
 #include <QCoreApplication>
-#include "include/swri_console/ros_thread.h"
+#include "swri_console/ros_thread.h"
 
 using namespace swri_console;
 
@@ -37,23 +37,23 @@ RosThread::RosThread(int argc, char** argv) :
   is_connected_(false),
   is_running_(true)
 {
-  ros::init(argc, argv, "swri_console",
-            ros::init_options::AnonymousName |
-            ros::init_options::NoRosout);
+  rclcpp::init(argc, argv);
 }
 
 void RosThread::run()
 {
   while (is_running_)
   {
-    bool master_status = ros::master::check();
+    bool is_initialized = rclcpp::is_initialized();
 
-    if (!is_connected_ && master_status) {
+    if (!is_connected_ && is_initialized) {
       startRos();
-    } else if (is_connected_ && !master_status) {
+    } else if (is_connected_ && !is_initialized) {
       stopRos();
-    } else if (is_connected_ && master_status) {
-      ros::spinOnce();
+    } else if (is_connected_ && is_initialized) {
+      auto poller = rclcpp::executors::SingleThreadedExecutor();
+      poller.add_node(nh_);
+      poller.spin_once();
       Q_EMIT spun();
     }
     msleep(50);
@@ -64,33 +64,35 @@ void RosThread::run()
 void RosThread::shutdown()
 {
   is_running_ = false;
-  if (ros::isStarted())
+  if (rclcpp::is_initialized())
   {
-    ros::shutdown();
-    ros::waitForShutdown();
+    rclcpp::shutdown();
+    // rclcpp::waitForShutdown();
   }
 }
 
 void RosThread::startRos()
 {
-  ros::start();
+  // ros::start();
+
   is_connected_ = true;
 
-  ros::NodeHandle nh;
-  rosout_sub_ = nh.subscribe("/rosout_agg", 10000,
-                             &RosThread::handleRosout,
-                             this);
+  nh_ = rclcpp::Node("swri_console").make_unique();
+  rosout_sub_ = nh_->create_subscription<rcl_interfaces::msg::Log>(
+    "/rosout_agg",
+    rclcpp::QoS(10000),
+    std::bind(&RosThread::handleRosout, this, std::placeholders::_1));
   Q_EMIT connected(true);
 }
 
 void RosThread::stopRos()
 {
-  ros::shutdown();
+  rclcpp::shutdown();
   is_connected_ = false;
   Q_EMIT connected(false);
 }
 
-void RosThread::handleRosout(const rosgraph_msgs::LogConstPtr &msg)
+void RosThread::handleRosout(const rcl_interfaces::msg::Log::SharedPtr msg)
 {
   Q_EMIT logReceived(msg);
 }
