@@ -36,7 +36,7 @@
 #include <QStringList>
 
 #include <rclcpp/rclcpp.hpp>
-#include <rcl_interfaces/msg/log.h>
+#include <rcl_interfaces/msg/log.hpp>
 #include <deque>
 #include <rclcpp/time.hpp>
 

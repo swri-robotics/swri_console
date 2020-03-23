@@ -36,7 +36,7 @@
 #include <QMetaType>
 
 #include <rclcpp/rclcpp.hpp>
-#include <rcl_interfaces/msg/log.h>
+#include <rcl_interfaces/msg/log.hpp>
 
 namespace swri_console
 {

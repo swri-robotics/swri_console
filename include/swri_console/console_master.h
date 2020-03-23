@@ -37,7 +37,7 @@
 #include <QFont>
 
 #include <rclcpp/rclcpp.hpp>
-#include <rcl_interfaces/msg/log.h>
+#include <rcl_interfaces/msg/log.hpp>
 
 #include <swri_console/log_database.h>
 #include <swri_console/bag_reader.h>
