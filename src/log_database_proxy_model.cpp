@@ -36,6 +36,11 @@
 // #include <rosbag/bag.h>
 #include <rclcpp/rclcpp.hpp>
 
+#include <rosbag2/logging.hpp>
+#include <rosbag2/types.hpp>
+#include <rosbag2/writer.hpp>
+#include <rosbag2_storage/logging.hpp>
+
 #include <swri_console/log_database_proxy_model.h>
 #include <swri_console/log_database.h>
 #include <swri_console/settings_keys.h>
@@ -359,15 +364,15 @@ QVariant LogDatabaseProxyModel::data(
 
   if (role == Qt::DisplayRole) {
     char level = '?';
-    if (item.level == rosgraph_msgs::Log::DEBUG) {
+    if (item.level == rcl_interfaces::msg::Log::DEBUG) {
       level = 'D';
-    } else if (item.level == rosgraph_msgs::Log::INFO) {
+    } else if (item.level == rcl_interfaces::msg::Log::INFO) {
       level = 'I';
-    } else if (item.level == rosgraph_msgs::Log::WARN) {
+    } else if (item.level == rcl_interfaces::msg::Log::WARN) {
       level = 'W';
-    } else if (item.level == rosgraph_msgs::Log::ERROR) {
+    } else if (item.level == rcl_interfaces::msg::Log::ERROR) {
       level = 'E';
-    } else if (item.level == rosgraph_msgs::Log::FATAL) {
+    } else if (item.level == rcl_interfaces::msg::Log::FATAL) {
       level = 'F';
     }
 
@@ -375,16 +380,16 @@ QVariant LogDatabaseProxyModel::data(
     if (display_absolute_time_) {
       snprintf(stamp, sizeof(stamp),
                "%u.%09u",
-               item.stamp.sec,
-               item.stamp.nsec);
+               item.stamp.seconds(),
+               item.stamp.nanoseconds());
     } else {
-      ros::Duration t = item.stamp - db_->minTime();
+      rclcpp::Duration t = item.stamp - db_->minTime();
 
-      int32_t secs = t.sec;
+      int32_t secs = t.seconds();
       int hours = secs / 60 / 60;
       int minutes = (secs / 60) % 60;
       int seconds = (secs % 60);
-      int milliseconds = t.nsec / 1000000;
+      int milliseconds = t.nanoseconds() / 1000000;
       
       snprintf(stamp, sizeof(stamp),
                "%d:%02d:%02d:%03d",
@@ -415,15 +420,15 @@ QVariant LogDatabaseProxyModel::data(
   }
   else if (role == Qt::ForegroundRole && colorize_logs_) {
     switch (item.level) {
-      case rosgraph_msgs::Log::DEBUG:
+      case rcl_interfaces::msg::Log::DEBUG:
         return QVariant(debug_color_);
-      case rosgraph_msgs::Log::INFO:
+      case rcl_interfaces::msg::Log::INFO:
         return QVariant(info_color_);
-      case rosgraph_msgs::Log::WARN:
+      case rcl_interfaces::msg::Log::WARN:
         return QVariant(warn_color_);
-      case rosgraph_msgs::Log::ERROR:
+      case rcl_interfaces::msg::Log::ERROR:
         return QVariant(error_color_);
-      case rosgraph_msgs::Log::FATAL:
+      case rcl_interfaces::msg::Log::FATAL:
         return QVariant(fatal_color_);
       default:
         return QVariant(info_color_);
@@ -440,8 +445,8 @@ QVariant LogDatabaseProxyModel::data(
              "File: %s\n"
              "Line: %d\n"
              "\n",
-             item.stamp.sec,
-             item.stamp.nsec,
+             item.stamp.seconds(),
+             item.stamp.nanoseconds(),
              item.seq,
              item.node.c_str(),
              item.function.c_str(),
@@ -462,8 +467,8 @@ QVariant LogDatabaseProxyModel::data(
              "File: %s\n"
              "Line: %d\n"
              "Message: ",
-             item.stamp.sec,
-             item.stamp.nsec,
+             item.stamp.seconds(),
+             item.stamp.nanoseconds(),
              item.node.c_str(),
              item.function.c_str(),
              item.file.c_str(),
@@ -502,33 +507,52 @@ void LogDatabaseProxyModel::saveToFile(const QString& filename) const
 
 void LogDatabaseProxyModel::saveBagFile(const QString& filename) const
 {
-  rosbag::Bag bag(filename.toStdString().c_str(), rosbag::bagmode::Write);
+  // Set up message serialization
+  auto serialized_msg = rmw_get_zero_initialized_serialized_message();
+  auto allocator = rcutils_get_default_allocator();
+  auto initial_capacity = 0u;
+  auto ret = rmw_serialized_message_init(
+    &serialized_msg,
+    initial_capacity,
+    &allocator
+  );
+  auto log_ts = rosidl_typesupport_cpp::get_message_type_support_handle<rcl_interfaces::msg::Log>();
+
+  // rosbag::Bag bag(filename.toStdString().c_str(), rosbag::bagmode::Write);
+  rosbag2::Writer bagwriter = rosbag2::Writer();
+
+  // Minimum time value ROS 2 can support
+  rclcpp::Time TIME_MIN = rclcpp::Time(std::numeric_limits<rcl_time_point_value_t>::min());
 
   size_t idx = 0;
   while (idx < msg_mapping_.size()) {
     const LineMap line_map = msg_mapping_[idx];    
     const LogEntry &item = db_->log()[line_map.log_index];
     
-    rosgraph_msgs::Log log;
+    rcl_interfaces::msg::Log log;
     log.file = item.file;
     log.function = item.function;
-    log.header.seq = item.seq;
-    if (item.stamp < ros::TIME_MIN) {
+    // log.header.seq = item.seq;
+    if (item.stamp < TIME_MIN) {
       // Note: I think TIME_MIN is the minimum representation of
       // ros::Time, so this branch should be impossible.  Nonetheless,
       // it doesn't hurt.
-      log.header.stamp = ros::Time::now();
-      qWarning("Msg with seq %d had time (%d); it's less than ros::TIME_MIN, which is invalid. "
+      log.stamp = rclcpp::Time();
+      qWarning("Msg had time (%d); it's less than ros::TIME_MIN, which is invalid. "
                "Writing 'now' instead.",
-               log.header.seq, item.stamp.sec);
+               item.stamp.seconds());
     } else {
-      log.header.stamp = item.stamp;
+      log.stamp = item.stamp;
     }
     log.level = item.level;
     log.line = item.line;
     log.msg = item.text.join("\n").toStdString();
     log.name = item.node;
-    bag.write("/rosout", log.header.stamp, log);
+
+    // Serialize for storage
+    ret = rmw_serialize(&log, log_ts, &serialized_msg);
+
+    bag.write("/rosout", log.stamp, log);
 
     // Advance to the next line with a different log index.
     idx++;
