@@ -551,6 +551,8 @@ void LogDatabaseProxyModel::saveBagFile(const QString& filename) const
 
     // Serialize for storage
     ret = rmw_serialize(&log, log_ts, &serialized_msg);
+    rosbag2_storage::SerializedBagMessage bag_message;
+    bag_message.serialized_data = serialized_msg.buffer;
 
     bag.write("/rosout", log.stamp, log);
 
