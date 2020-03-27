@@ -54,7 +54,7 @@ file (GLOB HEADER_FILES
   include/swri_console/console_master.h
   include/swri_console/console_window.h
   include/swri_console/log_database.h
-  include/swri_console/log_database_proxy_model.h
+  # include/swri_console/log_database_proxy_model.h
   include/swri_console/node_click_handler.h
   include/swri_console/node_list_model.h
   include/swri_console/rosout_log_loader.h
@@ -67,7 +67,7 @@ file (GLOB SRC_FILES
   src/log_database.cpp
   src/node_click_handler.cpp
   src/node_list_model.cpp
-  src/log_database_proxy_model.cpp
+  # src/log_database_proxy_model.cpp
   src/ros_thread.cpp
   src/rosout_log_loader.cpp
   src/settings_keys.cpp
