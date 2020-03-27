@@ -15,7 +15,6 @@ find_package(ament_cmake REQUIRED)
 # find_package(rosbag_storage REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rcl_interfaces REQUIRED)
-find_package(rosgraph_msgs REQUIRED)
 
 ### QT PACKAGES ###
 find_package(Qt5Core REQUIRED)
@@ -81,19 +80,11 @@ ament_target_dependencies(${PROJECT_NAME}
   rcl_interfaces
 )
 
-install(DIRECTORY include/${PROJECT_NAME}/
-  DESTINATION include/${PROJECT_NAME}
-  FILES_MATCHING PATTERN "*.h"
-)
-
 install(TARGETS ${PROJECT_NAME}
   RUNTIME DESTINATION lib/${PROJECT_NAME}
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
 )
 
-ament_export_dependencies(${RUNTIME_DEPS}
-
-)
-ament_export_include_directories(include)
+ament_export_dependencies(${RUNTIME_DEPS})
 ament_package()

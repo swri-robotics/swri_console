@@ -20,11 +20,13 @@
   <depend>libqt5-core</depend>
   <depend>libqt5-gui</depend>
   <depend>libqt5-widgets</depend>
-  <!-- <depend>rosbag_storage</depend>
-  <depend>roscpp</depend> -->
+  <!-- <depend>rosbag_storage</depend> -->
   <depend>rclcpp</depend>
   <depend>rcl_interfaces</depend>
-  <depend>rosgraph_msgs</depend>
  
   <exec_depend>rosidl_default_runtime</exec_depend>
+
+    <export>
+    <build_type>ament_cmake</build_type>
+  </export>
 </package>

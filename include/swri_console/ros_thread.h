@@ -58,7 +58,7 @@ namespace swri_console
      * Emitted every time a log message is received.  This can be emitted multiple times per spin of
      * the ROS core; wait until spun() is emitted to do any processing on them.
      */
-    void logReceived(const rcl_interfaces::msg::Log::ConstSharedPtr& msg);
+    void logReceived(rcl_interfaces::msg::Log::ConstSharedPtr msg);
     /**
      * Emitted after every time ros::spinOnce() completes.
      */
@@ -68,7 +68,6 @@ namespace swri_console
     void run() override;
 
   private:
-    void handleRosout(const rcl_interfaces::msg::Log::ConstSharedPtr msg);
     void startRos();
     void stopRos();
 
@@ -76,7 +75,6 @@ namespace swri_console
     volatile bool is_running_;
 
     rclcpp::Node::SharedPtr nh_;
-    rclcpp::executors::SingleThreadedExecutor::SharedPtr executor_;
     rclcpp::Subscription<rcl_interfaces::msg::Log>::SharedPtr rosout_sub_;
   };
 }

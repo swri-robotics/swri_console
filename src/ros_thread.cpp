@@ -55,8 +55,7 @@ void RosThread::run()
     } else if (is_connected_ && !is_initialized) {
       stopRos();
     } else if (is_connected_ && is_initialized) {
-      executor_->spin_once(1000ns);
-      //rclcpp::spin_some(nh_);
+      rclcpp::spin_some(nh_);
       Q_EMIT spun();
     }
     msleep(50);
@@ -78,12 +77,14 @@ void RosThread::startRos()
   is_connected_ = true;
 
   nh_ = rclcpp::Node::make_shared("swri_console");
-  executor_ = rclcpp::executors::SingleThreadedExecutor::make_shared();
-  executor_->add_node(nh_);
+
   rosout_sub_ = nh_->create_subscription<rcl_interfaces::msg::Log>(
     "/rosout",
-    rclcpp::QoS(100),
-    std::bind(&RosThread::handleRosout, this, std::placeholders::_1));
+    100,
+    [this](rcl_interfaces::msg::Log::ConstSharedPtr msg) {
+      Q_EMIT logReceived(msg);
+    }
+    );
   Q_EMIT connected(true);
 }
 
@@ -92,9 +93,4 @@ void RosThread::stopRos()
   rclcpp::shutdown();
   is_connected_ = false;
   Q_EMIT connected(false);
-}
-
-void RosThread::handleRosout(const rcl_interfaces::msg::Log::ConstSharedPtr msg)
-{
-  Q_EMIT logReceived(msg);
 }

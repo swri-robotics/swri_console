@@ -34,7 +34,7 @@ namespace swri_console
 {
 LogDatabase::LogDatabase()
   :
-  min_time_(rclcpp::Time(std::numeric_limits<rcl_time_point_value_t>::min()))
+  min_time_(rclcpp::Time(std::numeric_limits<rcl_time_point_value_t>::max()))
 {
 }
 
@@ -48,16 +48,16 @@ void LogDatabase::clear()
 
 void LogDatabase::queueMessage(const rcl_interfaces::msg::Log::ConstSharedPtr msg)
 {
-  rclcpp::Time stamp_time = msg->stamp;
+  rclcpp::Time stamp_time = rclcpp::Time(msg->stamp, min_time_.get_clock_type());
   if (stamp_time < min_time_) {
-    min_time_ = msg->stamp;
+    min_time_ = stamp_time;
     Q_EMIT minTimeUpdated();
   }
   
   msg_counts_[msg->name]++;
 
   LogEntry log;
-  log.stamp = msg->stamp;
+  log.stamp = stamp_time;
   log.level = msg->level;
   log.node = msg->name;
   log.file = msg->file;
