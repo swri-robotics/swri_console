@@ -35,6 +35,8 @@
 
 using namespace swri_console;
 
+using namespace std::literals::chrono_literals;
+
 RosThread::RosThread(int argc, char** argv) :
   is_connected_(false),
   is_running_(true)
@@ -53,7 +55,8 @@ void RosThread::run()
     } else if (is_connected_ && !is_initialized) {
       stopRos();
     } else if (is_connected_ && is_initialized) {
-      rclcpp::spin_some(nh_);
+      executor_->spin_once(1000ns);
+      //rclcpp::spin_some(nh_);
       Q_EMIT spun();
     }
     msleep(50);
@@ -74,7 +77,9 @@ void RosThread::startRos()
 {
   is_connected_ = true;
 
-  nh_ = std::make_shared<rclcpp::Node>("swri_console");
+  nh_ = rclcpp::Node::make_shared("swri_console");
+  executor_ = rclcpp::executors::SingleThreadedExecutor::make_shared();
+  executor_->add_node(nh_);
   rosout_sub_ = nh_->create_subscription<rcl_interfaces::msg::Log>(
     "/rosout",
     rclcpp::QoS(10000),

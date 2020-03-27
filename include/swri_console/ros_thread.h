@@ -76,6 +76,7 @@ namespace swri_console
     volatile bool is_running_;
 
     rclcpp::Node::SharedPtr nh_;
+    rclcpp::executors::SingleThreadedExecutor::SharedPtr executor_;
     rclcpp::Subscription<rcl_interfaces::msg::Log>::SharedPtr rosout_sub_;
   };
 }

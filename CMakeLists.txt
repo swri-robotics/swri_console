@@ -55,11 +55,11 @@ file (GLOB SRC_FILES
   src/console_master.cpp
   src/console_window.cpp
   src/log_database.cpp
+  src/log_database_proxy_model.cpp
   # src/node_click_handler.cpp
   src/node_list_model.cpp
-  src/log_database_proxy_model.cpp
-  src/ros_thread.cpp
   src/rosout_log_loader.cpp
+  src/ros_thread.cpp
   src/settings_keys.cpp
   )
 qt5_add_resources(RCC_SRCS resources/images.qrc)
