@@ -30,6 +30,8 @@
 
 #include <QCoreApplication>
 #include "swri_console/ros_thread.h"
+#include <rclcpp/rclcpp.hpp>
+#include <rclcpp/executors/single_threaded_executor.hpp>
 
 using namespace swri_console;
 
