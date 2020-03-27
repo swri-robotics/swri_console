@@ -81,7 +81,7 @@ void RosThread::startRos()
 
   is_connected_ = true;
 
-  nh_ = std::make_shared<rclcpp::Node>(rclcpp::Node("swri_console"));
+  nh_ = rclcpp::Node::make_shared("swri_console");
   rosout_sub_ = nh_->create_subscription<rcl_interfaces::msg::Log>(
     "/rosout_agg",
     rclcpp::QoS(10000),
