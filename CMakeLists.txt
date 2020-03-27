@@ -50,7 +50,7 @@ include_directories(src)
 file (GLOB UI_FILES
   ui/console_window.ui)
 file (GLOB HEADER_FILES
-  include/swri_console/bag_reader.h
+  # include/swri_console/bag_reader.h
   include/swri_console/console_master.h
   include/swri_console/console_window.h
   include/swri_console/log_database.h
@@ -61,7 +61,7 @@ file (GLOB HEADER_FILES
   include/swri_console/ros_thread.h
   )
 file (GLOB SRC_FILES
-  src/bag_reader.cpp
+  # src/bag_reader.cpp
   src/console_master.cpp
   src/console_window.cpp
   src/log_database.cpp
