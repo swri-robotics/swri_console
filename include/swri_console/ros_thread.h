@@ -68,7 +68,7 @@ namespace swri_console
     void run() override;
 
   private:
-    void handleRosout(rcl_interfaces::msg::Log::ConstSharedPtr msg);
+    void handleRosout(const rcl_interfaces::msg::Log::ConstSharedPtr msg);
     void startRos();
     void stopRos();
 

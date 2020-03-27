@@ -82,7 +82,7 @@ void RosThread::startRos()
   executor_->add_node(nh_);
   rosout_sub_ = nh_->create_subscription<rcl_interfaces::msg::Log>(
     "/rosout",
-    rclcpp::QoS(10000),
+    rclcpp::QoS(100),
     std::bind(&RosThread::handleRosout, this, std::placeholders::_1));
   Q_EMIT connected(true);
 }
