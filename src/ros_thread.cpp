@@ -53,7 +53,7 @@ void RosThread::run()
     } else if (is_connected_ && !is_initialized) {
       stopRos();
     } else if (is_connected_ && is_initialized) {
-      auto poller = rclcpp::executors::SingleThreadedExecutor();
+      rclcpp::executors::SingleThreadedExecutor poller;
       poller.add_node(nh_);
       poller.spin_once();
       Q_EMIT spun();
@@ -79,7 +79,7 @@ void RosThread::startRos()
 
   is_connected_ = true;
 
-  nh_ = rclcpp::Node("swri_console").make_unique();
+  nh_ = rclcpp::Node("swri_console").make_shared();
   rosout_sub_ = nh_->create_subscription<rcl_interfaces::msg::Log>(
     "/rosout_agg",
     rclcpp::QoS(10000),
