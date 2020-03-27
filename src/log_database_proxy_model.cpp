@@ -379,7 +379,7 @@ QVariant LogDatabaseProxyModel::data(
     char stamp[128];
     if (display_absolute_time_) {
       snprintf(stamp, sizeof(stamp),
-               "%u.%09u",
+               "%d.%09d",
                item.stamp.seconds(),
                item.stamp.nanoseconds());
     } else {
