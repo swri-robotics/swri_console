@@ -33,6 +33,8 @@
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp/executors/single_threaded_executor.hpp>
 
+#include <memory>
+
 using namespace swri_console;
 
 RosThread::RosThread(int argc, char** argv) :
@@ -79,7 +81,7 @@ void RosThread::startRos()
 
   is_connected_ = true;
 
-  nh_ = rclcpp::Node("swri_console").make_shared();
+  nh_ = std::make_shared<rclcpp::Node>(rclcpp::Node("swri_console"));
   rosout_sub_ = nh_->create_subscription<rcl_interfaces::msg::Log>(
     "/rosout_agg",
     rclcpp::QoS(10000),
