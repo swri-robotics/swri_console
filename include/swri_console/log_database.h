@@ -60,7 +60,7 @@ class LogDatabase : public QObject
   
 public:
   LogDatabase();
-  ~LogDatabase();
+  ~LogDatabase() override = default;
   
   void clear();
   const std::deque<LogEntry>& log() { return log_; }
@@ -74,7 +74,7 @@ public:
   void minTimeUpdated();
 
 public Q_SLOTS:
-  void queueMessage(const rcl_interfaces::msg::Log::SharedPtr msg);
+  void queueMessage(const rcl_interfaces::msg::Log::ConstSharedPtr msg);
   void processQueue();
 
 private:  

@@ -38,10 +38,6 @@ LogDatabase::LogDatabase()
 {
 }
 
-LogDatabase::~LogDatabase()
-{
-}
-
 void LogDatabase::clear()
 {
   std::map<std::string, size_t>::iterator iter;
@@ -50,7 +46,7 @@ void LogDatabase::clear()
   Q_EMIT databaseCleared();
 }
 
-void LogDatabase::queueMessage(const rcl_interfaces::msg::Log::SharedPtr msg)
+void LogDatabase::queueMessage(const rcl_interfaces::msg::Log::ConstSharedPtr msg)
 {
   rclcpp::Time stamp_time = msg->stamp;
   if (stamp_time < min_time_) {

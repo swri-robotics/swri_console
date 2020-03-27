@@ -379,9 +379,8 @@ QVariant LogDatabaseProxyModel::data(
     char stamp[128];
     if (display_absolute_time_) {
       snprintf(stamp, sizeof(stamp),
-               "%d.%09d",
-               item.stamp.seconds(),
-               item.stamp.nanoseconds());
+               "%f",
+               item.stamp.seconds());
     } else {
       rclcpp::Duration t = item.stamp - db_->minTime();
 
@@ -438,7 +437,7 @@ QVariant LogDatabaseProxyModel::data(
     char buffer[4096];
     snprintf(buffer, sizeof(buffer),
              "<p style='white-space:pre'>"
-             "Timestamp: %d.%09d\n"
+             "Timestamp: %f\n"
              "Seq: %d\n"
              "Node: %s\n"
              "Function: %s\n"
@@ -446,7 +445,6 @@ QVariant LogDatabaseProxyModel::data(
              "Line: %d\n"
              "\n",
              item.stamp.seconds(),
-             item.stamp.nanoseconds(),
              item.seq,
              item.node.c_str(),
              item.function.c_str(),
@@ -461,14 +459,13 @@ QVariant LogDatabaseProxyModel::data(
   } else if (role == LogDatabaseProxyModel::ExtendedLogRole) {
     char buffer[4096];
     snprintf(buffer, sizeof(buffer),
-             "Timestamp: %d.%09d\n"
+             "Timestamp: %f\n"
              "Node: %s\n"
              "Function: %s\n"
              "File: %s\n"
              "Line: %d\n"
              "Message: ",
              item.stamp.seconds(),
-             item.stamp.nanoseconds(),
              item.node.c_str(),
              item.function.c_str(),
              item.file.c_str(),
@@ -517,7 +514,7 @@ void LogDatabaseProxyModel::saveBagFile(const QString& filename) const
     &allocator
   );
   auto log_ts = rosidl_typesupport_cpp::get_message_type_support_handle<rcl_interfaces::msg::Log>();
-
+/*
   // rosbag::Bag bag(filename.toStdString().c_str(), rosbag::bagmode::Write);
   rosbag2::Writer bagwriter = rosbag2::Writer();
 
@@ -563,6 +560,7 @@ void LogDatabaseProxyModel::saveBagFile(const QString& filename) const
     }
   }
   bag.close();
+  */
 }
 
 void LogDatabaseProxyModel::saveTextFile(const QString& filename) const

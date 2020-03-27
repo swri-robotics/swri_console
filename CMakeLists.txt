@@ -22,21 +22,11 @@ find_package(Qt5Core REQUIRED)
 find_package(Qt5Gui REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 
-find_package(Boost COMPONENTS chrono REQUIRED)
+find_package(Boost COMPONENTS chrono thread REQUIRED)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-include_directories(include 
-  ${Qt5Core_INCLUDE_DIRS}
-  ${Qt5Gui_INCLUDE_DIRS}
-  ${Qt5Widgets_INCLUDE_DIRS}
-  ${Boost_INCLUDE_DIRS}
-)
-add_definitions(
-  ${Qt5Core_DEFINITIONS}
-  ${Qt5Gui_DEFINITIONS}
-  ${Qt5Widgets_DEFINITIONS}
-)
+include_directories(include)
 
 set(QT_USE_QTCORE TRUE)
 set(QT_USE_QTGUI TRUE)
@@ -50,22 +40,22 @@ include_directories(src)
 file (GLOB UI_FILES
   ui/console_window.ui)
 file (GLOB HEADER_FILES
-  # include/swri_console/bag_reader.h
+  include/swri_console/bag_reader.h
   include/swri_console/console_master.h
   include/swri_console/console_window.h
   include/swri_console/log_database.h
   include/swri_console/log_database_proxy_model.h
-  include/swri_console/node_click_handler.h
+  # include/swri_console/node_click_handler.h
   include/swri_console/node_list_model.h
   include/swri_console/rosout_log_loader.h
   include/swri_console/ros_thread.h
   )
 file (GLOB SRC_FILES
-  # src/bag_reader.cpp
+  src/bag_reader.cpp
   src/console_master.cpp
   src/console_window.cpp
   src/log_database.cpp
-  src/node_click_handler.cpp
+  # src/node_click_handler.cpp
   src/node_list_model.cpp
   src/log_database_proxy_model.cpp
   src/ros_thread.cpp
@@ -78,11 +68,11 @@ qt5_wrap_cpp(SRC_FILES ${HEADER_FILES})
 
 add_executable(swri_console ${HEADER_FILES} ${SRC_FILES} ${RCC_SRCS} src/main.cpp)
 target_link_libraries(swri_console
-  ${Qt5Core_LIBRARIES}
-  ${Qt5Gui_LIBRARIES}
-  ${Qt5Widgets_LIBRARIES}
-  # ${catkin_LIBRARIES}
-  ${Boost_LIBRARIES}
+  Qt5::Core
+  Qt5::Gui
+  Qt5::Widgets
+  Boost::chrono
+  Boost::thread
 )
 
 ament_target_dependencies(${PROJECT_NAME}

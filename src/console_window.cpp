@@ -63,8 +63,8 @@ ConsoleWindow::ConsoleWindow(LogDatabase *db)
   QMainWindow(),
   db_(db),
   db_proxy_(new LogDatabaseProxyModel(db)),
-  node_list_model_(new NodeListModel(db)),
-  node_click_handler_(new NodeClickHandler())
+  node_list_model_(new NodeListModel(db))
+  // , node_click_handler_(new NodeClickHandler())
 {
   ui.setupUi(this); 
 
@@ -135,7 +135,8 @@ ConsoleWindow::ConsoleWindow(LogDatabase *db)
     this,
     SLOT(nodeSelectionChanged()));
 
-  ui.nodeList->installEventFilter(node_click_handler_);
+  // TODO PJR handle node clicks
+  // ui.nodeList->installEventFilter(node_click_handler_);
 
   QObject::connect(
     ui.checkDebug, SIGNAL(toggled(bool)),
@@ -231,13 +232,14 @@ void ConsoleWindow::saveLogs()
 
 void ConsoleWindow::connected(bool connected)
 {
-  if (connected) {
-    // When connected, display current URL along with status in the status bar, VCM 4/12/2017
-    QString currentUrl = QString::fromStdString(ros::master::getURI());
-    statusBar()->showMessage("Connected to ROS Master.  URL: "+currentUrl);
-  } else {
-    statusBar()->showMessage("Disconnected from ROS Master.");
-  }
+  statusBar()->showMessage("Connected.");
+//  if (connected) {
+//    // When connected, display current URL along with status in the status bar, VCM 4/12/2017
+//    QString currentUrl = QString::fromStdString(ros::master::getURI());
+//    statusBar()->showMessage("Connected to ROS Master.  URL: "+currentUrl);
+//  } else {
+//    statusBar()->showMessage("Disconnected from ROS Master.");
+//  }
 }
 
 void ConsoleWindow::closeEvent(QCloseEvent *event)
@@ -272,19 +274,19 @@ void ConsoleWindow::setSeverityFilter()
   uint8_t mask = 0;
 
   if (ui.checkDebug->isChecked()) {
-    mask |= rosgraph_msgs::Log::DEBUG;
+    mask |= rcl_interfaces::msg::Log::DEBUG;
   }
   if (ui.checkInfo->isChecked()) {
-    mask |= rosgraph_msgs::Log::INFO;
+    mask |= rcl_interfaces::msg::Log::INFO;
   }
   if (ui.checkWarn->isChecked()) {
-    mask |= rosgraph_msgs::Log::WARN;
+    mask |= rcl_interfaces::msg::Log::WARN;
   }
   if (ui.checkError->isChecked()) {
-    mask |= rosgraph_msgs::Log::ERROR;
+    mask |= rcl_interfaces::msg::Log::ERROR;
   }
   if (ui.checkFatal->isChecked()) {
-    mask |= rosgraph_msgs::Log::FATAL;
+    mask |= rcl_interfaces::msg::Log::FATAL;
   }
 
   QSettings settings;
