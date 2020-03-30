@@ -78,13 +78,11 @@ void RosThread::startRos()
 
   nh_ = rclcpp::Node::make_shared("swri_console");
 
-  rosout_sub_ = nh_->create_subscription<rcl_interfaces::msg::Log>(
-    "/rosout",
-    100,
-    [this](rcl_interfaces::msg::Log::ConstSharedPtr msg) {
-      Q_EMIT logReceived(msg);
-    }
-    );
+  rosout_sub_ = nh_->create_subscription<rcl_interfaces::msg::Log>("/rosout", 100,
+      [this](rcl_interfaces::msg::Log::ConstSharedPtr msg) {
+    Q_EMIT logReceived(msg);
+  });
+
   Q_EMIT connected(true);
 }
 

@@ -27,18 +27,9 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 include_directories(include)
 
-set(QT_USE_QTCORE TRUE)
-set(QT_USE_QTGUI TRUE)
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
-
-# Build mapviz node
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(src)
-file (GLOB UI_FILES
+set(UI_FILES
   ui/console_window.ui)
-file (GLOB HEADER_FILES
+set(HEADER_FILES
   include/swri_console/bag_reader.h
   include/swri_console/console_master.h
   include/swri_console/console_window.h
@@ -49,7 +40,7 @@ file (GLOB HEADER_FILES
   include/swri_console/rosout_log_loader.h
   include/swri_console/ros_thread.h
   )
-file (GLOB SRC_FILES
+set(SRC_FILES
   src/bag_reader.cpp
   src/console_master.cpp
   src/console_window.cpp

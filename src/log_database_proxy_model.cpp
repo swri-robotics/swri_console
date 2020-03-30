@@ -32,14 +32,12 @@
 #include <algorithm>
 #include <iterator>
 
-// #include <ros/time.h>
-// #include <rosbag/bag.h>
 #include <rclcpp/rclcpp.hpp>
 
-#include <rosbag2/logging.hpp>
-#include <rosbag2/types.hpp>
-#include <rosbag2/writer.hpp>
-#include <rosbag2_storage/logging.hpp>
+//#include <rosbag2/logging.hpp>
+//#include <rosbag2/types.hpp>
+//#include <rosbag2/writer.hpp>
+//#include <rosbag2_storage/logging.hpp>
 
 #include <swri_console/log_database_proxy_model.h>
 #include <swri_console/log_database.h>
