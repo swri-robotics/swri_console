@@ -64,9 +64,9 @@ namespace swri_console
     void finishedReading();
 
   private:
-    int parseLine(std::string line, int seq, rcl_interfaces::msg::Log* log);
+    int parseLine(const std::string& line, rcl_interfaces::msg::Log* log);
     // rosgraph_msgs::Log::_level_type level_string_to_level_type(std::string level_str);
-    rcl_interfaces::msg::Log::_level_type level_string_to_level_type(std::string level_str);
+    rcl_interfaces::msg::Log::_level_type level_string_to_level_type(const std::string& level_str);
   };
 }
 

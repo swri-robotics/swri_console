@@ -55,7 +55,7 @@ class ConsoleMaster : public QObject
 
  public:  
   ConsoleMaster(int argc, char** argv);
-  virtual ~ConsoleMaster();
+  ~ConsoleMaster() override;
 
  public Q_SLOTS:
   void createNewWindow();

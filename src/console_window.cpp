@@ -28,8 +28,8 @@
 //
 // *****************************************************************************
 
-#include <stdint.h>
-#include <stdio.h>
+#include <cstdint>
+#include <cstdio>
 #include <set>
 
 // #include <rosgraph_msgs/Log.h>
@@ -59,12 +59,13 @@ using namespace Qt;
 namespace swri_console {
 
 ConsoleWindow::ConsoleWindow(LogDatabase *db)
-  :
-  QMainWindow(),
-  db_(db),
-  db_proxy_(new LogDatabaseProxyModel(db)),
-  node_list_model_(new NodeListModel(db))
-  // , node_click_handler_(new NodeClickHandler())
+  : QMainWindow()
+  , searchFunction_(SEARCH)
+  , ui()
+  , db_(db)
+  , db_proxy_(new LogDatabaseProxyModel(db))
+  , node_list_model_(new NodeListModel(db))
+  , node_click_handler_(new NodeClickHandler())
 {
   ui.setupUi(this); 
 
@@ -135,8 +136,7 @@ ConsoleWindow::ConsoleWindow(LogDatabase *db)
     this,
     SLOT(nodeSelectionChanged()));
 
-  // TODO PJR handle node clicks
-  // ui.nodeList->installEventFilter(node_click_handler_);
+  ui.nodeList->installEventFilter(node_click_handler_);
 
   QObject::connect(
     ui.checkDebug, SIGNAL(toggled(bool)),
@@ -225,21 +225,18 @@ void ConsoleWindow::saveLogs()
                                                   "Save Logs",
                                                   QDir::homePath() + QDir::separator() + defaultname,
                                                   tr("Bag Files (*.bag);;Text Files (*.txt)"));
-  if (filename != NULL && !filename.isEmpty()) {
+  if (filename != nullptr && !filename.isEmpty()) {
     db_proxy_->saveToFile(filename);
   }
 }
 
 void ConsoleWindow::connected(bool connected)
 {
-  statusBar()->showMessage("Connected.");
-//  if (connected) {
-//    // When connected, display current URL along with status in the status bar, VCM 4/12/2017
-//    QString currentUrl = QString::fromStdString(ros::master::getURI());
-//    statusBar()->showMessage("Connected to ROS Master.  URL: "+currentUrl);
-//  } else {
-//    statusBar()->showMessage("Disconnected from ROS Master.");
-//  }
+  if (connected) {
+    statusBar()->showMessage("Listening for logs.");
+  } else {
+    statusBar()->showMessage("ROS has shut down.");
+  }
 }
 
 void ConsoleWindow::closeEvent(QCloseEvent *event)
@@ -254,8 +251,8 @@ void ConsoleWindow::nodeSelectionChanged()
   std::set<std::string> nodes;
   QStringList node_names;
 
-  for (int i = 0; i < selection.size(); i++) {
-    std::string name = node_list_model_->nodeName(selection[i]);
+  for (const auto & i : selection) {
+    std::string name = node_list_model_->nodeName(i);
     nodes.insert(name);
     node_names.append(name.c_str());
   }

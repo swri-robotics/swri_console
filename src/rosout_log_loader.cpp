@@ -36,7 +36,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <rcl_interfaces/msg/log.hpp>
 #include <swri_console/rosout_log_loader.h>
-#include <time.h>
+#include <ctime>
 #include <string>
 
 namespace swri_console
@@ -58,25 +58,22 @@ namespace swri_console
   {
     std::string std_string_logfile = logfile_name.toStdString();
     std::ifstream logfile(std_string_logfile.c_str());
-    int seq = 0;
     for( std::string line; getline( logfile, line ); )
     {
       rcl_interfaces::msg::Log log;
       unsigned found = std_string_logfile.find_last_of("/\\");
       log.name = std_string_logfile.substr(found+1);
-      int result = parseLine(line, seq, &log);
+      int result = parseLine(line, &log);
       if (result == 0)
       {
-        // rosgraph_msgs::LogConstPtr log_ptr(new rosgraph_msgs::Log(log));
-        rcl_interfaces::msg::Log::SharedPtr log_ptr(new rcl_interfaces::msg::Log(log));
+        rcl_interfaces::msg::Log::SharedPtr log_ptr = std::make_shared<rcl_interfaces::msg::Log>(log);
         emit logReceived(log_ptr);
       }
-      seq++;
     }
     emit finishedReading();
   }
 
-  int RosoutLogLoader::parseLine(std::string line, int seq, rcl_interfaces::msg::Log* log)
+  int RosoutLogLoader::parseLine(const std::string& line, rcl_interfaces::msg::Log* log)
   {
     // Example: 1507066364.728102032 INFO [/home/pwesthart/code/src/mapviz/tile_map/src/tile_map_plugin.cpp:260(TileMapPlugin::PrintInfo) [topics: /rosout] OK
     char log_msg_fmt0[] = "%d.%d %s [%[^:]:%u(%[^)]) [topics: %[^]]] %[^\n]s";
@@ -242,21 +239,21 @@ namespace swri_console
     return 0;
   }
 
-  rcl_interfaces::msg::Log::_level_type RosoutLogLoader::level_string_to_level_type(std::string level_str)
+  rcl_interfaces::msg::Log::_level_type RosoutLogLoader::level_string_to_level_type(const std::string& level_str)
   {
-    if (level_str.compare("FATAL") == 0)
+    if (level_str == "FATAL")
     {
       return rcl_interfaces::msg::Log::FATAL;
     }
-    if (level_str.compare("ERROR") == 0)
+    if (level_str == "ERROR")
     {
       return rcl_interfaces::msg::Log::ERROR;
     }
-    if (level_str.compare("WARN") == 0)
+    if (level_str == "WARN")
     {
       return rcl_interfaces::msg::Log::WARN;
     }
-    if (level_str.compare("INFO") == 0)
+    if (level_str == "INFO")
     {
       return rcl_interfaces::msg::Log::INFO;
     }
@@ -266,12 +263,12 @@ namespace swri_console
 
   void RosoutLogLoader::promptForLogFile()
   {
-    QString filename = QFileDialog::getOpenFileName(NULL,
+    QString filename = QFileDialog::getOpenFileName(nullptr,
                                                     tr("Open ROS Log File"),
                                                     QDir::homePath(),
                                                     tr("Log Files (*.log)"));
 
-    if (filename != NULL)
+    if (filename != nullptr)
     {
       loadRosLog(filename);
     }
@@ -279,11 +276,11 @@ namespace swri_console
 
   void RosoutLogLoader::promptForLogDirectory()
   {
-    QString dirname = QFileDialog::getExistingDirectory(NULL,
+    QString dirname = QFileDialog::getExistingDirectory(nullptr,
                                                     tr("Open directory containing log files"),
                                                     QDir::homePath());
 
-    if (dirname != NULL)
+    if (dirname != nullptr)
     {
       loadRosLogDirectory(dirname);
     }

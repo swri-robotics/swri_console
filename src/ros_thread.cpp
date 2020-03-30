@@ -80,7 +80,7 @@ void RosThread::startRos()
 
   rosout_sub_ = nh_->create_subscription<rcl_interfaces::msg::Log>("/rosout", 100,
       [this](rcl_interfaces::msg::Log::ConstSharedPtr msg) {
-    Q_EMIT logReceived(msg);
+    Q_EMIT logReceived(std::move(msg));
   });
 
   Q_EMIT connected(true);

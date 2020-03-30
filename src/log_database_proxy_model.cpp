@@ -28,7 +28,7 @@
 //
 // *****************************************************************************
 
-#include <stdio.h>
+#include <cstdio>
 #include <algorithm>
 #include <iterator>
 
@@ -53,19 +53,22 @@
 namespace swri_console
 {
 LogDatabaseProxyModel::LogDatabaseProxyModel(LogDatabase *db)
-  :
-  colorize_logs_(true),
-  display_time_(true),
-  display_absolute_time_(false),
-  use_regular_expressions_(false),
-  debug_color_(Qt::gray),
-  info_color_(Qt::black),
-  warn_color_(QColor(255,127,0)),
-  error_color_(Qt::red),
-  fatal_color_(Qt::magenta),
-  db_(db),
-  failedSearchText_(""),
-  failedSearchIndex_(0)
+  : QAbstractListModel()
+  , severity_mask_(0)
+  , colorize_logs_(true)
+  , display_time_(true)
+  , display_absolute_time_(false)
+  , use_regular_expressions_(false)
+  , latest_log_index_(0)
+  , earliest_log_index_(0)
+  , debug_color_(Qt::gray)
+  , info_color_(Qt::black)
+  , warn_color_(QColor(255,127,0))
+  , error_color_(Qt::red)
+  , fatal_color_(Qt::magenta)
+  , db_(db)
+  , failedSearchText_("")
+  , failedSearchIndex_(0)
 {
   QObject::connect(db_, SIGNAL(databaseCleared()),
                    this, SLOT(handleDatabaseCleared()));
@@ -74,10 +77,6 @@ LogDatabaseProxyModel::LogDatabaseProxyModel(LogDatabase *db)
 
   QObject::connect(db_, SIGNAL(minTimeUpdated()),
                    this, SLOT(minTimeUpdated()));
-}
-
-LogDatabaseProxyModel::~LogDatabaseProxyModel()
-{
 }
 
 void LogDatabaseProxyModel::setNodeFilter(const std::set<std::string> &names)
@@ -103,7 +102,7 @@ void LogDatabaseProxyModel::setAbsoluteTime(bool absolute)
   QSettings settings;
   settings.setValue(SettingsKeys::ABSOLUTE_TIMESTAMPS, display_absolute_time_);
 
-  if (display_time_ && msg_mapping_.size()) {
+  if (display_time_ && !msg_mapping_.empty()) {
     Q_EMIT dataChanged(index(0), index(msg_mapping_.size()));
   }
 }
@@ -119,7 +118,7 @@ void LogDatabaseProxyModel::setColorizeLogs(bool colorize_logs)
   QSettings settings;
   settings.setValue(SettingsKeys::COLORIZE_LOGS, colorize_logs_);
 
-  if (msg_mapping_.size()) {
+  if (!msg_mapping_.empty()) {
     Q_EMIT dataChanged(index(0), index(msg_mapping_.size()));
   }
 }
@@ -135,7 +134,7 @@ void LogDatabaseProxyModel::setDisplayTime(bool display)
   QSettings settings;
   settings.setValue(SettingsKeys::DISPLAY_TIMESTAMPS, display_time_);
 
-  if (msg_mapping_.size()) {
+  if (!msg_mapping_.empty()) {
     Q_EMIT dataChanged(index(0), index(msg_mapping_.size()));
   }
 }
@@ -257,12 +256,12 @@ bool LogDatabaseProxyModel::isExcludeValid() const
 // searchText_ - string from searchText, all upper case and trimmed spaces
 // index - currently selected item in messageList
 // increment - +1 = next||search(i.e. down), -1 = prev (i.e. up)
-int LogDatabaseProxyModel::getItemIndex(const QString searchText, int index, int increment)
+int LogDatabaseProxyModel::getItemIndex(const QString& searchText, int index, int increment)
 {
   int searchNotFound = -1;  // indicates search not found
   int counter=0;  // used to stop loop once full list has been searched
   bool partialSearch = false;  // tells main loop to run a partial search, triggered by prior failed search
-  if(searchText==""||msg_mapping_.size()==0)  // skip search for 1)empty string 2)empty set
+  if(searchText.isEmpty() || msg_mapping_.empty())  // skip search for 1)empty string 2)empty set
   {
     clearSearchFailure();  // reset failed search variables
     return searchNotFound;
@@ -271,9 +270,9 @@ int LogDatabaseProxyModel::getItemIndex(const QString searchText, int index, int
   // round corners for searches
   if(index<0)  // if index < 0, set to size()-1;
   {
-    index = msg_mapping_.size()-1;
+    index = static_cast<int>(msg_mapping_.size()) - 1;
   }
-  else if(index>=msg_mapping_.size())  // if index >size(), set to 0;
+  else if(index >= msg_mapping_.size())  // if index >size(), set to 0;
   {
     index = 0;
   }
@@ -315,7 +314,7 @@ int LogDatabaseProxyModel::getItemIndex(const QString searchText, int index, int
     index = index + increment;
     if(index<0)  // less than 0 set to max
     {
-      index = msg_mapping_.size()-1;
+      index = static_cast<int>(msg_mapping_.size() - 1);
     }
     else if(index>=msg_mapping_.size())  // greater than max, set to 0
     {
@@ -386,7 +385,7 @@ QVariant LogDatabaseProxyModel::data(
       int hours = secs / 60 / 60;
       int minutes = (secs / 60) % 60;
       int seconds = (secs % 60);
-      int milliseconds = t.nanoseconds() / 1000000;
+      int milliseconds = static_cast<int>(t.nanoseconds() / 1000000);
       
       snprintf(stamp, sizeof(stamp),
                "%d:%02d:%02d:%03d",
@@ -597,14 +596,14 @@ void LogDatabaseProxyModel::processNewMessages()
     }    
 
     for (int i = 0; i < item.text.size(); i++) {
-      new_items.push_back(LineMap(latest_log_index_, i));
+      new_items.emplace_back(latest_log_index_, i);
     }
   }
   
   if (!new_items.empty()) {
     beginInsertRows(QModelIndex(),
                     msg_mapping_.size(),
-                    msg_mapping_.size() + new_items.size() - 1);
+                    static_cast<int>(msg_mapping_.size() + new_items.size() - 1));
     msg_mapping_.insert(msg_mapping_.end(),
                         new_items.begin(),
                         new_items.end());
@@ -640,11 +639,11 @@ void LogDatabaseProxyModel::processOldMessages()
     }
   }
  
-  if ((earliest_log_index_ == 0 && early_mapping_.size()) ||
+  if ((earliest_log_index_ == 0 && !early_mapping_.empty()) ||
       (early_mapping_.size() > 200)) {
     beginInsertRows(QModelIndex(),
                     0,
-                    early_mapping_.size() - 1);
+                    static_cast<int>(early_mapping_.size() - 1));
     msg_mapping_.insert(msg_mapping_.begin(),
                         early_mapping_.begin(),
                         early_mapping_.end());
@@ -724,7 +723,7 @@ void LogDatabaseProxyModel::minTimeUpdated()
 {
   if (display_time_ &&
       !display_absolute_time_
-      && msg_mapping_.size()) {
+      && !msg_mapping_.empty()) {
     Q_EMIT dataChanged(index(0), index(msg_mapping_.size()));
   }  
 }

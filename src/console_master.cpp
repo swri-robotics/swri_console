@@ -66,7 +66,7 @@ ConsoleMaster::~ConsoleMaster()
 
 void ConsoleMaster::createNewWindow()
 {
-  ConsoleWindow* win = new ConsoleWindow(&db_);
+  auto* win = new ConsoleWindow(&db_);
   windows_.append(win);
 
   QSettings settings;

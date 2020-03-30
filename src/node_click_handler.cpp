@@ -31,10 +31,7 @@
 #include <swri_console/node_click_handler.h>
 #include <swri_console/node_list_model.h>
 
-// #include <ros/ros.h>
 #include <rclcpp/rclcpp.hpp>
-// #include <roscpp/GetLoggers.h>
-// #include <roscpp/SetLoggerLevel.h>
 #include <rclcpp/logger.hpp>
 
 #include <QMessageBox>
@@ -53,11 +50,11 @@ namespace swri_console
 
     switch (event->type()) {
       case QEvent::ContextMenu:
-        context_event = static_cast<QContextMenuEvent*>(event);
+        context_event = dynamic_cast<QContextMenuEvent*>(event);
         // First, make sure we clicked on the list and have an item in the list
         // under the mouse cursor.
-        list = static_cast<QListView*>(obj);
-        if (list == NULL) {
+        list = dynamic_cast<QListView*>(obj);
+        if (list == nullptr) {
           return false;
         }
 
@@ -77,20 +74,20 @@ namespace swri_console
 
     // Now get the node name that was clicked on and make a service call to
     // get all of the loggers registered for that node.
-    NodeListModel* model = static_cast<NodeListModel*>(list->model());
+    auto* model = dynamic_cast<NodeListModel*>(list->model());
     node_name_ = model->nodeName(index_list.first());
 
     std::string service_name = node_name_ + GET_LOGGERS_SVC;
     // ros::ServiceClient client = nh_.serviceClient<roscpp::GetLoggers>(service_name);
-    rclcpp::Client<rclcpp::Logger>::SharedPtr client = nh_->create_client<rclcpp::Logger>(service_name);
+    //rclcpp::Client<rclcpp::Logger>::SharedPtr client = nh_->create_client<rclcpp::Logger>(service_name);
     /**
      * Normally this call should return very quickly, but we don't want the GUI to
      * hang if the roscore is stuck, so add a timeout.
      * The value is pretty arbitrary, but we also want to give enough time for this
      * to still respond over a slow network link, so it shouldn't be *too* small.
      */
-    // if (!client.waitForExistence(ros::Duration(2.0))) {
-    if (!client->wait_for_service(std::chrono::seconds(2)))
+     /*
+    if (!client->wait_for_service(std::chrono::seconds(2))) {
       RCLCPP_WARN(nh_->get_logger(), "Timed out while waiting for service at %s.", service_name.c_str());
       QMessageBox::warning(list, "Error Getting Loggers", "Timed out waiting for get_loggers service.");
       return false;
@@ -120,7 +117,9 @@ namespace swri_console
       ROS_WARN("%s", error.c_str());
       QMessageBox::warning(list, "Service Call Failed", error.c_str());
     }
-
+    */
+    QMenu menu;
+    menu.addAction("Configuring logging levels not supported in ROS2.");
     menu.exec(event->globalPos());
 
     return false;
@@ -135,12 +134,12 @@ namespace swri_console
       stream << " (" << current_level.toUpper() << ")";
     }
 
-    QMenu* nodeMenu = new QMenu(action_label);
+    auto* nodeMenu = new QMenu(action_label);
 
     const QString levels[] = {"DEBUG", "INFO", "WARN", "ERROR", "FATAL"};
 
-    for (int i = 0; i < 5; i++) {
-      QAction* action = nodeMenu->addAction(levels[i], this, SLOT(logLevelClicked()));
+    for (const auto & level : levels) {
+      QAction* action = nodeMenu->addAction(level, this, SLOT(logLevelClicked()));
       action->setData(logger_name);
     }
 
@@ -149,7 +148,7 @@ namespace swri_console
 
   void NodeClickHandler::logLevelClicked()
   {
-    QAction* action = static_cast<QAction*>(sender());
+    auto* action = dynamic_cast<QAction*>(sender());
 
     std::string logger = action->data().toString().toStdString();
     std::string level = action->text().toStdString();
@@ -157,6 +156,7 @@ namespace swri_console
 
     std::string service_name = node_name_ + SET_LOGGER_LEVEL_SVC;
 
+    /*
     ros::ServiceClient client = nh_.serviceClient<roscpp::SetLoggerLevel>(service_name);
     if (!client.waitForExistence(ros::Duration(2.0))) {
       RCLCPP_WARN(nh_->get_logger(), "Timed out while waiting for service at %s.", service_name.c_str());
@@ -184,6 +184,7 @@ namespace swri_console
         QMessageBox::warning(NULL, "Error Setting Log Level", "Failed to set logger level.");
       }
     }
+   */
   }
 }
 
