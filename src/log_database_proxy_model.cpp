@@ -45,6 +45,7 @@
 
 #include <QColor>
 #include <QFile>
+#include <QMessageBox>
 #include <QTextStream>
 #include <QTimer>
 #include <QSettings>
@@ -492,7 +493,10 @@ void LogDatabaseProxyModel::reset()
 void LogDatabaseProxyModel::saveToFile(const QString& filename) const
 {
   if (filename.endsWith(".bag", Qt::CaseInsensitive)) {
-    saveBagFile(filename);
+    QMessageBox::information(nullptr,
+                             tr("Bag Files not supported"),
+                             tr("Reading and writing bag files is not yet supported in ROS 2."));
+    //saveBagFile(filename);
   }
   else {
     saveTextFile(filename);

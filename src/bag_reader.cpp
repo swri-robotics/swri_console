@@ -30,6 +30,7 @@
 
 #include <QFileDialog>
 #include <QDir>
+#include <QMessageBox>
 
 #include "swri_console/bag_reader.h"
 
@@ -68,6 +69,10 @@ void BagReader::readBagFile(const QString& filename)
 
 void BagReader::promptForBagFile()
 {
+  QMessageBox::information(nullptr,
+                           tr("Bag files not supported"),
+                           tr("Reading and writing bag files is not yet supported in ROS 2."));
+  /*
   QString filename = QFileDialog::getOpenFileName(nullptr,
                                                   tr("Open Bag File"),
                                                   QDir::homePath(),
@@ -77,4 +82,5 @@ void BagReader::promptForBagFile()
   {
     readBagFile(filename);
   }
+   */
 }

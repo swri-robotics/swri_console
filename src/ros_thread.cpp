@@ -76,7 +76,16 @@ void RosThread::startRos()
 {
   is_connected_ = true;
 
-  nh_ = rclcpp::Node::make_shared("swri_console");
+  // ROS 2 Dashing doesn't support making an anonymous name as an init option,
+  // so we manually make it anonymous.  This is the same way ros::init does
+  // it in ROS 1.
+  std::stringstream name;
+  name << "swri_console";
+  char buf[200];
+  std::snprintf(buf, sizeof(buf), "_%llu", (unsigned long long)rclcpp::Clock().now().nanoseconds());
+  name << buf;
+
+  nh_ = rclcpp::Node::make_shared(name.str());
 
   rosout_sub_ = nh_->create_subscription<rcl_interfaces::msg::Log>("/rosout", 100,
       [this](rcl_interfaces::msg::Log::ConstSharedPtr msg) {

@@ -298,7 +298,7 @@
      <x>0</x>
      <y>0</y>
      <width>1035</width>
-     <height>25</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -470,6 +470,28 @@
    </property>
   </action>
  </widget>
+ <tabstops>
+  <tabstop>nodeList</tabstop>
+  <tabstop>clearAllButton</tabstop>
+  <tabstop>clearMessagesButton</tabstop>
+  <tabstop>checkDebug</tabstop>
+  <tabstop>debugColorWidget</tabstop>
+  <tabstop>checkInfo</tabstop>
+  <tabstop>infoColorWidget</tabstop>
+  <tabstop>checkWarn</tabstop>
+  <tabstop>warnColorWidget</tabstop>
+  <tabstop>checkError</tabstop>
+  <tabstop>errorColorWidget</tabstop>
+  <tabstop>checkFatal</tabstop>
+  <tabstop>fatalColorWidget</tabstop>
+  <tabstop>checkFollowNewest</tabstop>
+  <tabstop>messageList</tabstop>
+  <tabstop>includeText</tabstop>
+  <tabstop>excludeText</tabstop>
+  <tabstop>searchText</tabstop>
+  <tabstop>pushNext</tabstop>
+  <tabstop>pushPrev</tabstop>
+ </tabstops>
  <resources>
   <include location="../resources/images.qrc"/>
  </resources>
