@@ -2,8 +2,8 @@
 Changelog for package swri_console
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.0 (2020-03-31)
+------------------
 * ROS 2 Dashing Support (`#31 <https://github.com/swri-robotics/swri_console/issues/31>`_)
 * Contributors: Jacob Hassold, P. J. Reed
 
