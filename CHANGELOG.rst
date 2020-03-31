@@ -2,6 +2,11 @@
 Changelog for package swri_console
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* ROS 2 Dashing Support (`#31 <https://github.com/swri-robotics/swri_console/issues/31>`_)
+* Contributors: Jacob Hassold, P. J. Reed
+
 1.1.0 (2018-05-11)
 ------------------
 * Added simple rosout_agg_recorder (`#15 <https://github.com/pjreed/swri_console/issues/15>`_)
