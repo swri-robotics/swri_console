@@ -386,7 +386,7 @@ QVariant LogDatabaseProxyModel::data(
       int hours = secs / 60 / 60;
       int minutes = (secs / 60) % 60;
       int seconds = (secs % 60);
-      int milliseconds = static_cast<int>(t.nanoseconds() / 1000000);
+      int milliseconds = static_cast<int>(1000.0 * (t.seconds() - static_cast<double>(secs)));
       
       snprintf(stamp, sizeof(stamp),
                "%d:%02d:%02d:%03d",
