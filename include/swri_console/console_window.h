@@ -37,7 +37,7 @@
 #include <QSettings>
 #include "ui_console_window.h"
 
-#include "node_click_handler.h"
+#include <swri_console/node_click_handler.h>
 
 namespace swri_console
 {

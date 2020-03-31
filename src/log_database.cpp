@@ -34,11 +34,7 @@ namespace swri_console
 {
 LogDatabase::LogDatabase()
   :
-  min_time_(ros::TIME_MAX)
-{
-}
-
-LogDatabase::~LogDatabase()
+  min_time_(rclcpp::Time(std::numeric_limits<rcl_time_point_value_t>::max()))
 {
 }
 
@@ -50,24 +46,25 @@ void LogDatabase::clear()
   Q_EMIT databaseCleared();
 }
 
-void LogDatabase::queueMessage(const rosgraph_msgs::LogConstPtr msg)
+void LogDatabase::queueMessage(const rcl_interfaces::msg::Log::ConstSharedPtr msg)
 {
-  if (msg->header.stamp < min_time_) {
-    min_time_ = msg->header.stamp;
+  rclcpp::Time stamp_time = rclcpp::Time(msg->stamp, min_time_.get_clock_type());
+  if (stamp_time < min_time_) {
+    min_time_ = stamp_time;
     Q_EMIT minTimeUpdated();
   }
   
   msg_counts_[msg->name]++;
 
   LogEntry log;
-  log.stamp = msg->header.stamp;
+  log.stamp = stamp_time;
   log.level = msg->level;
   log.node = msg->name;
   log.file = msg->file;
   log.function = msg->function;
   log.line = msg->line;
   log.text = QString(msg->msg.c_str()).split('\n');
-  log.seq = msg->header.seq;
+  // log.seq = msg->header.seq;
   new_msgs_.push_back(log);
 }
 

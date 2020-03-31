@@ -34,15 +34,17 @@
 #include <QObject>
 #include <QAbstractListModel>
 #include <QStringList>
-#include <rosgraph_msgs/Log.h>
+
+#include <rclcpp/rclcpp.hpp>
+#include <rcl_interfaces/msg/log.hpp>
 #include <deque>
-#include <ros/time.h>
+#include <rclcpp/time.hpp>
 
 namespace swri_console
 {
 struct LogEntry
 {
-  ros::Time stamp;
+  rclcpp::Time stamp;
   uint8_t level;  
   std::string node;  
   std::string file;
@@ -58,11 +60,11 @@ class LogDatabase : public QObject
   
 public:
   LogDatabase();
-  ~LogDatabase();
+  ~LogDatabase() override = default;
   
   void clear();
   const std::deque<LogEntry>& log() { return log_; }
-  const ros::Time& minTime() const { return min_time_; }
+  const rclcpp::Time& minTime() const { return min_time_; }
 
   const std::map<std::string, size_t>& messageCounts() const { return msg_counts_; }
 
@@ -72,7 +74,7 @@ public:
   void minTimeUpdated();
 
 public Q_SLOTS:
-  void queueMessage(const rosgraph_msgs::LogConstPtr msg);
+  void queueMessage(const rcl_interfaces::msg::Log::ConstSharedPtr msg);
   void processQueue();
 
 private:  
@@ -80,7 +82,7 @@ private:
   std::deque<LogEntry> log_;
   std::deque<LogEntry> new_msgs_;
 
-  ros::Time min_time_;
+  rclcpp::Time min_time_;
 };  // class LogDatabase
 }  // namespace swri_console 
 #endif  // SWRI_CONSOLE_LOG_DATABASE_H_

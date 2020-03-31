@@ -1,15 +1,14 @@
-sudo: required
-dist: trusty
-notifications:
-  email:
-    on_success: always
-    on_failure: always
-env:
-  matrix:
-    - ROS_DISTRO="indigo"  USE_DEB="true"
-    - ROS_DISTRO="kinetic" USE_DEB="true"
-    - ROS_DISTRO="lunar"   USE_DEB="true"
-install:
-  - git clone https://github.com/ros-industrial/industrial_ci.git .ci_config
-script: 
-  - source .ci_config/travis.sh
+language: generic 
+
+
+services:
+  - docker
+
+jobs:
+  include:
+    - stage: compile
+      script:
+        - exec docker run -a STDOUT -a STDERR --rm -v $(pwd):/ws/src/mapviz ros:dashing /ws/src/mapviz/.ros2_build.sh
+    - stage: compile
+      script:
+        - exec docker run -a STDOUT -a STDERR --rm -v $(pwd):/ws/src/mapviz ros:eloquent /ws/src/mapviz/.ros2_build.sh

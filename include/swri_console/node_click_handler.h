@@ -42,8 +42,7 @@
 #include <QListView>
 #include <QMenu>
 
-#include <ros/ros.h>
-#include <ros/service_client.h>
+#include <rclcpp/rclcpp.hpp>
 
 namespace swri_console
 {
@@ -58,43 +57,10 @@ namespace swri_console
     bool eventFilter(QObject* obj, QEvent* event);
 
   private:
-    /**
-     * Used by callService() to actually call the service in another thread.
-     */
-    template <class T> void callServiceWorker(ros::ServiceClient& client, T* service, bool* success)
-    {
-      *success = client.call(*service);
-    }
-
-    /**
-     * Attempts to call a ROS service.  Will time out and return false if the service call
-     * does not return within a specified time.
-     *
-     * This is *so* ugly, but some sort of hack like this is necessary for keeping the UI responsive;
-     * ROS service clients do not have any built-in timeout mechanism, so we have to wrap our own
-     * around the service call.  If we don't, a call to a hanged node could spin forever.
-     * @tparam T Type of the ROS service
-     * @param client An initialized ros::ServiceClient
-     * @param service An instance of the ROS service
-     * @param timeout_secs The number of seconds to wait before timing out
-     * @return true if the service call completed successfully, otherwise false
-     */
-    template <class T> bool callService(ros::ServiceClient& client, T& service, int timeout_secs = 5)
-    {
-      bool success = false;
-      boost::thread svc_thread(&NodeClickHandler::callServiceWorker<T>, this, client, &service, &success);
-
-      if (svc_thread.try_join_for(boost::chrono::seconds(timeout_secs))) {
-        return success;
-      }
-      svc_thread.interrupt();
-      return false;
-    }
-
     bool showContextMenu(QListView* list, QContextMenuEvent* event);
     QMenu* createMenu(const QString& logger_name, const QString& current_level);
 
-    ros::NodeHandle nh_;
+    std::shared_ptr<rclcpp::Node> nh_;
     std::string node_name_;
     std::vector<std::string> all_loggers_;
 

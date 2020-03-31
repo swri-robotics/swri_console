@@ -33,8 +33,8 @@
 
 #include <QThread>
 
-#include <ros/ros.h>
-#include <rosgraph_msgs/Log.h>
+#include <rclcpp/rclcpp.hpp>
+#include <rcl_interfaces/msg/log.hpp>
 #include <QMetaType>
 
 namespace swri_console
@@ -58,23 +58,24 @@ namespace swri_console
      * Emitted every time a log message is received.  This can be emitted multiple times per spin of
      * the ROS core; wait until spun() is emitted to do any processing on them.
      */
-    void logReceived(const rosgraph_msgs::LogConstPtr &msg);
+    void logReceived(rcl_interfaces::msg::Log::ConstSharedPtr msg);
     /**
      * Emitted after every time ros::spinOnce() completes.
      */
     void spun();
 
   protected:
-    void run();
+    void run() override;
 
   private:
-    void handleRosout(const rosgraph_msgs::LogConstPtr &msg);
     void startRos();
     void stopRos();
 
     bool is_connected_;
     volatile bool is_running_;
-    ros::Subscriber rosout_sub_;
+
+    rclcpp::Node::SharedPtr nh_;
+    rclcpp::Subscription<rcl_interfaces::msg::Log>::SharedPtr rosout_sub_;
   };
 }
 

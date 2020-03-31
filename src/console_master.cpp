@@ -46,14 +46,14 @@ ConsoleMaster::ConsoleMaster(int argc, char** argv):
   // to ensure that the messages are processed in the console window's event thread.
   // In order for that to work, we have to manually register the message type with
   // Qt's QMetaType system.
-  qRegisterMetaType<rosgraph_msgs::LogConstPtr>("rosgraph_msgs::LogConstPtr");
+  qRegisterMetaType<rcl_interfaces::msg::Log::ConstSharedPtr>("rcl_interfaces::msg::Log::ConstSharedPtr");
 
-  QObject::connect(&bag_reader_, SIGNAL(logReceived(const rosgraph_msgs::LogConstPtr& )),
-                   &db_, SLOT(queueMessage(const rosgraph_msgs::LogConstPtr&) ));
+  QObject::connect(&bag_reader_, SIGNAL(logReceived(const rcl_interfaces::msg::Log::ConstSharedPtr )),
+                   &db_, SLOT(queueMessage(const rcl_interfaces::msg::Log::ConstSharedPtr) ));
   QObject::connect(&bag_reader_, SIGNAL(finishedReading()),
                    &db_, SLOT(processQueue()));
-  QObject::connect(&log_reader_, SIGNAL(logReceived(const rosgraph_msgs::LogConstPtr& )),
-                   &db_, SLOT(queueMessage(const rosgraph_msgs::LogConstPtr&) ));
+  QObject::connect(&log_reader_, SIGNAL(logReceived(const rcl_interfaces::msg::Log::ConstSharedPtr )),
+                   &db_, SLOT(queueMessage(const rcl_interfaces::msg::Log::ConstSharedPtr) ));
   QObject::connect(&log_reader_, SIGNAL(finishedReading()),
                    &db_, SLOT(processQueue()));
 }
@@ -66,7 +66,7 @@ ConsoleMaster::~ConsoleMaster()
 
 void ConsoleMaster::createNewWindow()
 {
-  ConsoleWindow* win = new ConsoleWindow(&db_);
+  auto* win = new ConsoleWindow(&db_);
   windows_.append(win);
 
   QSettings settings;
@@ -100,8 +100,8 @@ void ConsoleMaster::createNewWindow()
     // There's only one ROS thread, and it services every window.  We need to initialize
     // it and its connections to the LogDatabase when we first create a window, but
     // after that it doesn't need to be modified again.
-    QObject::connect(&ros_thread_, SIGNAL(logReceived(const rosgraph_msgs::LogConstPtr& )),
-                     &db_, SLOT(queueMessage(const rosgraph_msgs::LogConstPtr&) ));
+    QObject::connect(&ros_thread_, SIGNAL(logReceived(const rcl_interfaces::msg::Log::ConstSharedPtr )),
+                     &db_, SLOT(queueMessage(const rcl_interfaces::msg::Log::ConstSharedPtr) ));
 
     QObject::connect(&ros_thread_, SIGNAL(spun()),
                      &db_, SLOT(processQueue()));

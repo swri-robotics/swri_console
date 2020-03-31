@@ -28,12 +28,16 @@
 //
 // *****************************************************************************
 
-#include <stdio.h>
+#include <cstdio>
 #include <algorithm>
 #include <iterator>
 
-#include <ros/time.h>
-#include <rosbag/bag.h>
+#include <rclcpp/rclcpp.hpp>
+
+//#include <rosbag2/logging.hpp>
+//#include <rosbag2/types.hpp>
+//#include <rosbag2/writer.hpp>
+//#include <rosbag2_storage/logging.hpp>
 
 #include <swri_console/log_database_proxy_model.h>
 #include <swri_console/log_database.h>
@@ -41,6 +45,7 @@
 
 #include <QColor>
 #include <QFile>
+#include <QMessageBox>
 #include <QTextStream>
 #include <QTimer>
 #include <QSettings>
@@ -49,19 +54,22 @@
 namespace swri_console
 {
 LogDatabaseProxyModel::LogDatabaseProxyModel(LogDatabase *db)
-  :
-  colorize_logs_(true),
-  display_time_(true),
-  display_absolute_time_(false),
-  use_regular_expressions_(false),
-  debug_color_(Qt::gray),
-  info_color_(Qt::black),
-  warn_color_(QColor(255,127,0)),
-  error_color_(Qt::red),
-  fatal_color_(Qt::magenta),
-  db_(db),
-  failedSearchText_(""),
-  failedSearchIndex_(0)
+  : QAbstractListModel()
+  , severity_mask_(0)
+  , colorize_logs_(true)
+  , display_time_(true)
+  , display_absolute_time_(false)
+  , use_regular_expressions_(false)
+  , latest_log_index_(0)
+  , earliest_log_index_(0)
+  , debug_color_(Qt::gray)
+  , info_color_(Qt::black)
+  , warn_color_(QColor(255,127,0))
+  , error_color_(Qt::red)
+  , fatal_color_(Qt::magenta)
+  , db_(db)
+  , failedSearchText_("")
+  , failedSearchIndex_(0)
 {
   QObject::connect(db_, SIGNAL(databaseCleared()),
                    this, SLOT(handleDatabaseCleared()));
@@ -70,10 +78,6 @@ LogDatabaseProxyModel::LogDatabaseProxyModel(LogDatabase *db)
 
   QObject::connect(db_, SIGNAL(minTimeUpdated()),
                    this, SLOT(minTimeUpdated()));
-}
-
-LogDatabaseProxyModel::~LogDatabaseProxyModel()
-{
 }
 
 void LogDatabaseProxyModel::setNodeFilter(const std::set<std::string> &names)
@@ -99,7 +103,7 @@ void LogDatabaseProxyModel::setAbsoluteTime(bool absolute)
   QSettings settings;
   settings.setValue(SettingsKeys::ABSOLUTE_TIMESTAMPS, display_absolute_time_);
 
-  if (display_time_ && msg_mapping_.size()) {
+  if (display_time_ && !msg_mapping_.empty()) {
     Q_EMIT dataChanged(index(0), index(msg_mapping_.size()));
   }
 }
@@ -115,7 +119,7 @@ void LogDatabaseProxyModel::setColorizeLogs(bool colorize_logs)
   QSettings settings;
   settings.setValue(SettingsKeys::COLORIZE_LOGS, colorize_logs_);
 
-  if (msg_mapping_.size()) {
+  if (!msg_mapping_.empty()) {
     Q_EMIT dataChanged(index(0), index(msg_mapping_.size()));
   }
 }
@@ -131,7 +135,7 @@ void LogDatabaseProxyModel::setDisplayTime(bool display)
   QSettings settings;
   settings.setValue(SettingsKeys::DISPLAY_TIMESTAMPS, display_time_);
 
-  if (msg_mapping_.size()) {
+  if (!msg_mapping_.empty()) {
     Q_EMIT dataChanged(index(0), index(msg_mapping_.size()));
   }
 }
@@ -253,12 +257,12 @@ bool LogDatabaseProxyModel::isExcludeValid() const
 // searchText_ - string from searchText, all upper case and trimmed spaces
 // index - currently selected item in messageList
 // increment - +1 = next||search(i.e. down), -1 = prev (i.e. up)
-int LogDatabaseProxyModel::getItemIndex(const QString searchText, int index, int increment)
+int LogDatabaseProxyModel::getItemIndex(const QString& searchText, int index, int increment)
 {
   int searchNotFound = -1;  // indicates search not found
   int counter=0;  // used to stop loop once full list has been searched
   bool partialSearch = false;  // tells main loop to run a partial search, triggered by prior failed search
-  if(searchText==""||msg_mapping_.size()==0)  // skip search for 1)empty string 2)empty set
+  if(searchText.isEmpty() || msg_mapping_.empty())  // skip search for 1)empty string 2)empty set
   {
     clearSearchFailure();  // reset failed search variables
     return searchNotFound;
@@ -267,9 +271,9 @@ int LogDatabaseProxyModel::getItemIndex(const QString searchText, int index, int
   // round corners for searches
   if(index<0)  // if index < 0, set to size()-1;
   {
-    index = msg_mapping_.size()-1;
+    index = static_cast<int>(msg_mapping_.size()) - 1;
   }
-  else if(index>=msg_mapping_.size())  // if index >size(), set to 0;
+  else if(index >= msg_mapping_.size())  // if index >size(), set to 0;
   {
     index = 0;
   }
@@ -311,7 +315,7 @@ int LogDatabaseProxyModel::getItemIndex(const QString searchText, int index, int
     index = index + increment;
     if(index<0)  // less than 0 set to max
     {
-      index = msg_mapping_.size()-1;
+      index = static_cast<int>(msg_mapping_.size() - 1);
     }
     else if(index>=msg_mapping_.size())  // greater than max, set to 0
     {
@@ -358,32 +362,31 @@ QVariant LogDatabaseProxyModel::data(
 
   if (role == Qt::DisplayRole) {
     char level = '?';
-    if (item.level == rosgraph_msgs::Log::DEBUG) {
+    if (item.level == rcl_interfaces::msg::Log::DEBUG) {
       level = 'D';
-    } else if (item.level == rosgraph_msgs::Log::INFO) {
+    } else if (item.level == rcl_interfaces::msg::Log::INFO) {
       level = 'I';
-    } else if (item.level == rosgraph_msgs::Log::WARN) {
+    } else if (item.level == rcl_interfaces::msg::Log::WARN) {
       level = 'W';
-    } else if (item.level == rosgraph_msgs::Log::ERROR) {
+    } else if (item.level == rcl_interfaces::msg::Log::ERROR) {
       level = 'E';
-    } else if (item.level == rosgraph_msgs::Log::FATAL) {
+    } else if (item.level == rcl_interfaces::msg::Log::FATAL) {
       level = 'F';
     }
 
     char stamp[128];
     if (display_absolute_time_) {
       snprintf(stamp, sizeof(stamp),
-               "%u.%09u",
-               item.stamp.sec,
-               item.stamp.nsec);
+               "%f",
+               item.stamp.seconds());
     } else {
-      ros::Duration t = item.stamp - db_->minTime();
+      rclcpp::Duration t = item.stamp - db_->minTime();
 
-      int32_t secs = t.sec;
+      int32_t secs = t.seconds();
       int hours = secs / 60 / 60;
       int minutes = (secs / 60) % 60;
       int seconds = (secs % 60);
-      int milliseconds = t.nsec / 1000000;
+      int milliseconds = static_cast<int>(1000.0 * (t.seconds() - static_cast<double>(secs)));
       
       snprintf(stamp, sizeof(stamp),
                "%d:%02d:%02d:%03d",
@@ -414,15 +417,15 @@ QVariant LogDatabaseProxyModel::data(
   }
   else if (role == Qt::ForegroundRole && colorize_logs_) {
     switch (item.level) {
-      case rosgraph_msgs::Log::DEBUG:
+      case rcl_interfaces::msg::Log::DEBUG:
         return QVariant(debug_color_);
-      case rosgraph_msgs::Log::INFO:
+      case rcl_interfaces::msg::Log::INFO:
         return QVariant(info_color_);
-      case rosgraph_msgs::Log::WARN:
+      case rcl_interfaces::msg::Log::WARN:
         return QVariant(warn_color_);
-      case rosgraph_msgs::Log::ERROR:
+      case rcl_interfaces::msg::Log::ERROR:
         return QVariant(error_color_);
-      case rosgraph_msgs::Log::FATAL:
+      case rcl_interfaces::msg::Log::FATAL:
         return QVariant(fatal_color_);
       default:
         return QVariant(info_color_);
@@ -432,15 +435,14 @@ QVariant LogDatabaseProxyModel::data(
     char buffer[4096];
     snprintf(buffer, sizeof(buffer),
              "<p style='white-space:pre'>"
-             "Timestamp: %d.%09d\n"
+             "Timestamp: %f\n"
              "Seq: %d\n"
              "Node: %s\n"
              "Function: %s\n"
              "File: %s\n"
              "Line: %d\n"
              "\n",
-             item.stamp.sec,
-             item.stamp.nsec,
+             item.stamp.seconds(),
              item.seq,
              item.node.c_str(),
              item.function.c_str(),
@@ -455,14 +457,13 @@ QVariant LogDatabaseProxyModel::data(
   } else if (role == LogDatabaseProxyModel::ExtendedLogRole) {
     char buffer[4096];
     snprintf(buffer, sizeof(buffer),
-             "Timestamp: %d.%09d\n"
+             "Timestamp: %f\n"
              "Node: %s\n"
              "Function: %s\n"
              "File: %s\n"
              "Line: %d\n"
              "Message: ",
-             item.stamp.sec,
-             item.stamp.nsec,
+             item.stamp.seconds(),
              item.node.c_str(),
              item.function.c_str(),
              item.file.c_str(),
@@ -492,7 +493,10 @@ void LogDatabaseProxyModel::reset()
 void LogDatabaseProxyModel::saveToFile(const QString& filename) const
 {
   if (filename.endsWith(".bag", Qt::CaseInsensitive)) {
-    saveBagFile(filename);
+    QMessageBox::information(nullptr,
+                             tr("Bag Files not supported"),
+                             tr("Reading and writing bag files is not yet supported in ROS 2."));
+    //saveBagFile(filename);
   }
   else {
     saveTextFile(filename);
@@ -501,33 +505,54 @@ void LogDatabaseProxyModel::saveToFile(const QString& filename) const
 
 void LogDatabaseProxyModel::saveBagFile(const QString& filename) const
 {
-  rosbag::Bag bag(filename.toStdString().c_str(), rosbag::bagmode::Write);
+  // Set up message serialization
+  auto serialized_msg = rmw_get_zero_initialized_serialized_message();
+  auto allocator = rcutils_get_default_allocator();
+  auto initial_capacity = 0u;
+  auto ret = rmw_serialized_message_init(
+    &serialized_msg,
+    initial_capacity,
+    &allocator
+  );
+  auto log_ts = rosidl_typesupport_cpp::get_message_type_support_handle<rcl_interfaces::msg::Log>();
+/*
+  // rosbag::Bag bag(filename.toStdString().c_str(), rosbag::bagmode::Write);
+  rosbag2::Writer bagwriter = rosbag2::Writer();
+
+  // Minimum time value ROS 2 can support
+  rclcpp::Time TIME_MIN = rclcpp::Time(std::numeric_limits<rcl_time_point_value_t>::min());
 
   size_t idx = 0;
   while (idx < msg_mapping_.size()) {
     const LineMap line_map = msg_mapping_[idx];    
     const LogEntry &item = db_->log()[line_map.log_index];
     
-    rosgraph_msgs::Log log;
+    rcl_interfaces::msg::Log log;
     log.file = item.file;
     log.function = item.function;
-    log.header.seq = item.seq;
-    if (item.stamp < ros::TIME_MIN) {
+    // log.header.seq = item.seq;
+    if (item.stamp < TIME_MIN) {
       // Note: I think TIME_MIN is the minimum representation of
       // ros::Time, so this branch should be impossible.  Nonetheless,
       // it doesn't hurt.
-      log.header.stamp = ros::Time::now();
-      qWarning("Msg with seq %d had time (%d); it's less than ros::TIME_MIN, which is invalid. "
+      log.stamp = rclcpp::Time();
+      qWarning("Msg had time (%d); it's less than ros::TIME_MIN, which is invalid. "
                "Writing 'now' instead.",
-               log.header.seq, item.stamp.sec);
+               item.stamp.seconds());
     } else {
-      log.header.stamp = item.stamp;
+      log.stamp = item.stamp;
     }
     log.level = item.level;
     log.line = item.line;
     log.msg = item.text.join("\n").toStdString();
     log.name = item.node;
-    bag.write("/rosout", log.header.stamp, log);
+
+    // Serialize for storage
+    ret = rmw_serialize(&log, log_ts, &serialized_msg);
+    rosbag2_storage::SerializedBagMessage bag_message;
+    bag_message.serialized_data = serialized_msg.buffer;
+
+    bag.write("/rosout", log.stamp, log);
 
     // Advance to the next line with a different log index.
     idx++;
@@ -536,6 +561,7 @@ void LogDatabaseProxyModel::saveBagFile(const QString& filename) const
     }
   }
   bag.close();
+  */
 }
 
 void LogDatabaseProxyModel::saveTextFile(const QString& filename) const
@@ -574,14 +600,14 @@ void LogDatabaseProxyModel::processNewMessages()
     }    
 
     for (int i = 0; i < item.text.size(); i++) {
-      new_items.push_back(LineMap(latest_log_index_, i));
+      new_items.emplace_back(latest_log_index_, i);
     }
   }
   
   if (!new_items.empty()) {
     beginInsertRows(QModelIndex(),
                     msg_mapping_.size(),
-                    msg_mapping_.size() + new_items.size() - 1);
+                    static_cast<int>(msg_mapping_.size() + new_items.size() - 1));
     msg_mapping_.insert(msg_mapping_.end(),
                         new_items.begin(),
                         new_items.end());
@@ -617,11 +643,11 @@ void LogDatabaseProxyModel::processOldMessages()
     }
   }
  
-  if ((earliest_log_index_ == 0 && early_mapping_.size()) ||
+  if ((earliest_log_index_ == 0 && !early_mapping_.empty()) ||
       (early_mapping_.size() > 200)) {
     beginInsertRows(QModelIndex(),
                     0,
-                    early_mapping_.size() - 1);
+                    static_cast<int>(early_mapping_.size() - 1));
     msg_mapping_.insert(msg_mapping_.begin(),
                         early_mapping_.begin(),
                         early_mapping_.end());
@@ -701,7 +727,7 @@ void LogDatabaseProxyModel::minTimeUpdated()
 {
   if (display_time_ &&
       !display_absolute_time_
-      && msg_mapping_.size()) {
+      && !msg_mapping_.empty()) {
     Q_EMIT dataChanged(index(0), index(msg_mapping_.size()));
   }  
 }

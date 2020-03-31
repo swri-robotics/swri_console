@@ -30,16 +30,19 @@
 
 #include <QFileDialog>
 #include <QDir>
+#include <QMessageBox>
 
-#include "include/swri_console/bag_reader.h"
+#include "swri_console/bag_reader.h"
 
-#include <rosbag/bag.h>
-#include <rosbag/view.h>
+// #include <rosbag/bag.h>
+// #include <rosbag/view.h>
+#include <rclcpp/rclcpp.hpp>
 
 using namespace swri_console;
 
 void BagReader::readBagFile(const QString& filename)
 {
+  /*
   rosbag::Bag bag;
   bag.open(filename.toStdString(), rosbag::bagmode::Read);
 
@@ -59,19 +62,25 @@ void BagReader::readBagFile(const QString& filename)
       qWarning("Got a message that was not a log message but a: %s", iter->getDataType().c_str());
     }
   }
+   */
 
   emit finishedReading();
 }
 
 void BagReader::promptForBagFile()
 {
-  QString filename = QFileDialog::getOpenFileName(NULL,
+  QMessageBox::information(nullptr,
+                           tr("Bag files not supported"),
+                           tr("Reading and writing bag files is not yet supported in ROS 2."));
+  /*
+  QString filename = QFileDialog::getOpenFileName(nullptr,
                                                   tr("Open Bag File"),
                                                   QDir::homePath(),
                                                   tr("Bag Files (*.bag)"));
 
-  if (filename != NULL)
+  if (filename != nullptr)
   {
     readBagFile(filename);
   }
+   */
 }
