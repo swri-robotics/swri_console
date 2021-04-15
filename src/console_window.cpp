@@ -42,6 +42,7 @@
 #include <swri_console/log_database_proxy_model.h>
 #include <swri_console/node_list_model.h>
 #include <swri_console/settings_keys.h>
+#include <swri_console/defines.h>
 
 #include <QColorDialog>
 #include <QRegExp>
@@ -98,6 +99,12 @@ ConsoleWindow::ConsoleWindow(LogDatabase *db)
 
   QObject::connect(ui.action_ShowTimestamps, SIGNAL(toggled(bool)),
                    db_proxy_, SLOT(setDisplayTime(bool)));
+
+  QObject::connect(ui.action_ShowLoggerName, SIGNAL(toggled(bool)),
+                   db_proxy_, SLOT(setDisplayLogger(bool)));
+
+  QObject::connect(ui.action_ShowFunctionName, SIGNAL(toggled(bool)),
+                   db_proxy_, SLOT(setDisplayFunction(bool)));
 
   QObject::connect(ui.action_RegularExpressions, SIGNAL(toggled(bool)),
                    db_proxy_, SLOT(setUseRegularExpressions(bool)));
@@ -271,20 +278,21 @@ void ConsoleWindow::setSeverityFilter()
   uint8_t mask = 0;
 
   if (ui.checkDebug->isChecked()) {
-    mask |= rcl_interfaces::msg::Log::DEBUG;
+    mask |= LogLevelMask::DEBUG;
   }
   if (ui.checkInfo->isChecked()) {
-    mask |= rcl_interfaces::msg::Log::INFO;
+    mask |= LogLevelMask::INFO;
   }
   if (ui.checkWarn->isChecked()) {
-    mask |= rcl_interfaces::msg::Log::WARN;
+    mask |= LogLevelMask::WARN;
   }
   if (ui.checkError->isChecked()) {
-    mask |= rcl_interfaces::msg::Log::ERROR;
+    mask |= LogLevelMask::ERROR;
   }
   if (ui.checkFatal->isChecked()) {
-    mask |= rcl_interfaces::msg::Log::FATAL;
+    mask |= LogLevelMask::FATAL;
   }
+  printf("ConsoleWindow::setSeverityFilter, mask = 0x%X\n", mask);
 
   QSettings settings;
   settings.setValue(SettingsKeys::SHOW_DEBUG, ui.checkDebug->isChecked());

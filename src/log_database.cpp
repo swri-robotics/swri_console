@@ -58,7 +58,7 @@ void LogDatabase::queueMessage(const rcl_interfaces::msg::Log::ConstSharedPtr ms
 
   LogEntry log;
   log.stamp = stamp_time;
-  log.level = msg->level;
+  log.setLogLvl(msg->level);
   log.node = msg->name;
   log.file = msg->file;
   log.function = msg->function;
