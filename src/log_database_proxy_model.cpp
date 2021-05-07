@@ -362,15 +362,15 @@ QVariant LogDatabaseProxyModel::data(
 
   if (role == Qt::DisplayRole) {
     char level = '?';
-    if (item.level == rcl_interfaces::msg::Log::DEBUG) {
+    if (item.getLogLvl() == rcl_interfaces::msg::Log::DEBUG) {
       level = 'D';
-    } else if (item.level == rcl_interfaces::msg::Log::INFO) {
+    } else if (item.getLogLvl() == rcl_interfaces::msg::Log::INFO) {
       level = 'I';
-    } else if (item.level == rcl_interfaces::msg::Log::WARN) {
+    } else if (item.getLogLvl() == rcl_interfaces::msg::Log::WARN) {
       level = 'W';
-    } else if (item.level == rcl_interfaces::msg::Log::ERROR) {
+    } else if (item.getLogLvl() == rcl_interfaces::msg::Log::ERROR) {
       level = 'E';
-    } else if (item.level == rcl_interfaces::msg::Log::FATAL) {
+    } else if (item.getLogLvl() == rcl_interfaces::msg::Log::FATAL) {
       level = 'F';
     }
 
@@ -416,7 +416,7 @@ QVariant LogDatabaseProxyModel::data(
     return QVariant(QString(header) + item.text[line_idx.line_index]);
   }
   else if (role == Qt::ForegroundRole && colorize_logs_) {
-    switch (item.level) {
+    switch (item.getLogLvl()) {
       case rcl_interfaces::msg::Log::DEBUG:
         return QVariant(debug_color_);
       case rcl_interfaces::msg::Log::INFO:
@@ -671,7 +671,7 @@ void LogDatabaseProxyModel::scheduleIdleProcessing()
 
 bool LogDatabaseProxyModel::acceptLogEntry(const LogEntry &item)
 {
-  if (!(item.level & severity_mask_)) {
+  if (!(item.level_mask & severity_mask_)) {
     return false;
   }
   
