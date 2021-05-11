@@ -327,6 +327,8 @@
     </property>
     <addaction name="action_ShowTimestamps"/>
     <addaction name="action_AbsoluteTimestamps"/>
+    <addaction name="action_ShowLoggerName"/>
+    <addaction name="action_ShowFunctionName"/>
     <addaction name="action_RegularExpressions"/>
     <addaction name="action_ColorizeLogs"/>
     <addaction name="action_SelectFont"/>
@@ -467,6 +469,28 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+D, Return</string>
+   </property>
+  </action>
+  <action name="action_ShowLoggerName">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show logger name</string>
+   </property>
+  </action>
+  <action name="action_ShowFunctionName">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show function name</string>
    </property>
   </action>
  </widget>
