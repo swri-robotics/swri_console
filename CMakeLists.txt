@@ -31,6 +31,7 @@ set(UI_FILES
   ui/console_window.ui)
 set(HEADER_FILES
   include/swri_console/bag_reader.h
+  include/swri_console/defines.h
   include/swri_console/console_master.h
   include/swri_console/console_window.h
   include/swri_console/log_database.h

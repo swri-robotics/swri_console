@@ -45,13 +45,31 @@ namespace swri_console
 struct LogEntry
 {
   rclcpp::Time stamp;
-  uint8_t level;  
-  std::string node;  
+  uint8_t level_mask;
+  std::string node;
   std::string file;
   std::string function;
   uint32_t line;
   QStringList text;
   uint32_t seq;
+
+  void setLogLvl(uint8_t ros_log_lvl)
+  {
+    level = ros_log_lvl;
+    switch (ros_log_lvl) {
+      case rcl_interfaces::msg::Log::DEBUG : level_mask = 0x01; break;
+      case rcl_interfaces::msg::Log::INFO : level_mask = 0x02; break;
+      case rcl_interfaces::msg::Log::WARN : level_mask = 0x04; break;
+      case rcl_interfaces::msg::Log::ERROR : level_mask = 0x08; break;
+      case rcl_interfaces::msg::Log::FATAL : level_mask = 0x10; break;
+      default: level_mask = 0x01; break;
+    }
+  }
+
+  uint8_t getLogLvl(void) const { return level; }
+
+private:
+  uint8_t level;
 };
 
 class LogDatabase : public QObject
