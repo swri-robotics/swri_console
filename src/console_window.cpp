@@ -97,6 +97,12 @@ ConsoleWindow::ConsoleWindow(LogDatabase *db)
   QObject::connect(ui.action_ShowTimestamps, SIGNAL(toggled(bool)),
                    db_proxy_, SLOT(setDisplayTime(bool)));
 
+  QObject::connect(ui.action_ShowLoggerName, SIGNAL(toggled(bool)),
+                   db_proxy_, SLOT(setDisplayLogger(bool)));
+
+  QObject::connect(ui.action_ShowFunctionName, SIGNAL(toggled(bool)),
+                   db_proxy_, SLOT(setDisplayFunction(bool)));
+
   QObject::connect(ui.action_RegularExpressions, SIGNAL(toggled(bool)),
                    db_proxy_, SLOT(setUseRegularExpressions(bool)));
 

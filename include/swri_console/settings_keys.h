@@ -46,6 +46,8 @@ namespace swri_console
   public:
     static const QString DISPLAY_TIMESTAMPS;
     static const QString ABSOLUTE_TIMESTAMPS;
+    static const QString DISPLAY_LOGGER;
+    static const QString DISPLAY_FUNCTION;
     static const QString USE_REGEXPS;
     static const QString INCLUDE_FILTER;
     static const QString EXCLUDE_FILTER;

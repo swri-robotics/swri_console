@@ -91,6 +91,8 @@ class LogDatabaseProxyModel : public QAbstractListModel
   void minTimeUpdated();
   void setDisplayTime(bool display);
   void setAbsoluteTime(bool absolute);
+  void setDisplayLogger(bool logger_name);
+  void setDisplayFunction(bool function_name);
   void setColorizeLogs(bool colorize_logs);
   void setUseRegularExpressions(bool useRegexps);
 
@@ -107,6 +109,8 @@ class LogDatabaseProxyModel : public QAbstractListModel
   bool colorize_logs_;
   bool display_time_;
   bool display_absolute_time_;
+  bool display_logger_;
+  bool display_function_;
   bool use_regular_expressions_;
 
   // For performance reasons, the proxy model presents single line
