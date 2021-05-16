@@ -59,6 +59,8 @@ LogDatabaseProxyModel::LogDatabaseProxyModel(LogDatabase *db)
   , colorize_logs_(true)
   , display_time_(true)
   , display_absolute_time_(false)
+  , display_logger_(true)
+  , display_function_(true)
   , use_regular_expressions_(false)
   , latest_log_index_(0)
   , earliest_log_index_(0)
@@ -134,6 +136,38 @@ void LogDatabaseProxyModel::setDisplayTime(bool display)
 
   QSettings settings;
   settings.setValue(SettingsKeys::DISPLAY_TIMESTAMPS, display_time_);
+
+  if (!msg_mapping_.empty()) {
+    Q_EMIT dataChanged(index(0), index(msg_mapping_.size()));
+  }
+}
+
+void LogDatabaseProxyModel::setDisplayLogger(bool logger_name)
+{
+  if (logger_name == display_logger_) {
+    return;
+  }
+
+  display_logger_ = logger_name;
+
+  QSettings settings;
+  settings.setValue(SettingsKeys::DISPLAY_LOGGER, display_logger_);
+
+  if (!msg_mapping_.empty()) {
+    Q_EMIT dataChanged(index(0), index(msg_mapping_.size()));
+  }
+}
+
+void LogDatabaseProxyModel::setDisplayFunction(bool function_name)
+{
+  if (function_name == display_function_) {
+    return;
+  }
+
+  display_function_ = function_name;
+
+  QSettings settings;
+  settings.setValue(SettingsKeys::DISPLAY_FUNCTION, display_function_);
 
   if (!msg_mapping_.empty()) {
     Q_EMIT dataChanged(index(0), index(msg_mapping_.size()));
@@ -393,13 +427,26 @@ QVariant LogDatabaseProxyModel::data(
                hours, minutes, seconds, milliseconds);
     }
 
+    char id[256];
+    if (display_logger_ && display_function_) {
+      snprintf(id, sizeof(id), "%s::%s", item.node.c_str(), item.function.c_str());
+    } else if (display_logger_ && !display_function_) {
+      snprintf(id, sizeof(id), "%s", item.node.c_str());
+    } else if (!display_logger_ && display_function_) {
+      snprintf(id, sizeof(id), "::%s", item.function.c_str());
+    }
+
+    bool display_id = display_logger_ || display_function_;
+
     char header[1024];
-    if (display_time_) {
-      snprintf(header, sizeof(header),
-               "[%c %s] ", level, stamp);
+    if (display_time_ && display_id) {
+      snprintf(header, sizeof(header), "%c %s [%s] ", level, stamp, id);
+    } else if (display_time_) {
+      snprintf(header, sizeof(header), "%c %s [] ", level, stamp);
+    } else if (display_id) {
+      snprintf(header, sizeof(header), "%c [%s] ", level, id);
     } else {
-      snprintf(header, sizeof(header),
-               "[%c] ", level);
+      snprintf(header, sizeof(header), "%c [] ", level);
     }
 
     // For multiline messages, we only want to display the header for
