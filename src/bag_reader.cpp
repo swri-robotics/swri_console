@@ -40,23 +40,36 @@ using namespace swri_console;
 
 void BagReader::readBagFile(const QString& filename)
 {
+  bool log_messages_found = true;
   rosbag::Bag bag;
   bag.open(filename.toStdString(), rosbag::bagmode::Read);
 
-  std::vector<std::string> topics;
-  topics.push_back(std::string("/rosout"));
-
-  rosbag::View view(bag, rosbag::TopicQuery(topics));
-  rosbag::View::const_iterator iter;
-
-  for(iter = view.begin(); iter != view.end(); ++iter)
+  rosbag::View view(bag, rosbag::TopicQuery("/rosout"));
+  if (view.size() == 0)
   {
-    rosgraph_msgs::LogConstPtr log = iter->instantiate<rosgraph_msgs::Log>();
-    if (log != NULL ) {
-      emit logReceived(log);
+    // This implies we have no messages on /rosout, let's try /rosout_agg
+    view.addQuery(bag, rosbag::TopicQuery("/rosout_agg"));
+    if (view.size() == 0)
+    {
+      qWarning("Could not find any messages on either '/rosout' or '/rosout_agg' in bag file '%s'",
+               filename.toStdString().c_str());
+      log_messages_found = false;
     }
-    else {
-      qWarning("Got a message that was not a log message but a: %s", iter->getDataType().c_str());
+  }
+
+  if (log_messages_found)
+  {
+    rosbag::View::const_iterator iter;
+
+    for(iter = view.begin(); iter != view.end(); ++iter)
+    {
+      rosgraph_msgs::LogConstPtr log = iter->instantiate<rosgraph_msgs::Log>();
+      if (log != NULL ) {
+        emit logReceived(log);
+      }
+      else {
+        qWarning("Got a message that was not a log message but a: %s", iter->getDataType().c_str());
+      }
     }
   }
 
