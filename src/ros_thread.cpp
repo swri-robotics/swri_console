@@ -39,7 +39,8 @@ RosThread::RosThread(int argc, char** argv) :
 {
   ros::init(argc, argv, "swri_console",
             ros::init_options::AnonymousName |
-            ros::init_options::NoRosout);
+            ros::init_options::NoRosout |
+            ros::init_options::NoSigintHandler);
 }
 
 void RosThread::run()
