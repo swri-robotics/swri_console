@@ -48,7 +48,7 @@ void RosThread::run()
 {
   while (is_running_)
   {
-    bool is_initialized = rclcpp::is_initialized();
+    bool is_initialized = rclcpp::ok();
 
     if (!is_connected_ && is_initialized) {
       startRos();
@@ -66,7 +66,7 @@ void RosThread::run()
 void RosThread::shutdown()
 {
   is_running_ = false;
-  if (rclcpp::is_initialized())
+  if (rclcpp::ok())
   {
     rclcpp::shutdown();
   }
