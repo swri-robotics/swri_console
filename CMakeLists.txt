@@ -21,7 +21,7 @@ find_package(Qt5Core REQUIRED)
 find_package(Qt5Gui REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 
-find_package(Boost COMPONENTS chrono thread REQUIRED)
+find_package(Boost COMPONENTS thread REQUIRED)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -61,7 +61,6 @@ target_link_libraries(swri_console
   Qt5::Core
   Qt5::Gui
   Qt5::Widgets
-  Boost::chrono
   Boost::thread
 )
 
