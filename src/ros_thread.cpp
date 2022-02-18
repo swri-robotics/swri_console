@@ -87,7 +87,8 @@ void RosThread::startRos()
 
   nh_ = rclcpp::Node::make_shared(name.str());
 
-  rosout_sub_ = nh_->create_subscription<rcl_interfaces::msg::Log>("/rosout", 100,
+  rclcpp::QoS qos(rclcpp::QoSInitialization::from_rmw(rcl_qos_profile_rosout_default));
+  rosout_sub_ = nh_->create_subscription<rcl_interfaces::msg::Log>("/rosout", qos,
       [this](rcl_interfaces::msg::Log::ConstSharedPtr msg) {
     Q_EMIT logReceived(std::move(msg));
   });
