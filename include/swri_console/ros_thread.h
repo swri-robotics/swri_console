@@ -71,6 +71,8 @@ namespace swri_console
     void startRos();
     void stopRos();
 
+    void emptyLogQueue(rcl_interfaces::msg::Log::ConstSharedPtr msg);
+
     bool is_connected_;
     volatile bool is_running_;
 
