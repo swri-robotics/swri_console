@@ -33,6 +33,7 @@
 #include <QCoreApplication>
 #include <QDirIterator>
 #include <QStringList>
+#include <csignal>
 
 #include <swri_console/console_master.h>
 
@@ -73,6 +74,12 @@ void loadFonts()
   }
 }
 
+void sigHandler(int s)
+{
+  std::signal(s, SIG_DFL);
+  qApp->quit();
+}
+
 int main(int argc, char **argv)
 {
   QApplication app(argc, argv);
@@ -84,7 +91,10 @@ int main(int argc, char **argv)
   
   swri_console::ConsoleMaster master(argc, argv);
   master.createNewWindow();
-  app.connect(&app, SIGNAL(destroyed()), &app, SLOT(objectDestroyed()));
+
+  std::signal(SIGINT, sigHandler);
+  std::signal(SIGTERM, sigHandler);
+
   int result = app.exec();
   return result;
 }
