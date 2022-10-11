@@ -84,7 +84,7 @@ int main(int argc, char **argv)
   
   swri_console::ConsoleMaster master(argc, argv);
   master.createNewWindow();
-  app.connect(&app, SIGNAL(lastWindowClosed()), &app, SLOT(quit()));
+  app.connect(&app, SIGNAL(destroyed(QObject*)), &app, SLOT(objectDestroyed()));
   int result = app.exec();
   return result;
 }
