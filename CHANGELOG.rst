@@ -2,8 +2,8 @@
 Changelog for package swri_console
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.2 (2022-11-03)
+------------------
 * Update Qt Flags (`#52 <https://github.com/swri-robotics/swri_console/issues/52>`_)
   * Update to use new flags
 * Contributors: David Anthony
