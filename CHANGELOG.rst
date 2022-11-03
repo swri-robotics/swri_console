@@ -2,8 +2,8 @@
 Changelog for package swri_console
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.1 (2022-11-03)
+------------------
 * Switching to system default QoS (`#50 <https://github.com/swri-robotics/swri_console/issues/50>`_)
 * Merge pull request `#45 <https://github.com/swri-robotics/swri_console/issues/45>`_ from rasmusan/bugfix/log_queue_not_emptied
   Fix: Before maximum 1 log entry every 50 ms was processed. Now all en…
