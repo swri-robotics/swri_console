@@ -2,6 +2,26 @@
 Changelog for package swri_console
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Switching to system default QoS (`#50 <https://github.com/swri-robotics/swri_console/issues/50>`_)
+* Merge pull request `#45 <https://github.com/swri-robotics/swri_console/issues/45>`_ from rasmusan/bugfix/log_queue_not_emptied
+  Fix: Before maximum 1 log entry every 50 ms was processed. Now all en…
+* Merge pull request `#44 <https://github.com/swri-robotics/swri_console/issues/44>`_ from rasmusan/bugfix/rosout_qos_fixed
+  Fix: Changed rosout subsciption to use rcl_qos_profile_rosout_default…
+* Merge pull request `#43 <https://github.com/swri-robotics/swri_console/issues/43>`_ from nobleo/fix/boost-thread-dep
+  Fix boost dependency
+* Merge pull request `#41 <https://github.com/swri-robotics/swri_console/issues/41>`_ from nobleo/ros-ok
+  Replace deprecated is_initialized() with ok()
+* Merge pull request `#36 <https://github.com/swri-robotics/swri_console/issues/36>`_ from rasmusan/bugfix/fix_loglevel_masking
+  Fixed loglevel masking (for ROS2)
+* Merge pull request `#42 <https://github.com/swri-robotics/swri_console/issues/42>`_ from nobleo/libboost-thread
+  More specific boost dependency
+* Merge pull request `#37 <https://github.com/swri-robotics/swri_console/issues/37>`_ from rasmusan/feature/add-display-options
+  Added options to show logger_name and function in each log line
+* Fixed loglevel masking (for ROS2)
+* Contributors: David Anthony, Matthew, Rasmus Skovgaard Andersen, Tim Clephas, rasmus.andersen
+
 2.0.0 (2020-03-31)
 ------------------
 * ROS 2 Dashing Support (`#31 <https://github.com/swri-robotics/swri_console/issues/31>`_)
