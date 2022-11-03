@@ -2,6 +2,12 @@
 Changelog for package swri_console
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Update Qt Flags (`#52 <https://github.com/swri-robotics/swri_console/issues/52>`_)
+  * Update to use new flags
+* Contributors: David Anthony
+
 2.0.1 (2022-11-03)
 ------------------
 * Switching to system default QoS (`#50 <https://github.com/swri-robotics/swri_console/issues/50>`_)
