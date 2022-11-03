@@ -267,7 +267,7 @@ void ConsoleWindow::nodeSelectionChanged()
   db_proxy_->setNodeFilter(nodes);
 
   for (int i = 0; i < node_names.size(); i++) {
-    node_names[i] = node_names[i].split("/", QString::SkipEmptyParts).last();
+    node_names[i] = node_names[i].split("/", Qt::SkipEmptyParts).last();
   }
     
   setWindowTitle(QString("SWRI Console (") + node_names.join(", ") + ")");
@@ -386,7 +386,7 @@ void ConsoleWindow::setFollowNewest(bool follow)
 
 void ConsoleWindow::includeFilterUpdated(const QString &text)
 {
-  QStringList items = text.split(";", QString::SkipEmptyParts);
+  QStringList items = text.split(";", Qt::SkipEmptyParts);
   QStringList filtered;
   
   for (int i = 0; i < items.size(); i++) {
@@ -404,7 +404,7 @@ void ConsoleWindow::includeFilterUpdated(const QString &text)
 
 void ConsoleWindow::excludeFilterUpdated(const QString &text)
 {
-  QStringList items = text.split(";", QString::SkipEmptyParts);
+  QStringList items = text.split(";", Qt::SkipEmptyParts);
   QStringList filtered;
   
   for (int i = 0; i < items.size(); i++) {
