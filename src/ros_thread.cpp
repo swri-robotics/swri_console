@@ -88,10 +88,10 @@ void RosThread::startRos()
 
   nh_ = rclcpp::Node::make_shared(name.str());
 
-  rclcpp::QoS qos(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_system_default));
-
   rosout_sub_ = nh_->create_subscription<rcl_interfaces::msg::Log>(
-    "/rosout", qos, std::bind(&RosThread::emptyLogQueue, this, std::placeholders::_1));
+    "/rosout",
+    getQos(),
+    std::bind(&RosThread::emptyLogQueue, this, std::placeholders::_1));
 
   Q_EMIT connected(true);
 }
