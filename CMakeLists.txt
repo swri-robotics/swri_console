@@ -23,6 +23,13 @@ find_package(Qt5Widgets REQUIRED)
 
 find_package(Boost COMPONENTS thread REQUIRED)
 
+### Compile flag to support different versions of ROS ###
+if($ENV{ROS_DISTRO} STREQUAL "foxy")
+  set(USE_NEW_QOS_DEFN 0)
+else()
+  set(USE_NEW_QOS_DEFN 1)
+endif()
+
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 include_directories(include)
