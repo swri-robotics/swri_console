@@ -131,7 +131,7 @@ rclcpp::QoS RosThread::getQos()
   qos_profile.lifespan.nsec = 0;
   return rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(qos_profile));
 #else
-  return rclcpp::QoSInitialization::from_rmw(rcl_qos_profile_rosout_default);
+  return rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rcl_qos_profile_rosout_default));
 #endif
 }
 }
