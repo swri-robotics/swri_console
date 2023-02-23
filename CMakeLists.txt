@@ -23,6 +23,13 @@ find_package(Qt5Widgets REQUIRED)
 
 find_package(Boost COMPONENTS thread REQUIRED)
 
+### Compile flag to support different versions of ROS ###
+if($ENV{ROS_DISTRO} STRGREATER "foxy")
+  set(USE_NEW_QOS_DEFN 1)
+else()
+  set(USE_NEW_QOS_DEFN 0)
+endif()
+
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 include_directories(include)
@@ -58,6 +65,12 @@ qt5_wrap_ui(SRC_FILES ${UI_FILES})
 qt5_wrap_cpp(SRC_FILES ${HEADER_FILES})
 
 add_executable(swri_console ${HEADER_FILES} ${SRC_FILES} ${RCC_SRCS} src/main.cpp)
+
+target_compile_definitions(swri_console
+  PRIVATE
+    USE_NEW_QOS_DEFN=${USE_NEW_QOS_DEFN}
+)
+
 target_link_libraries(swri_console
   Qt5::Core
   Qt5::Gui

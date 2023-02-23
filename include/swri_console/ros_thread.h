@@ -71,6 +71,7 @@ namespace swri_console
     void startRos();
     void stopRos();
 
+    rclcpp::QoS getQos();
     void emptyLogQueue(rcl_interfaces::msg::Log::ConstSharedPtr msg);
 
     bool is_connected_;

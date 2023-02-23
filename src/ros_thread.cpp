@@ -33,9 +33,10 @@
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp/executors/single_threaded_executor.hpp>
 
-using namespace swri_console;
-
 using namespace std::literals::chrono_literals;
+
+namespace swri_console
+{
 
 RosThread::RosThread(int argc, char** argv) :
   is_connected_(false),
@@ -87,10 +88,10 @@ void RosThread::startRos()
 
   nh_ = rclcpp::Node::make_shared(name.str());
 
-  rclcpp::QoS qos(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_system_default));
-
   rosout_sub_ = nh_->create_subscription<rcl_interfaces::msg::Log>(
-    "/rosout", qos, std::bind(&RosThread::emptyLogQueue, this, std::placeholders::_1));
+    "/rosout",
+    getQos(),
+    std::bind(&RosThread::emptyLogQueue, this, std::placeholders::_1));
 
   Q_EMIT connected(true);
 }
@@ -116,4 +117,22 @@ void RosThread::emptyLogQueue(rcl_interfaces::msg::Log::ConstSharedPtr msg)
     }
     Q_EMIT logReceived(std::move(m_ptr));
   }
+}
+
+rclcpp::QoS RosThread::getQos()
+{
+#if USE_NEW_QOS_DEFN == 0
+  // Foxy does not have a rosout QoS profile, so we copy the initialization from
+  // rclc/logging_rosout.c
+  auto qos_profile = rmw_qos_profile_default;
+  qos_profile.depth = 1000;
+  qos_profile.durability = RMW_QOS_POLICY_DURABILITY_TRANSIENT_LOCAL;
+  qos_profile.lifespan.sec = 10;
+  qos_profile.lifespan.nsec = 0;
+  return rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(qos_profile));
+#else
+  // Humble and on can use the same QoS as the standard rosout config
+  return rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rcl_qos_profile_rosout_default));
+#endif
+}
 }
