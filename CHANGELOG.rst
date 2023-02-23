@@ -2,8 +2,8 @@
 Changelog for package swri_console
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.3 (2023-02-23)
+------------------
 * Fix QoS on Humble (`#55 <https://github.com/swri-robotics/swri_console/issues/55>`_)
   * Use Humble's Default rosout QoS Settings
   Co-authored-by: David Anthony <david.anthony@swri.org>
