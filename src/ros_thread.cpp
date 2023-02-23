@@ -122,7 +122,7 @@ void RosThread::emptyLogQueue(rcl_interfaces::msg::Log::ConstSharedPtr msg)
 rclcpp::QoS RosThread::getQos()
 {
 #if USE_NEW_QOS_DEFN == 0
-  // Foxy does not have a defined QoS profile, so we copy the initialization from
+  // Foxy does not have a rosout QoS profile, so we copy the initialization from
   // rclc/logging_rosout.c
   auto qos_profile = rmw_qos_profile_default;
   qos_profile.depth = 1000;
@@ -131,6 +131,7 @@ rclcpp::QoS RosThread::getQos()
   qos_profile.lifespan.nsec = 0;
   return rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(qos_profile));
 #else
+  // Humble and on can use the same QoS as the standard rosout config
   return rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rcl_qos_profile_rosout_default));
 #endif
 }
