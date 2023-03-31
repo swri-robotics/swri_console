@@ -46,6 +46,7 @@ namespace swri_console
   public:
     static const QString DISPLAY_TIMESTAMPS;
     static const QString ABSOLUTE_TIMESTAMPS;
+    static const QString HUMAN_READABLE_TIME;
     static const QString DISPLAY_LOGGER;
     static const QString DISPLAY_FUNCTION;
     static const QString USE_REGEXPS;
@@ -65,6 +66,7 @@ namespace swri_console
     static const QString FATAL_COLOR;
     static const QString COLORIZE_LOGS;
     static const QString ALTERNATE_LOG_ROW_COLORS;
+
   };
 }
 
