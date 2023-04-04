@@ -2,8 +2,8 @@
 Changelog for package swri_console
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.1.1 (2023-04-04)
+------------------
 * feat: human readable time formatting (`#57 <https://github.com/swri-robotics/swri_console/issues/57>`_)
   Adds option to make the date and time easier to read for humans
 * Added options to be displayed in each log line: logger name and function name. (`#38 <https://github.com/swri-robotics/swri_console/issues/38>`_)
