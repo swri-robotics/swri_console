@@ -2,6 +2,11 @@
 Changelog for package swri_console
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Adding missing dependency needed by build farm (`#58 <https://github.com/swri-robotics/swri_console/issues/58>`_)
+* Contributors: David Anthony
+
 2.0.3 (2023-02-23)
 ------------------
 * Fix QoS on Humble (`#55 <https://github.com/swri-robotics/swri_console/issues/55>`_)
