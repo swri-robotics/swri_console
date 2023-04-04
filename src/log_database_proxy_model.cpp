@@ -31,6 +31,9 @@
 #include <stdio.h>
 #include <algorithm>
 #include <iterator>
+#include <iomanip>
+#include <chrono>
+#include <ctime>
 
 #include <ros/time.h>
 #include <rosbag/bag.h>
@@ -53,6 +56,7 @@ LogDatabaseProxyModel::LogDatabaseProxyModel(LogDatabase *db)
   colorize_logs_(true),
   display_time_(true),
   display_absolute_time_(false),
+  human_readable_time_(false),
   display_logger_(false),
   display_function_(false),
   use_regular_expressions_(false),
@@ -105,7 +109,21 @@ void LogDatabaseProxyModel::setAbsoluteTime(bool absolute)
     Q_EMIT dataChanged(index(0), index(msg_mapping_.size()));
   }
 }
+void LogDatabaseProxyModel::setHumanReadableTime(bool human_readable_time)
+{
+    if (human_readable_time == human_readable_time_) {
+        return;
+    }
 
+    human_readable_time_ = human_readable_time;
+
+    QSettings settings;
+    settings.setValue(SettingsKeys::HUMAN_READABLE_TIME, human_readable_time_);
+
+    if (display_time_ && msg_mapping_.size()) {
+        Q_EMIT dataChanged(index(0), index(msg_mapping_.size()));
+    }
+}
 
 void LogDatabaseProxyModel::setColorizeLogs(bool colorize_logs)
 {
@@ -406,10 +424,19 @@ QVariant LogDatabaseProxyModel::data(
 
     char stamp[128];
     if (display_absolute_time_) {
-      snprintf(stamp, sizeof(stamp),
-               "%u.%09u",
-               item.stamp.sec,
-               item.stamp.nsec);
+
+        if(human_readable_time_){
+            int milliseconds = item.stamp.nsec / 1000000 ;
+            const time_t time = static_cast<time_t>(item.stamp.sec);
+            std::ostringstream oss;
+            oss << std::put_time(std::localtime(&time), "%Y-%m-%d %H:%M:%S");
+            snprintf(stamp, sizeof(stamp), "%s::%03d",oss.str().c_str(), milliseconds);
+        }else{
+          snprintf(stamp, sizeof(stamp),
+                   "%u.%09u",
+                   item.stamp.sec,
+                   item.stamp.nsec);
+        }
     } else {
       ros::Duration t = item.stamp - db_->minTime();
 
