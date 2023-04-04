@@ -2,6 +2,28 @@
 Changelog for package swri_console
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* feat: human readable time formatting (`#57 <https://github.com/swri-robotics/swri_console/issues/57>`_)
+  Adds option to make the date and time easier to read for humans
+* Added options to be displayed in each log line: logger name and function name. (`#38 <https://github.com/swri-robotics/swri_console/issues/38>`_)
+  Co-authored-by: Rasmus Skovgaard Andersen <Rasmus.Andersen@marel.com>
+* Switching to GitHub actions (`#47 <https://github.com/swri-robotics/swri_console/issues/47>`_)
+* Merge pull request `#40 <https://github.com/swri-robotics/swri_console/issues/40>`_ from cellumation/master
+  Enable closing via Ctrl-C from a terminal
+* Merge pull request `#39 <https://github.com/swri-robotics/swri_console/issues/39>`_ from jarvisschultz/rosout_agg_bag_support
+  Add ability to read either `/rosout` or `/rosout_agg` from bag files
+* Do not use the ros signal handlers. Thus, it is now possible to close the swri_console via Ctrl-C from the console
+* Add ability to read either `/rosout` or `/rosout_agg` from bag files
+  Prefer `/rosout` if it exists, if not, fall back to `/rosout_agg`. Also, if no log messages are found in a bag emit a
+  warning to indicate to user the reason why log messages did not change.
+  Tested this with bag files containing only `/rosout`, only `/rosout_agg`, both `/rosout` and `/rosout_agg`, and neither
+  `/rosout` nor `/rosout_agg`.
+* Update documentation
+  Add some feature bullet points and point out ROS 2 support
+* Update package maintainers (`#29 <https://github.com/swri-robotics/swri_console/issues/29>`_)
+* Contributors: Alexis Tsogias, David Anthony, Jarvis Schultz, Mart Moerdijk, Matthew, P. J. Reed
+
 1.1.0 (2018-05-11)
 ------------------
 * Added simple rosout_agg_recorder (`#15 <https://github.com/pjreed/swri_console/issues/15>`_)
