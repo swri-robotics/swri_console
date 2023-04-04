@@ -2,8 +2,8 @@
 Changelog for package swri_console
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.4 (2023-04-04)
+------------------
 * Adding missing dependency needed by build farm (`#58 <https://github.com/swri-robotics/swri_console/issues/58>`_)
 * Contributors: David Anthony
 
