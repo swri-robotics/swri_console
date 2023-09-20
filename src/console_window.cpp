@@ -102,6 +102,9 @@ ConsoleWindow::ConsoleWindow(LogDatabase *db)
   QObject::connect(ui.action_AbsoluteTimestamps, SIGNAL(toggled(bool)),
                    db_proxy_, SLOT(setAbsoluteTime(bool)));
 
+  QObject::connect(ui.action_Use_human_readable_time, SIGNAL(toggled(bool)),
+                   db_proxy_, SLOT(setHumanReadableTime(bool)));
+
   QObject::connect(ui.action_ShowTimestamps, SIGNAL(toggled(bool)),
                    db_proxy_, SLOT(setDisplayTime(bool)));
 
@@ -626,6 +629,7 @@ void ConsoleWindow::loadSettings()
   // First, load all the boolean settings...
   loadBooleanSetting(SettingsKeys::DISPLAY_TIMESTAMPS, ui.action_ShowTimestamps);
   loadBooleanSetting(SettingsKeys::ABSOLUTE_TIMESTAMPS, ui.action_AbsoluteTimestamps);
+  loadBooleanSetting(SettingsKeys::HUMAN_READABLE_TIME, ui.action_Use_human_readable_time);
   loadBooleanSetting(SettingsKeys::USE_REGEXPS, ui.action_RegularExpressions);
   loadBooleanSetting(SettingsKeys::COLORIZE_LOGS, ui.action_ColorizeLogs);
   loadBooleanSetting(SettingsKeys::FOLLOW_NEWEST, ui.checkFollowNewest);
@@ -634,11 +638,13 @@ void ConsoleWindow::loadSettings()
   // into a single integer mask under the hood.  First they have to be loaded from the settings,
   // then set in the UI, then the mask has to actually be applied.
   QSettings settings;
+  bool displayTimestamp = settings.value(SettingsKeys::DISPLAY_TIMESTAMPS, true).toBool();
   bool showDebug = settings.value(SettingsKeys::SHOW_DEBUG, true).toBool();
   bool showInfo = settings.value(SettingsKeys::SHOW_INFO, true).toBool();
   bool showWarn = settings.value(SettingsKeys::SHOW_WARN, true).toBool();
   bool showError = settings.value(SettingsKeys::SHOW_ERROR, true).toBool();
   bool showFatal = settings.value(SettingsKeys::SHOW_FATAL, true).toBool();
+  ui.action_Use_human_readable_time->setEnabled(displayTimestamp);
   ui.checkDebug->setChecked(showDebug);
   ui.checkInfo->setChecked(showInfo);
   ui.checkWarn->setChecked(showWarn);
