@@ -31,13 +31,11 @@
 #include <cstdio>
 #include <algorithm>
 #include <iterator>
+#include <iomanip>
+#include <chrono>
+#include <ctime>
 
 #include <rclcpp/rclcpp.hpp>
-
-//#include <rosbag2/logging.hpp>
-//#include <rosbag2/types.hpp>
-//#include <rosbag2/writer.hpp>
-//#include <rosbag2_storage/logging.hpp>
 
 #include <swri_console/log_database_proxy_model.h>
 #include <swri_console/log_database.h>
@@ -59,6 +57,7 @@ LogDatabaseProxyModel::LogDatabaseProxyModel(LogDatabase *db)
   , colorize_logs_(true)
   , display_time_(true)
   , display_absolute_time_(false)
+  , human_readable_time_(false)
   , display_logger_(true)
   , display_function_(true)
   , use_regular_expressions_(false)
@@ -110,6 +109,23 @@ void LogDatabaseProxyModel::setAbsoluteTime(bool absolute)
   }
 }
 
+void LogDatabaseProxyModel::setHumanReadableTime(bool human_readable_time)
+{
+  if (human_readable_time == human_readable_time_)
+  {
+    return;
+  }
+
+  human_readable_time_ = human_readable_time;
+
+  QSettings settings;
+  settings.setValue(SettingsKeys::HUMAN_READABLE_TIME, human_readable_time_);
+
+  if (display_time_ && msg_mapping_.size())
+  {
+    Q_EMIT dataChanged(index(0), index(msg_mapping_.size()));
+  }
+}
 
 void LogDatabaseProxyModel::setColorizeLogs(bool colorize_logs)
 {
@@ -410,9 +426,25 @@ QVariant LogDatabaseProxyModel::data(
 
     char stamp[128];
     if (display_absolute_time_) {
-      snprintf(stamp, sizeof(stamp),
-               "%f",
-               item.stamp.seconds());
+      if (human_readable_time_) {
+        char date_str[std::size("yyyy-mm-dd hh:mm:ss")];
+        const time_t time = static_cast<time_t>(item.stamp.seconds());
+        int32_t milliseconds = static_cast<int>(1000.0 * (item.stamp.seconds() - static_cast<double>(item.stamp.seconds())));
+        std::strftime(std::data(date_str),
+          std::size(date_str),
+          "%F %T",
+          std::localtime(&time));
+        snprintf(stamp,
+          sizeof(stamp),
+          "%s:%03d",
+          date_str,
+          milliseconds);
+      } else {
+        snprintf(stamp,
+          sizeof(stamp),
+          "%f",
+          item.stamp.seconds());
+      }
     } else {
       rclcpp::Duration t = item.stamp - db_->minTime();
 
