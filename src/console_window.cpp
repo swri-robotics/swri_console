@@ -32,8 +32,6 @@
 #include <cstdio>
 #include <set>
 
-// #include <rosgraph_msgs/Log.h>
-// #include <ros/master.h>  // required for getURI, VCM 12 April 2017
 #include <rclcpp/rclcpp.hpp>
 #include <rcl_interfaces/msg/log.hpp>
 
@@ -42,7 +40,6 @@
 #include <swri_console/log_database_proxy_model.h>
 #include <swri_console/node_list_model.h>
 #include <swri_console/settings_keys.h>
-#include <swri_console/defines.h>
 
 #include <QColorDialog>
 #include <QRegExp>
@@ -55,15 +52,15 @@
 #include <QMenu>
 #include <QSettings>
 
-// QString::SkipEmptyParts was deprecated in favor of Qt::SkipEmptyParts in
-// Qt 5.14.0
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
-  #define SPLIT_FLAG (Qt::SkipEmptyParts)
-#else
-  #define SPLIT_FLAG (QString::SkipEmptyParts)
-#endif
-
 using namespace Qt;
+
+namespace log_level_mask {
+  static constexpr uint8_t DEBUG = 1 << 0;
+  static constexpr uint8_t INFO = 1 << 1;
+  static constexpr uint8_t WARN = 1 << 2;
+  static constexpr uint8_t ERROR = 1 << 3;
+  static constexpr uint8_t FATAL = 1 << 4;
+};
 
 namespace swri_console {
 
@@ -275,7 +272,7 @@ void ConsoleWindow::nodeSelectionChanged()
   db_proxy_->setNodeFilter(nodes);
 
   for (int i = 0; i < node_names.size(); i++) {
-    node_names[i] = node_names[i].split("/", SPLIT_FLAG).last();
+    node_names[i] = node_names[i].split("/", Qt::SkipEmptyParts).last();
   }
     
   setWindowTitle(QString("SWRI Console (") + node_names.join(", ") + ")");
@@ -286,19 +283,19 @@ void ConsoleWindow::setSeverityFilter()
   uint8_t mask = 0;
 
   if (ui.checkDebug->isChecked()) {
-    mask |= LogLevelMask::DEBUG;
+    mask |= log_level_mask::DEBUG;
   }
   if (ui.checkInfo->isChecked()) {
-    mask |= LogLevelMask::INFO;
+    mask |= log_level_mask::INFO;
   }
   if (ui.checkWarn->isChecked()) {
-    mask |= LogLevelMask::WARN;
+    mask |= log_level_mask::WARN;
   }
   if (ui.checkError->isChecked()) {
-    mask |= LogLevelMask::ERROR;
+    mask |= log_level_mask::ERROR;
   }
   if (ui.checkFatal->isChecked()) {
-    mask |= LogLevelMask::FATAL;
+    mask |= log_level_mask::FATAL;
   }
 
   QSettings settings;
@@ -394,7 +391,7 @@ void ConsoleWindow::setFollowNewest(bool follow)
 
 void ConsoleWindow::includeFilterUpdated(const QString &text)
 {
-  QStringList items = text.split(";", SPLIT_FLAG);
+  QStringList items = text.split(";", Qt::SkipEmptyParts);
   QStringList filtered;
   
   for (int i = 0; i < items.size(); i++) {
@@ -412,7 +409,7 @@ void ConsoleWindow::includeFilterUpdated(const QString &text)
 
 void ConsoleWindow::excludeFilterUpdated(const QString &text)
 {
-  QStringList items = text.split(";", SPLIT_FLAG);
+  QStringList items = text.split(";", Qt::SkipEmptyParts);
   QStringList filtered;
   
   for (int i = 0; i < items.size(); i++) {
