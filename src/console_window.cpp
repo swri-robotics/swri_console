@@ -42,7 +42,6 @@
 #include <swri_console/log_database_proxy_model.h>
 #include <swri_console/node_list_model.h>
 #include <swri_console/settings_keys.h>
-#include <swri_console/defines.h>
 
 #include <QColorDialog>
 #include <QRegExp>
@@ -64,6 +63,14 @@
 #endif
 
 using namespace Qt;
+
+namespace log_level_mask {
+  static constexpr uint8_t DEBUG = 1 << 0;
+  static constexpr uint8_t INFO = 1 << 1;
+  static constexpr uint8_t WARN = 1 << 2;
+  static constexpr uint8_t ERROR = 1 << 3;
+  static constexpr uint8_t FATAL = 1 << 4;
+};
 
 namespace swri_console {
 
@@ -286,19 +293,19 @@ void ConsoleWindow::setSeverityFilter()
   uint8_t mask = 0;
 
   if (ui.checkDebug->isChecked()) {
-    mask |= LogLevelMask::DEBUG;
+    mask |= log_level_mask::DEBUG;
   }
   if (ui.checkInfo->isChecked()) {
-    mask |= LogLevelMask::INFO;
+    mask |= log_level_mask::INFO;
   }
   if (ui.checkWarn->isChecked()) {
-    mask |= LogLevelMask::WARN;
+    mask |= log_level_mask::WARN;
   }
   if (ui.checkError->isChecked()) {
-    mask |= LogLevelMask::ERROR;
+    mask |= log_level_mask::ERROR;
   }
   if (ui.checkFatal->isChecked()) {
-    mask |= LogLevelMask::FATAL;
+    mask |= log_level_mask::FATAL;
   }
 
   QSettings settings;
