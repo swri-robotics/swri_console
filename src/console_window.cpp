@@ -32,8 +32,6 @@
 #include <cstdio>
 #include <set>
 
-// #include <rosgraph_msgs/Log.h>
-// #include <ros/master.h>  // required for getURI, VCM 12 April 2017
 #include <rclcpp/rclcpp.hpp>
 #include <rcl_interfaces/msg/log.hpp>
 
@@ -53,14 +51,6 @@
 #include <QScrollBar>
 #include <QMenu>
 #include <QSettings>
-
-// QString::SkipEmptyParts was deprecated in favor of Qt::SkipEmptyParts in
-// Qt 5.14.0
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
-  #define SPLIT_FLAG (Qt::SkipEmptyParts)
-#else
-  #define SPLIT_FLAG (QString::SkipEmptyParts)
-#endif
 
 using namespace Qt;
 
@@ -282,7 +272,7 @@ void ConsoleWindow::nodeSelectionChanged()
   db_proxy_->setNodeFilter(nodes);
 
   for (int i = 0; i < node_names.size(); i++) {
-    node_names[i] = node_names[i].split("/", SPLIT_FLAG).last();
+    node_names[i] = node_names[i].split("/", Qt::SkipEmptyParts).last();
   }
     
   setWindowTitle(QString("SWRI Console (") + node_names.join(", ") + ")");
@@ -401,7 +391,7 @@ void ConsoleWindow::setFollowNewest(bool follow)
 
 void ConsoleWindow::includeFilterUpdated(const QString &text)
 {
-  QStringList items = text.split(";", SPLIT_FLAG);
+  QStringList items = text.split(";", Qt::SkipEmptyParts);
   QStringList filtered;
   
   for (int i = 0; i < items.size(); i++) {
@@ -419,7 +409,7 @@ void ConsoleWindow::includeFilterUpdated(const QString &text)
 
 void ConsoleWindow::excludeFilterUpdated(const QString &text)
 {
-  QStringList items = text.split(";", SPLIT_FLAG);
+  QStringList items = text.split(";", Qt::SkipEmptyParts);
   QStringList filtered;
   
   for (int i = 0; i < items.size(); i++) {
