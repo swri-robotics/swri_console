@@ -22,7 +22,7 @@
   <depend>libqt5-core</depend>
   <depend>libqt5-gui</depend>
   <depend>libqt5-widgets</depend>
-  <!-- <depend>rosbag_storage</depend> -->
+  <depend>rosbag2_transport</depend>
   <depend>rclcpp</depend>
   <depend>rcl_interfaces</depend>
 
