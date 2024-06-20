@@ -14,6 +14,7 @@ project(swri_console)
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rcl_interfaces REQUIRED)
+find_package(rosbag2_transport REQUIRED)
 
 ### QT PACKAGES ###
 find_package(Qt5Core REQUIRED)
@@ -68,6 +69,7 @@ ament_target_dependencies(${PROJECT_NAME}
   ament_cmake
   rclcpp
   rcl_interfaces
+  rosbag2_transport
 )
 
 install(TARGETS ${PROJECT_NAME}

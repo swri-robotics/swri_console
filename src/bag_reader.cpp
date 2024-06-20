@@ -33,54 +33,45 @@
 #include <QMessageBox>
 
 #include "swri_console/bag_reader.h"
-
-// #include <rosbag/bag.h>
-// #include <rosbag/view.h>
-#include <rclcpp/rclcpp.hpp>
+#include <rosbag2_transport/reader_writer_factory.hpp>
 
 using namespace swri_console;
 
 void BagReader::readBagFile(const QString& filename)
 {
-  /*
-  rosbag::Bag bag;
-  bag.open(filename.toStdString(), rosbag::bagmode::Read);
+  rosbag2_storage::StorageOptions storage_options;
+  storage_options.uri = filename.toStdString();
+  auto reader = rosbag2_transport::ReaderWriterFactory::make_reader(storage_options);
+  reader->open(storage_options);
 
-  std::vector<std::string> topics;
-  topics.push_back(std::string("/rosout"));
+  while (reader->has_next()) {
+    auto msg = reader->read_next();
 
-  rosbag::View view(bag, rosbag::TopicQuery(topics));
-  rosbag::View::const_iterator iter;
-
-  for(iter = view.begin(); iter != view.end(); ++iter)
-  {
-    rosgraph_msgs::LogConstPtr log = iter->instantiate<rosgraph_msgs::Log>();
-    if (log != NULL ) {
-      emit logReceived(log);
+    if (msg->topic_name != "/rosout") {
+      continue;
     }
-    else {
-      qWarning("Got a message that was not a log message but a: %s", iter->getDataType().c_str());
-    }
+
+    // Deserialize the message
+    rclcpp::SerializedMessage serialized_msg(*msg->serialized_data);
+    auto log = std::make_shared<rcl_interfaces::msg::Log>();
+    rclcpp::Serialization<rcl_interfaces::msg::Log> serialization_;
+    serialization_.deserialize_message(&serialized_msg, log.get());
+
+    emit logReceived(log);
   }
-   */
 
   emit finishedReading();
 }
 
 void BagReader::promptForBagFile()
 {
-  QMessageBox::information(nullptr,
-                           tr("Bag files not supported"),
-                           tr("Reading and writing bag files is not yet supported in ROS 2."));
-  /*
   QString filename = QFileDialog::getOpenFileName(nullptr,
                                                   tr("Open Bag File"),
                                                   QDir::homePath(),
-                                                  tr("Bag Files (*.bag)"));
+                                                  tr("Bag Files (*.mcap)"));
 
   if (filename != nullptr)
   {
     readBagFile(filename);
   }
-   */
 }
