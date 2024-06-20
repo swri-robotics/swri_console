@@ -9,8 +9,6 @@ Forthcoming
 * Remove Old Distro Support (`#62 <https://github.com/swri-robotics/swri_console/issues/62>`_)
 * Update package.xml
 * Adding ROS-Industrial CI Actions for ROS2 Releases
-  ---------
-  Co-authored-by: David Anthony <djanthony@gmail.com>
 * Contributors: David Anthony, Matthijs van der Burgh, Ramon Wijnands
 
 2.0.4 (2023-04-04)
