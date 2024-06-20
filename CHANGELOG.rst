@@ -2,6 +2,17 @@
 Changelog for package swri_console
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Implement reading from rosbag2 files (`#64 <https://github.com/swri-robotics/swri_console/issues/64>`_)
+* Add human readable time (`#63 <https://github.com/swri-robotics/swri_console/issues/63>`_)
+* Remove Old Distro Support (`#62 <https://github.com/swri-robotics/swri_console/issues/62>`_)
+* Update package.xml
+* Adding ROS-Industrial CI Actions for ROS2 Releases
+  ---------
+  Co-authored-by: David Anthony <djanthony@gmail.com>
+* Contributors: David Anthony, Matthijs van der Burgh, Ramon Wijnands
+
 2.0.4 (2023-04-04)
 ------------------
 * Adding missing dependency needed by build farm (`#58 <https://github.com/swri-robotics/swri_console/issues/58>`_)
