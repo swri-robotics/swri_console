@@ -2,8 +2,8 @@
 Changelog for package swri_console
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.5 (2024-06-20)
+------------------
 * Implement reading from rosbag2 files (`#64 <https://github.com/swri-robotics/swri_console/issues/64>`_)
 * Add human readable time (`#63 <https://github.com/swri-robotics/swri_console/issues/63>`_)
 * Remove Old Distro Support (`#62 <https://github.com/swri-robotics/swri_console/issues/62>`_)
