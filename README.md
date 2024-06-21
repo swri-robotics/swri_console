@@ -12,7 +12,6 @@ swri_console is an alternative to rqt_console for viewing the ROS console output
 - Hide, show, and colorize log messages based on severity
 - Save and load log messages to text files
 - Save and load log messages directly from the `/rosout` topic in a bag file
-   - *Not supported in ROS 2 yet*
 - Right-click on nodes to dynamically set their logger levels
    - *Not supported in ROS 2 yet*
 
