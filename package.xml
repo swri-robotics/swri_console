@@ -4,7 +4,7 @@
   <version>2.0.5</version>
   <description>
 
-     A rosout GUI viewer developed at Southwest Research Insititute as an
+     A rosout GUI viewer developed at Southwest Research Institute as an
      alternative to rqt_console.
 
   </description>
@@ -26,6 +26,7 @@
   <depend>rclcpp</depend>
   <depend>rcl_interfaces</depend>
 
+  <exec_depend>rosbag2_storage_mcap</exec_depend>
   <exec_depend>rosidl_default_runtime</exec_depend>
 
     <export>
