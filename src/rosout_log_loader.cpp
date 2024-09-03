@@ -102,140 +102,149 @@ namespace swri_console
       log->level = level_string_to_level_type(std::string(level));
       log->line = line_num;
       log->msg = msg;
+      return 0;
     }
-    else // try another format
-    {
-      char log_msg_fmt1[] = "%d.%d %s [%[^:]:%u(%[^)])) [topics: %[^]]] %[^\n]s";
-      num_parsed = sscanf(line.c_str(), log_msg_fmt1, &secs, &nsecs, level, file, &line_num, function, topics, msg);
-      if (num_parsed == 8 )
-      {
-        // Populate new log message
-        log->file = file;
-        log->function = function;
-        // log->header.seq = seq;
-        // stamp.sec = secs;
-        // stamp.nsec = nsecs;
-        stamp = rclcpp::Time(secs, nsecs);
-        log->stamp = stamp;
-        log->level = level_string_to_level_type(std::string(level));
-        log->line = line_num;
-        log->msg = msg;
-      }
-      else // try another format
-      {
-        // Example: [rospy.registration][INFO] 2017-11-30 08:11:39,231: registering subscriber topic [/tf] type [tf2_msgs/TFMessage] with master
-        char log_msg_fmt2[] = "[%[^]]][%[^]]] %d-%d-%d %d:%d:%d,%d: %[^\n]s";
-        int year;
-        int month;
-        int day;
-        int hour;
-        int minute;
-        int msecs;
-        char name[1024];
-        time_t rawtime;
-        struct tm * timeinfo;
 
-        num_parsed = sscanf(line.c_str(), log_msg_fmt2, name, level, &year, &month, &day, &hour, &minute, &secs, &msecs, msg);
-        if (num_parsed == 10)
-        {
-          // Populate new log message
-          file[0] = 0;
-          function[0] = 0;
-          line_num = 0;
-          time ( &rawtime );
-          timeinfo = localtime ( &rawtime );
-          timeinfo->tm_year = year - 1900;
-          timeinfo->tm_mon = month - 1;
-          timeinfo->tm_mday = day;
-          timeinfo->tm_hour = hour;
-          timeinfo->tm_min = minute;
-          timeinfo->tm_sec = secs;
-          rawtime = mktime ( timeinfo );
-          secs = rawtime;
-          nsecs = msecs * 1000000;
-          log->file = file;
-          log->function = function;
-          // log->header.seq = seq;
-          // stamp.sec = secs;
-          // stamp.nsec = nsecs;
-          stamp = rclcpp::Time(secs, nsecs);
-          log->stamp = stamp;
-          log->level = level_string_to_level_type(std::string(level));
-          log->line = line_num;
-          log->msg = msg;
-        }
-        else
-        {
-          // Example: [ INFO] [1512051098.518631473]: Read parameter lower_cost_threshold = 0.000000
-          char log_msg_fmt3[] = "\x1b[%dm[ %[^]]] [%d.%d]: %[^\n\x1b]s";
-//          char log_msg_fmt3[] = "\x1b[%dm[ %[^]]] [%d.%d]]%[^\n]";
-          int ansi_color;
-          msg[0] = 0;
-          num_parsed = sscanf(line.c_str(), log_msg_fmt3, &ansi_color, level, &secs, &nsecs, msg);
-          if (num_parsed == 5)
-          {
-            // Populate new log message
-            file[0] = 0;
-            function[0] = 0;
-            line_num = 0;
-            log->file = file;
-            log->function = function;
-            // log->header.seq = seq;
-            // stamp.sec = secs;
-            // stamp.nsec = nsecs;
-            stamp = rclcpp::Time(secs, nsecs);
-            log->stamp = stamp;
-            log->level = level_string_to_level_type(std::string(level));
-            log->line = line_num;
-            log->msg = msg;
-          }
-          else
-          {
-            // Example: [ WARN] [1512051107.153917534, 1507066358.521849475]: Offset change exceeds limit! reduce from 0.814476 to 0.500000
-            char log_msg_fmt4[] = "\x1b[%dm[ %[^]]] [%d.%d, %d.%d]: %[^\n\x1b]";
-            int secs2;
-            int nsecs2;
-            msg[0] = 0;
-            num_parsed = sscanf(line.c_str(), log_msg_fmt4, &ansi_color, level, &secs, &nsecs, &secs2, &nsecs2, msg);
-            if (num_parsed == 7)
-            {
-              // Populate new log message
-              file[0] = 0;
-              function[0] = 0;
-              line_num = 0;
-              log->file = file;
-              log->function = function;
-              // log->header.seq = seq;
-              // stamp.sec = secs;
-              // stamp.nsec = nsecs;
-              stamp = rclcpp::Time(secs, nsecs);
-              log->stamp = stamp;
-              log->level = level_string_to_level_type(std::string(level));
-              log->line = line_num;
-              log->msg = msg;
-            }
-            else // Couldn't parse with known formats
-            {
-              if (line.length() < MIN_MSG_SIZE)
-              {
-                return -1;
-              }
-              log->file = std::string("");
-              log->function = std::string("");
-              // log->header.seq = seq;
-              // stamp.sec = 0;
-              // stamp.nsec = 0;
-              stamp = rclcpp::Time(0, 0);
-              log->stamp = stamp;
-              log->level = level_string_to_level_type(std::string("DEBUG"));
-              log->line = 0;
-              log->msg = line;
-              log->name = log->name + "-unparsed";
-            }
-          }
-        }
-      }
+    // try another format
+    char log_msg_fmt1[] = "%d.%d %s [%[^:]:%u(%[^)])) [topics: %[^]]] %[^\n]s";
+    num_parsed = sscanf(line.c_str(), log_msg_fmt1, &secs, &nsecs, level, file, &line_num, function, topics, msg);
+    if (num_parsed == 8) {
+      // Populate new log message
+      log->file = file;
+      log->function = function;
+      // log->header.seq = seq;
+      // stamp.sec = secs;
+      // stamp.nsec = nsecs;
+      stamp = rclcpp::Time(secs, nsecs);
+      log->stamp = stamp;
+      log->level = level_string_to_level_type(std::string(level));
+      log->line = line_num;
+      log->msg = msg;
+      return 0;
     }
+
+    // try another format
+    // Example: [rospy.registration][INFO] 2017-11-30 08:11:39,231: registering subscriber topic [/tf] type [tf2_msgs/TFMessage] with master
+    char log_msg_fmt2[] = "[%[^]]][%[^]]] %d-%d-%d %d:%d:%d,%d: %[^\n]s";
+    int year;
+    int month;
+    int day;
+    int hour;
+    int minute;
+    int msecs;
+    char name[1024];
+    time_t rawtime;
+    struct tm * timeinfo;
+
+    num_parsed = sscanf(line.c_str(), log_msg_fmt2, name, level, &year, &month, &day, &hour, &minute, &secs, &msecs, msg);
+    if (num_parsed == 10) {
+      // Populate new log message
+      file[0] = 0;
+      function[0] = 0;
+      line_num = 0;
+      time ( &rawtime );
+      timeinfo = localtime ( &rawtime );
+      timeinfo->tm_year = year - 1900;
+      timeinfo->tm_mon = month - 1;
+      timeinfo->tm_mday = day;
+      timeinfo->tm_hour = hour;
+      timeinfo->tm_min = minute;
+      timeinfo->tm_sec = secs;
+      rawtime = mktime ( timeinfo );
+      secs = rawtime;
+      nsecs = msecs * 1000000;
+      log->file = file;
+      log->function = function;
+      // log->header.seq = seq;
+      // stamp.sec = secs;
+      // stamp.nsec = nsecs;
+      stamp = rclcpp::Time(secs, nsecs);
+      log->stamp = stamp;
+      log->level = level_string_to_level_type(std::string(level));
+      log->line = line_num;
+      log->msg = msg;
+      return 0;
+    }
+
+    // Example: [ INFO] [1512051098.518631473]: Read parameter lower_cost_threshold = 0.000000
+    char log_msg_fmt3[] = "\x1b[%dm[ %[^]]] [%d.%d]: %[^\n\x1b]s";
+//          char log_msg_fmt3[] = "\x1b[%dm[ %[^]]] [%d.%d]]%[^\n]";
+    int ansi_color;
+    msg[0] = 0;
+    num_parsed = sscanf(line.c_str(), log_msg_fmt3, &ansi_color, level, &secs, &nsecs, msg);
+    if (num_parsed == 5) {
+      // Populate new log message
+      file[0] = 0;
+      function[0] = 0;
+      line_num = 0;
+      log->file = file;
+      log->function = function;
+      // log->header.seq = seq;
+      // stamp.sec = secs;
+      // stamp.nsec = nsecs;
+      stamp = rclcpp::Time(secs, nsecs);
+      log->stamp = stamp;
+      log->level = level_string_to_level_type(std::string(level));
+      log->line = line_num;
+      log->msg = msg;
+      return 0;
+    }
+
+    // Example: [ WARN] [1512051107.153917534, 1507066358.521849475]: Offset change exceeds limit! reduce from 0.814476 to 0.500000
+    char log_msg_fmt4[] = "\x1b[%dm[ %[^]]] [%d.%d, %d.%d]: %[^\n\x1b]";
+    int secs2;
+    int nsecs2;
+    msg[0] = 0;
+    num_parsed = sscanf(line.c_str(), log_msg_fmt4, &ansi_color, level, &secs, &nsecs, &secs2, &nsecs2, msg);
+    if (num_parsed == 7) {
+      // Populate new log message
+      file[0] = 0;
+      function[0] = 0;
+      line_num = 0;
+      log->file = file;
+      log->function = function;
+      // log->header.seq = seq;
+      // stamp.sec = secs;
+      // stamp.nsec = nsecs;
+      stamp = rclcpp::Time(secs, nsecs);
+      log->stamp = stamp;
+      log->level = level_string_to_level_type(std::string(level));
+      log->line = line_num;
+      log->msg = msg;
+      return 0;
+    }
+
+    // Example: 1724314618.146484723 [INFO] [namespace.Node::Fuction]:  The actual log msg
+    char log_msg_fmt5[] = "%d.%d [%[^]]] [%49[^:]::%127[^]]]: %[^\n\x1b]";
+    num_parsed = sscanf(line.c_str(), log_msg_fmt5, &secs, &nsecs, level, name, function, msg);
+
+    if (num_parsed == 6) {
+      // Populate new log message
+      log->name = name;  // override 'name' with node_fqn
+      log->function = function;
+      stamp = rclcpp::Time(secs, nsecs);
+      log->stamp = stamp;
+      log->level = level_string_to_level_type(std::string(level));
+      log->line = line_num;
+      log->msg = msg;
+      return 0;
+    }
+
+    // Couldn't parse with known formats
+    if (line.length() < MIN_MSG_SIZE) {
+      return -1;
+    }
+    log->file = std::string("");
+    log->function = std::string("");
+    // log->header.seq = seq;
+    // stamp.sec = 0;
+    // stamp.nsec = 0;
+    stamp = rclcpp::Time(0, 0);
+    log->stamp = stamp;
+    log->level = level_string_to_level_type(std::string("DEBUG"));
+    log->line = 0;
+    log->msg = line;
+    log->name = log->name + "-unparsed";
     return 0;
   }
 
