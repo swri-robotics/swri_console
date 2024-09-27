@@ -2,6 +2,18 @@
 Changelog for package swri_console
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix: "Human readable time" now shows milliseconds correctly. (`#67 <https://github.com/swri-robotics/swri_console/issues/67>`_)
+  Co-authored-by: David Anthony <djanthony@gmail.com>
+* Update industrial_ci.yml
+  Adds CI for Jazzy and Rolling.
+* Allow default support for mcap files (`#65 <https://github.com/swri-robotics/swri_console/issues/65>`_)
+* Add: Added support for log files of the format "Example: 1724314618.146484723 [INFO] [namespace.Node::Fuction]:  The actual log msg". (`#66 <https://github.com/swri-robotics/swri_console/issues/66>`_)
+  Refactor: Removed nested if's
+* Update README.md
+* Contributors: David Anthony, Rasmus Skovgaard Andersen, Tim Clephas
+
 2.0.5 (2024-06-20)
 ------------------
 * Implement reading from rosbag2 files (`#64 <https://github.com/swri-robotics/swri_console/issues/64>`_)
