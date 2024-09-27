@@ -429,7 +429,7 @@ QVariant LogDatabaseProxyModel::data(
       if (human_readable_time_) {
         char date_str[std::size("yyyy-mm-dd hh:mm:ss")];
         const time_t time = static_cast<time_t>(item.stamp.seconds());
-        int32_t milliseconds = static_cast<int>(1000.0 * (item.stamp.seconds() - static_cast<double>(item.stamp.seconds())));
+        int32_t milliseconds = static_cast<int>(1000.0 * (item.stamp.seconds() - std::floor(item.stamp.seconds())));
         std::strftime(std::data(date_str),
           std::size(date_str),
           "%F %T",
