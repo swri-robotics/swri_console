@@ -2,8 +2,8 @@
 Changelog for package swri_console
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.6 (2024-09-27)
+------------------
 * Fix: "Human readable time" now shows milliseconds correctly. (`#67 <https://github.com/swri-robotics/swri_console/issues/67>`_)
   Co-authored-by: David Anthony <djanthony@gmail.com>
 * Update industrial_ci.yml
