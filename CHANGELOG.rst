@@ -2,8 +2,8 @@
 Changelog for package swri_console
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.7 (2025-06-12)
+------------------
 * Update README.md
 * Update industrial_ci.yml
 * Updating CI and readme to remove references to Iron
