@@ -18,13 +18,13 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
   <buildtool_depend>rosidl_default_generators</buildtool_depend>
   <build_depend>libqt5-opengl-dev</build_depend>
-  <depend>libboost-thread-dev</depend>
   <depend>libqt5-core</depend>
   <depend>libqt5-gui</depend>
   <depend>libqt5-widgets</depend>
-  <depend>rosbag2_transport</depend>
   <depend>rclcpp</depend>
   <depend>rcl_interfaces</depend>
+  <depend>rmw</depend>
+  <depend>rosbag2_transport</depend>
 
   <exec_depend>rosbag2_storage_mcap</exec_depend>
   <exec_depend>rosidl_default_runtime</exec_depend>

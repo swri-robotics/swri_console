@@ -33,8 +33,6 @@
 
 #include <vector>
 
-#include <boost/thread.hpp>
-
 #include <QContextMenuEvent>
 #include <QObject>
 #include <QEvent>
