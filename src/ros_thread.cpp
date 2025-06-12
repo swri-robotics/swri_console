@@ -30,6 +30,7 @@
 
 #include <QCoreApplication>
 #include "swri_console/ros_thread.h"
+#include <rmw/qos_profiles.h>
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp/executors/single_threaded_executor.hpp>
 
@@ -122,6 +123,6 @@ void RosThread::emptyLogQueue(rcl_interfaces::msg::Log::ConstSharedPtr msg)
 rclcpp::QoS RosThread::getQos()
 {
   // Humble and on can use the same QoS as the standard rosout config
-  return rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rcl_qos_profile_rosout_default));
+  return rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_rosout_default));
 }
 }
