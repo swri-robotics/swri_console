@@ -14,11 +14,8 @@ project(swri_console)
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rcl_interfaces REQUIRED)
-<<<<<<< HEAD
-find_package(rosbag2_transport REQUIRED)
-=======
 find_package(rmw REQUIRED)
->>>>>>> b523ebd (Updating for new build commands and constants in Kilted and later)
+find_package(rosbag2_transport REQUIRED)
 
 ### QT PACKAGES ###
 find_package(Qt5Core REQUIRED)
