@@ -2,6 +2,15 @@
 Changelog for package swri_console
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Update README.md
+* Updating for new build commands and constants in Kilted and later (`#71 <https://github.com/swri-robotics/swri_console/issues/71>`_)
+* Updating CI and readme to remove references to Iron
+* Update industrial_ci.yml
+  Updating to use ROS-I CI with support for new versions of Python.
+* Contributors: David Anthony
+
 2.0.6 (2024-09-27)
 ------------------
 * Fix: "Human readable time" now shows milliseconds correctly. (`#67 <https://github.com/swri-robotics/swri_console/issues/67>`_)
