@@ -17,6 +17,6 @@ swri_console is an alternative to rqt_console for viewing the ROS console output
 
 Build Status
 --------
-| Humble | Jazzy | Rolling |
-| :----- | :---- | :------ |
-| [![Build Status](https://build.ros2.org/job/Hbin_uJ64__swri_console__ubuntu_jammy_amd64__binary/badge/icon)](https://build.ros2.org/job/Hbin_uJ64__swri_console__ubuntu_jammy_amd64__binary/) | [![Build Status](https://build.ros2.org/job/Jbin_uN64__swri_console__ubuntu_noble_amd64__binary/badge/icon)](https://build.ros2.org/job/Jbin_uN64__swri_console__ubuntu_noble_amd64__binary/) | [![Build Status](https://build.ros2.org/job/Rbin_uN64__swri_console__ubuntu_noble_amd64__binary/badge/icon)](https://build.ros2.org/job/Rbin_uN64__swri_console__ubuntu_noble_amd64__binary/)
+| Humble | Jazzy |
+| :----- | :---- |
+| [![Build Status](https://build.ros2.org/job/Hbin_uJ64__swri_console__ubuntu_jammy_amd64__binary/badge/icon)](https://build.ros2.org/job/Hbin_uJ64__swri_console__ubuntu_jammy_amd64__binary/) | [![Build Status](https://build.ros2.org/job/Jbin_uN64__swri_console__ubuntu_noble_amd64__binary/badge/icon)](https://build.ros2.org/job/Jbin_uN64__swri_console__ubuntu_noble_amd64__binary/)
