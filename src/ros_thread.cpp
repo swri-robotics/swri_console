@@ -29,9 +29,13 @@
 // *****************************************************************************
 
 #include <QCoreApplication>
-#include "swri_console/ros_thread.h"
+
+#include <rclcpp/qos.hpp>
 #include <rclcpp/rclcpp.hpp>
+#include <rclcpp/version.h>
 #include <rclcpp/executors/single_threaded_executor.hpp>
+
+#include "swri_console/ros_thread.h"
 
 using namespace std::literals::chrono_literals;
 
@@ -50,7 +54,12 @@ void RosThread::run()
   while (is_running_)
   {
     bool is_initialized = rclcpp::ok();
+#include <rclcpp/qos.hpp>
+#include <rclcpp/rclcpp.hpp>
+#include <rclcpp/version.h>
+#include <rclcpp/executors/single_threaded_executor.hpp>
 
+#include "swri_console/ros_thread.h"
     if (!is_connected_ && is_initialized) {
       startRos();
     } else if (is_connected_ && !is_initialized) {
@@ -63,7 +72,12 @@ void RosThread::run()
   }
 }
 
+#include <rclcpp/qos.hpp>
+#include <rclcpp/rclcpp.hpp>
+#include <rclcpp/version.h>
+#include <rclcpp/executors/single_threaded_executor.hpp>
 
+#include "swri_console/ros_thread.h"
 void RosThread::shutdown()
 {
   is_running_ = false;
@@ -121,7 +135,12 @@ void RosThread::emptyLogQueue(rcl_interfaces::msg::Log::ConstSharedPtr msg)
 
 rclcpp::QoS RosThread::getQos()
 {
-  // Humble and on can use the same QoS as the standard rosout config
-  return rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rcl_qos_profile_rosout_default));
+  // Humble and on can use the same QoS as the standard rosout config. Later versions
+  // can use the best available QoS for improved compatibility
+#if RCLCPP_VERSION_GTE(17, 0, 0)
+  return rclcpp::BestAvailableQoS();
+#else
+  return rclcpp::RosoutQoS();
+#endif
 }
 }
