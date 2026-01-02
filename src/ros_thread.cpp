@@ -29,11 +29,13 @@
 // *****************************************************************************
 
 #include <QCoreApplication>
-#include "swri_console/ros_thread.h"
-#include <rmw/qos_profiles.h>
+
+#include <rclcpp/qos.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp/version.h>
 #include <rclcpp/executors/single_threaded_executor.hpp>
+
+#include "swri_console/ros_thread.h"
 
 using namespace std::literals::chrono_literals;
 
@@ -128,7 +130,7 @@ rclcpp::QoS RosThread::getQos()
 #if RCLCPP_VERSION_GTE(17, 0, 0)
   return rclcpp::BestAvailableQoS();
 #else
-  return rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_rosout_default));
+  return rclcpp::RosoutQoS();
 #endif
 }
 }
