@@ -54,12 +54,7 @@ void RosThread::run()
   while (is_running_)
   {
     bool is_initialized = rclcpp::ok();
-#include <rclcpp/qos.hpp>
-#include <rclcpp/rclcpp.hpp>
-#include <rclcpp/version.h>
-#include <rclcpp/executors/single_threaded_executor.hpp>
 
-#include "swri_console/ros_thread.h"
     if (!is_connected_ && is_initialized) {
       startRos();
     } else if (is_connected_ && !is_initialized) {
@@ -72,12 +67,6 @@ void RosThread::run()
   }
 }
 
-#include <rclcpp/qos.hpp>
-#include <rclcpp/rclcpp.hpp>
-#include <rclcpp/version.h>
-#include <rclcpp/executors/single_threaded_executor.hpp>
-
-#include "swri_console/ros_thread.h"
 void RosThread::shutdown()
 {
   is_running_ = false;
