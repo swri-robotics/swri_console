@@ -2,6 +2,13 @@
 Changelog for package swri_console
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Backport off https://github.com/swri-robotics/swri_console/pull/73 (`#74 <https://github.com/swri-robotics/swri_console/issues/74>`_)
+  * Backport off https://github.com/swri-robotics/swri_console/pull/73
+* Updating README with information about all distributions.
+* Contributors: David Anthony
+
 2.0.7 (2025-06-12)
 ------------------
 * Update README.md
