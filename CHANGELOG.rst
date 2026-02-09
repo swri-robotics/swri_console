@@ -2,6 +2,12 @@
 Changelog for package swri_console
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Include <limits> for std::numeric_limits (`#75 <https://github.com/swri-robotics/swri_console/issues/75>`_)
+  * Include <limits> for std::numeric_limits
+* Contributors: Tim Clephas
+
 2.1.1 (2026-01-06)
 ------------------
 * Using best available QoS if function is available (`#73 <https://github.com/swri-robotics/swri_console/issues/73>`_)
