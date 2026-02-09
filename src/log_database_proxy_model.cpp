@@ -17,12 +17,12 @@
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 // AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-// ARE DISCLAIMED. IN NO EVENT SHALL Southwest Research Institute® BE LIABLE 
-// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
-// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR 
-// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
-// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT 
-// LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY 
+// ARE DISCLAIMED. IN NO EVENT SHALL Southwest Research Institute® BE LIABLE
+// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+// LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 // OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 //
@@ -34,6 +34,7 @@
 #include <iomanip>
 #include <chrono>
 #include <ctime>
+#include <limits>
 
 #include <rclcpp/rclcpp.hpp>
 
@@ -453,7 +454,7 @@ QVariant LogDatabaseProxyModel::data(
       int minutes = (secs / 60) % 60;
       int seconds = (secs % 60);
       int milliseconds = static_cast<int>(1000.0 * (t.seconds() - static_cast<double>(secs)));
-      
+
       snprintf(stamp, sizeof(stamp),
                "%d:%02d:%02d:%03d",
                hours, minutes, seconds, milliseconds);
@@ -484,14 +485,14 @@ QVariant LogDatabaseProxyModel::data(
     // For multiline messages, we only want to display the header for
     // the first line.  For the subsequent lines, we generate a header
     // and then fill it with blank lines so that the messages are
-    // aligned properly (assuming monospaced font).  
+    // aligned properly (assuming monospaced font).
     if (line_idx.line_index != 0) {
       size_t len = strnlen(header, sizeof(header));
       for (size_t i = 0; i < len; i++) {
         header[i] = ' ';
       }
     }
-    
+
     return QVariant(QString(header) + item.text[line_idx.line_index]);
   }
   else if (role == Qt::ForegroundRole && colorize_logs_) {
@@ -527,11 +528,11 @@ QVariant LogDatabaseProxyModel::data(
              item.function.c_str(),
              item.file.c_str(),
              item.line);
-    
+
     QString text = (QString(buffer) +
-                    item.text.join("\n") + 
+                    item.text.join("\n") +
                     QString("</p>"));
-                            
+
     return QVariant(text);
   } else if (role == LogDatabaseProxyModel::ExtendedLogRole) {
     char buffer[4096];
@@ -547,13 +548,13 @@ QVariant LogDatabaseProxyModel::data(
              item.function.c_str(),
              item.file.c_str(),
              item.line);
-    
+
     QString text = (QString(buffer) +
-                    item.text.join("\n")); 
-                            
+                    item.text.join("\n"));
+
     return QVariant(text);
   }
-      
+
   return QVariant();
 }
 
@@ -603,9 +604,9 @@ void LogDatabaseProxyModel::saveBagFile(const QString& filename) const
 
   size_t idx = 0;
   while (idx < msg_mapping_.size()) {
-    const LineMap line_map = msg_mapping_[idx];    
+    const LineMap line_map = msg_mapping_[idx];
     const LogEntry &item = db_->log()[line_map.log_index];
-    
+
     rcl_interfaces::msg::Log log;
     log.file = item.file;
     log.function = item.function;
@@ -666,23 +667,23 @@ void LogDatabaseProxyModel::handleDatabaseCleared()
 void LogDatabaseProxyModel::processNewMessages()
 {
   std::deque<LineMap> new_items;
- 
+
   // Process all messages from latest_log_index_ to the end of the
   // log.
   for (;
        latest_log_index_ < db_->log().size();
        latest_log_index_++)
   {
-    const LogEntry &item = db_->log()[latest_log_index_];    
+    const LogEntry &item = db_->log()[latest_log_index_];
     if (!acceptLogEntry(item)) {
       continue;
-    }    
+    }
 
     for (int i = 0; i < item.text.size(); i++) {
       new_items.emplace_back(latest_log_index_, i);
     }
   }
-  
+
   if (!new_items.empty()) {
     beginInsertRows(QModelIndex(),
                     msg_mapping_.size(),
@@ -693,7 +694,7 @@ void LogDatabaseProxyModel::processNewMessages()
     endInsertRows();
 
     Q_EMIT messagesAdded();
-  }  
+  }
 }
 
 void LogDatabaseProxyModel::processOldMessages()
@@ -705,7 +706,7 @@ void LogDatabaseProxyModel::processOldMessages()
   // merge the early_mapping buffer in the main buffer.  This approach
   // allows us to process very large logs without causing major lag
   // for the user.
-  
+
   for (size_t i = 0;
        earliest_log_index_ != 0 && i < 100;
        earliest_log_index_--, i++)
@@ -721,7 +722,7 @@ void LogDatabaseProxyModel::processOldMessages()
         LineMap(earliest_log_index_-1, item.text.size()-1-i));
     }
   }
- 
+
   if ((earliest_log_index_ == 0 && !early_mapping_.empty()) ||
       (early_mapping_.size() > 200)) {
     beginInsertRows(QModelIndex(),
@@ -753,7 +754,7 @@ bool LogDatabaseProxyModel::acceptLogEntry(const LogEntry &item)
   if (!(item.level_mask & severity_mask_)) {
     return false;
   }
-  
+
   if (names_.count(item.node) == 0) {
     return false;
   }
@@ -766,7 +767,7 @@ bool LogDatabaseProxyModel::acceptLogEntry(const LogEntry &item)
     // For multi-line messages, we join the lines together with a
     // space to make it easy for users to use filters that spread
     // across the new lines.
-    
+
     // Don't let an empty regexp filter out everything
     return exclude_regexp_.isEmpty() || exclude_regexp_.indexIn(item.text.join(" ")) < 0;
   } else {
@@ -776,7 +777,7 @@ bool LogDatabaseProxyModel::acceptLogEntry(const LogEntry &item)
       }
     }
   }
-  
+
   return true;
 }
 
@@ -808,6 +809,6 @@ void LogDatabaseProxyModel::minTimeUpdated()
       !display_absolute_time_
       && !msg_mapping_.empty()) {
     Q_EMIT dataChanged(index(0), index(msg_mapping_.size()));
-  }  
+  }
 }
 }  // namespace swri_console
