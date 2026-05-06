@@ -44,7 +44,15 @@ void BagReader::readBagFile(const QString& filename)
   rosbag2_storage::StorageOptions storage_options;
   storage_options.uri = filename.toStdString();
   auto reader = rosbag2_transport::ReaderWriterFactory::make_reader(storage_options);
-  reader->open(storage_options);
+  try
+  {
+    reader->open(storage_options);
+  }
+  catch (const std::runtime_error& e)
+  {
+    qCritical() << "Bag " << filename << " failed to open with error: " << e.what();
+    return;
+  }
 
   while (reader->has_next()) {
     auto msg = reader->read_next();
@@ -77,6 +85,12 @@ void BagReader::promptForBagFile()
   {
     QString bagDir = QFileInfo(filename).dir().absolutePath();
     qInfo() << "Reading bag directory:" << bagDir;
+
+    if (!QFileInfo::exists(bagDir + "/metadata.yaml"))
+    {
+      qWarning() << "Bag directory " << bagDir << " does not contain metadata.yaml. Reading may fail.";
+    }
+
     readBagFile(bagDir);
   }
 }
