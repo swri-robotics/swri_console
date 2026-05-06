@@ -2,8 +2,8 @@
 Changelog for package swri_console
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.3 (2026-05-06)
+------------------
 * Improve bag reading (`#76 <https://github.com/swri-robotics/swri_console/issues/76>`_)
   * Opening bag from parent directory so that metadata can be found. Added .db3 as option so both mcap and sqlite3 supported.
   * Added some extra safe-guards around reading bags w/ no metadata
