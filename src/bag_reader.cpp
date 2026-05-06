@@ -30,6 +30,8 @@
 
 #include <QFileDialog>
 #include <QDir>
+#include <QDebug>
+#include <QFileInfo>
 #include <QMessageBox>
 
 #include "swri_console/bag_reader.h"
@@ -60,6 +62,7 @@ void BagReader::readBagFile(const QString& filename)
     emit logReceived(log);
   }
 
+  qInfo() << "Finished reading " << filename;
   emit finishedReading();
 }
 
@@ -68,10 +71,12 @@ void BagReader::promptForBagFile()
   QString filename = QFileDialog::getOpenFileName(nullptr,
                                                   tr("Open Bag File"),
                                                   QDir::homePath(),
-                                                  tr("Bag Files (*.mcap)"));
+                                                  tr("Bag Files (*.mcap *.db3)"));
 
   if (filename != nullptr)
   {
-    readBagFile(filename);
+    QString bagDir = QFileInfo(filename).dir().absolutePath();
+    qInfo() << "Reading bag directory:" << bagDir;
+    readBagFile(bagDir);
   }
 }
