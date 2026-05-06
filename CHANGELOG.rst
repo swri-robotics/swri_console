@@ -2,6 +2,15 @@
 Changelog for package swri_console
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Improve bag reading (`#76 <https://github.com/swri-robotics/swri_console/issues/76>`_)
+  * Opening bag from parent directory so that metadata can be found. Added .db3 as option so both mcap and sqlite3 supported.
+  * Added some extra safe-guards around reading bags w/ no metadata
+* Update README.md
+* Harmonizing Builds Across ROS Distros
+* Contributors: David Anthony, Robert Brothers
+
 2.1.2 (2026-02-09)
 ------------------
 * Include <limits> for std::numeric_limits (`#75 <https://github.com/swri-robotics/swri_console/issues/75>`_)
