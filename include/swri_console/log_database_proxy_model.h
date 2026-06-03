@@ -33,8 +33,8 @@
 
 #include <QAbstractListModel>
 #include <QColor>
+#include <QRegularExpression>
 #include <QStringList>
-#include <QRegExp>
 
 #include <cstdint>
 #include <set>
@@ -134,8 +134,8 @@ class LogDatabaseProxyModel : public QAbstractListModel
   size_t earliest_log_index_;
   std::deque<LineMap> early_mapping_;
 
-  QRegExp include_regexp_;
-  QRegExp exclude_regexp_;
+  QRegularExpression include_regexp_;
+  QRegularExpression exclude_regexp_;
   QStringList include_strings_;
   QStringList exclude_strings_;
 

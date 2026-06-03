@@ -18,9 +18,9 @@ find_package(rmw REQUIRED)
 find_package(rosbag2_transport REQUIRED)
 
 ### QT PACKAGES ###
-find_package(Qt5Core REQUIRED)
-find_package(Qt5Gui REQUIRED)
-find_package(Qt5Widgets REQUIRED)
+find_package(Qt6Core REQUIRED)
+find_package(Qt6Gui REQUIRED)
+find_package(Qt6Widgets REQUIRED)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -54,16 +54,16 @@ set(SRC_FILES
   src/settings_keys.cpp
   )
 
-qt5_add_resources(RCC_SRCS resources/images.qrc)
-qt5_wrap_ui(SRC_FILES ${UI_FILES})
-qt5_wrap_cpp(SRC_FILES ${HEADER_FILES})
+qt6_add_resources(RCC_SRCS resources/images.qrc)
+qt6_wrap_ui(SRC_FILES ${UI_FILES})
+qt6_wrap_cpp(SRC_FILES ${HEADER_FILES})
 
 add_executable(swri_console ${HEADER_FILES} ${SRC_FILES} ${RCC_SRCS} src/main.cpp)
 
 target_link_libraries(swri_console PUBLIC
-  Qt5::Core
-  Qt5::Gui
-  Qt5::Widgets
+  Qt6::Core
+  Qt6::Gui
+  Qt6::Widgets
   ${rcl_interfaces_TARGETS}
   rclcpp::rclcpp
   ${rosbag2_transport_TARGETS}
@@ -76,9 +76,9 @@ install(TARGETS ${PROJECT_NAME}
 
 ament_export_dependencies(
   ament_cmake
-  Qt5Core
-  Qt5Gui
-  Qt5Widgets
+  Qt6Core
+  Qt6Gui
+  Qt6Widgets
   rclcpp
   rcl_interfaces
   rosbag2_transport
