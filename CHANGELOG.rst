@@ -2,6 +2,11 @@
 Changelog for package swri_console
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Backport of https://github.com/swri-robotics/swri_console/pull/78 (`#79 <https://github.com/swri-robotics/swri_console/issues/79>`_)
+* Contributors: David Anthony, Ferry Schoenmakers
+
 2.1.3 (2026-05-06)
 ------------------
 * Improve bag reading (`#76 <https://github.com/swri-robotics/swri_console/issues/76>`_)
