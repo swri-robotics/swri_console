@@ -89,6 +89,8 @@ void BagReader::promptForBagFile()
     if (!QFileInfo::exists(bagDir + "/metadata.yaml"))
     {
       qWarning() << "Bag directory " << bagDir << " does not contain metadata.yaml. Reading may fail.";
+      readBagFile(filename);
+      return;
     }
 
     readBagFile(bagDir);
