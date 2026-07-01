@@ -2,8 +2,8 @@
 Changelog for package swri_console
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.1.4 (2026-07-01)
+------------------
 * Backport of https://github.com/swri-robotics/swri_console/pull/78 (`#79 <https://github.com/swri-robotics/swri_console/issues/79>`_)
 * Contributors: David Anthony, Ferry Schoenmakers
 
