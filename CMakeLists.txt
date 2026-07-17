@@ -14,7 +14,9 @@ project(swri_console)
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rcl_interfaces REQUIRED)
+find_package(rcutils REQUIRED)
 find_package(rmw REQUIRED)
+find_package(rosbag2_storage REQUIRED)
 find_package(rosbag2_transport REQUIRED)
 
 ### QT PACKAGES ###
@@ -66,6 +68,8 @@ target_link_libraries(swri_console PUBLIC
   Qt6::Widgets
   ${rcl_interfaces_TARGETS}
   rclcpp::rclcpp
+  rcutils::rcutils
+  ${rosbag2_storage_TARGETS}
   ${rosbag2_transport_TARGETS}
   rmw::rmw
 )
@@ -81,6 +85,8 @@ ament_export_dependencies(
   Qt6Widgets
   rclcpp
   rcl_interfaces
+  rcutils
+  rosbag2_storage
   rosbag2_transport
   rmw)
 ament_package()

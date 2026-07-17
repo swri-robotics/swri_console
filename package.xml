@@ -16,7 +16,6 @@
   <license>BSD</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
-  <buildtool_depend>rosidl_default_generators</buildtool_depend>
 
   <build_depend>ament_cmake</build_depend>
   <build_depend>qt-base-dev</build_depend>
@@ -25,14 +24,15 @@
 
   <depend>rclcpp</depend>
   <depend>rcl_interfaces</depend>
+  <depend>rcutils</depend>
   <depend>rmw</depend>
+  <depend>rosbag2_storage</depend>
   <depend>rosbag2_transport</depend>
 
   <exec_depend>libqtwidgets</exec_depend>
   <exec_depend>libqtcore</exec_depend>
   <exec_depend>libqtgui</exec_depend>
   <exec_depend>rosbag2_storage_mcap</exec_depend>
-  <exec_depend>rosidl_default_runtime</exec_depend>
 
   <export>
     <build_type>ament_cmake</build_type>
