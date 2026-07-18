@@ -20,9 +20,15 @@ find_package(rosbag2_storage REQUIRED)
 find_package(rosbag2_transport REQUIRED)
 
 ### QT PACKAGES ###
-find_package(Qt6Core REQUIRED)
-find_package(Qt6Gui REQUIRED)
-find_package(Qt6Widgets REQUIRED)
+# Prefer Qt6, but fall back to Qt5 if Qt6 is not installed.
+find_package(Qt6 QUIET COMPONENTS Core Gui Widgets)
+if(Qt6_FOUND)
+  set(QT_VERSION_MAJOR 6)
+else()
+  find_package(Qt5 REQUIRED COMPONENTS Core Gui Widgets)
+  set(QT_VERSION_MAJOR 5)
+endif()
+message(STATUS "Building swri_console against Qt${QT_VERSION_MAJOR}")
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -56,16 +62,16 @@ set(SRC_FILES
   src/settings_keys.cpp
   )
 
-qt6_add_resources(RCC_SRCS resources/images.qrc)
-qt6_wrap_ui(SRC_FILES ${UI_FILES})
-qt6_wrap_cpp(SRC_FILES ${HEADER_FILES})
+qt_add_resources(RCC_SRCS resources/images.qrc)
+qt_wrap_ui(SRC_FILES ${UI_FILES})
+qt_wrap_cpp(SRC_FILES ${HEADER_FILES})
 
 add_executable(swri_console ${HEADER_FILES} ${SRC_FILES} ${RCC_SRCS} src/main.cpp)
 
 target_link_libraries(swri_console PUBLIC
-  Qt6::Core
-  Qt6::Gui
-  Qt6::Widgets
+  Qt${QT_VERSION_MAJOR}::Core
+  Qt${QT_VERSION_MAJOR}::Gui
+  Qt${QT_VERSION_MAJOR}::Widgets
   ${rcl_interfaces_TARGETS}
   rclcpp::rclcpp
   rcutils::rcutils
@@ -80,9 +86,9 @@ install(TARGETS ${PROJECT_NAME}
 
 ament_export_dependencies(
   ament_cmake
-  Qt6Core
-  Qt6Gui
-  Qt6Widgets
+  Qt${QT_VERSION_MAJOR}Core
+  Qt${QT_VERSION_MAJOR}Gui
+  Qt${QT_VERSION_MAJOR}Widgets
   rclcpp
   rcl_interfaces
   rcutils
