@@ -20,13 +20,15 @@ find_package(rosbag2_storage REQUIRED)
 find_package(rosbag2_transport REQUIRED)
 
 ### QT PACKAGES ###
-# Prefer Qt6, but fall back to Qt5 if Qt6 is not installed.
-find_package(Qt6 QUIET COMPONENTS Core Gui Widgets)
-if(Qt6_FOUND)
-  set(QT_VERSION_MAJOR 6)
-else()
-  find_package(Qt5 REQUIRED COMPONENTS Core Gui Widgets)
+# Prefer Qt5. This is because jazzy and kilted have both Qt5
+# and Qt6 installed, but Rqt is build against Qt5. Lyrical does
+# not have Qt5, so it will build against Qt6 in that case
+find_package(Qt5 QUIET COMPONENTS Core Gui Widgets)
+if(Qt5_FOUND)
   set(QT_VERSION_MAJOR 5)
+else()
+  find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets)
+  set(QT_VERSION_MAJOR 6)
 endif()
 message(STATUS "Building swri_console against Qt${QT_VERSION_MAJOR}")
 
