@@ -47,6 +47,7 @@ RosThread::RosThread(int argc, char** argv) :
   is_running_(true)
 {
   rclcpp::init(argc, argv);
+  executor_ = std::make_unique<rclcpp::executors::SingleThreadedExecutor>();
 }
 
 void RosThread::run()
@@ -60,7 +61,7 @@ void RosThread::run()
     } else if (is_connected_ && !is_initialized) {
       stopRos();
     } else if (is_connected_ && is_initialized) {
-      rclcpp::spin_some(nh_);
+      executor_->spin_some();
       Q_EMIT spun();
     }
     msleep(50);
@@ -97,11 +98,17 @@ void RosThread::startRos()
     getQos(),
     std::bind(&RosThread::emptyLogQueue, this, std::placeholders::_1));
 
+  executor_->add_node(nh_);
+
   Q_EMIT connected(true);
 }
 
 void RosThread::stopRos()
 {
+  if (nh_)
+  {
+    executor_->remove_node(nh_);
+  }
   rclcpp::shutdown();
   is_connected_ = false;
   Q_EMIT connected(false);
