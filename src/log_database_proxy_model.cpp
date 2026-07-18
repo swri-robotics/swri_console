@@ -647,7 +647,12 @@ void LogDatabaseProxyModel::saveBagFile(const QString& filename) const
 void LogDatabaseProxyModel::saveTextFile(const QString& filename) const
 {
   QFile outFile(filename);
-  outFile.open(QFile::WriteOnly);
+  if (!outFile.open(QFile::WriteOnly))
+  {
+    qWarning("Failed to open file '%s' for writing: %s",
+             qPrintable(filename), qPrintable(outFile.errorString()));
+    return;
+  }
   QTextStream outstream(&outFile);
   for(size_t i = 0; i < msg_mapping_.size(); i++)
   {
