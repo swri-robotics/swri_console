@@ -647,7 +647,12 @@ void LogDatabaseProxyModel::saveBagFile(const QString& filename) const
 void LogDatabaseProxyModel::saveTextFile(const QString& filename) const
 {
   QFile outFile(filename);
-  outFile.open(QFile::WriteOnly);
+  if (!outFile.open(QFile::WriteOnly))
+  {
+    qWarning("Failed to open file '%s' for writing: %s",
+             qPrintable(filename), qPrintable(outFile.errorString()));
+    return;
+  }
   QTextStream outstream(&outFile);
   for(size_t i = 0; i < msg_mapping_.size(); i++)
   {
@@ -769,7 +774,8 @@ bool LogDatabaseProxyModel::acceptLogEntry(const LogEntry &item)
     // across the new lines.
 
     // Don't let an empty regexp filter out everything
-    return exclude_regexp_.isEmpty() || exclude_regexp_.indexIn(item.text.join(" ")) < 0;
+    return exclude_regexp_.pattern().isEmpty() ||
+      !exclude_regexp_.match(item.text.join(" ")).hasMatch();
   } else {
     for (int i = 0; i < exclude_strings_.size(); i++) {
       if (item.text.join(" ").contains(exclude_strings_[i], Qt::CaseInsensitive)) {
@@ -787,7 +793,7 @@ bool LogDatabaseProxyModel::acceptLogEntry(const LogEntry &item)
 bool LogDatabaseProxyModel::testIncludeFilter(const LogEntry &item)
 {
   if (use_regular_expressions_) {
-    return include_regexp_.indexIn(item.text.join(" ")) >= 0;
+    return include_regexp_.match(item.text.join(" ")).hasMatch();
   } else {
     if (include_strings_.empty()) {
       return true;

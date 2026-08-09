@@ -42,7 +42,7 @@
 #include <swri_console/settings_keys.h>
 
 #include <QColorDialog>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QApplication>
 #include <QClipboard>
 #include <QDateTime>
@@ -554,10 +554,11 @@ void ConsoleWindow::chooseButtonColor(QPushButton* widget)
 QColor ConsoleWindow::getButtonColor(const QPushButton* button) const
 {
   QString ss = button->styleSheet();
-  QRegExp re("background: (#\\w*);");
+  QRegularExpression re("background: (#\\w*);");
   QColor old_color;
-  if (re.indexIn(ss) >= 0) {
-    old_color = QColor(re.cap(1));
+  QRegularExpressionMatch match = re.match(ss);
+  if (match.hasMatch()) {
+    old_color = QColor(match.captured(1));
   }
   return old_color;
 }

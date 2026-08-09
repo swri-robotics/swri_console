@@ -33,7 +33,10 @@
 
 #include <QThread>
 
+#include <memory>
+
 #include <rclcpp/rclcpp.hpp>
+#include <rclcpp/executors/single_threaded_executor.hpp>
 #include <rcl_interfaces/msg/log.hpp>
 #include <QMetaType>
 
@@ -79,6 +82,7 @@ namespace swri_console
 
     rclcpp::Node::SharedPtr nh_;
     rclcpp::Subscription<rcl_interfaces::msg::Log>::SharedPtr rosout_sub_;
+    std::unique_ptr<rclcpp::executors::SingleThreadedExecutor> executor_;
   };
 }
 
