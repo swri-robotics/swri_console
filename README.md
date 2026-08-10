@@ -26,5 +26,5 @@ ROS2 Distro | Branch | Build status | Released packages
    - *Not supported in ROS 2 yet*
  
 ## Supported ROS Distributions
-The package currently supports all ROS 2 distributions up to `rolling`. Branches marked `*-eol` indicate a distribution that is at end of life status and is no longer updated. As of `v2.2.0`, `humble`, `jazzy`,  and `kilted` are released from the `kilted-devel` branch because they use Qt5. `lyrical` and `rolling` releases are bloomed from the `ros2-devel` branch and have Qt6 compatibility.
+The package currently supports all ROS 2 distributions up to `rolling`. Branches marked `*-eol` indicate a distribution that is at end of life status and is no longer updated.
 
