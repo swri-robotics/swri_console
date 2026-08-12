@@ -79,9 +79,11 @@ class ConsoleWindow : public QMainWindow {
 
   void includeFilterUpdated(const QString &);
   void excludeTextEdited();
+  void highlightFilterUpdated(const QString &);
   void searchIndex();  // VM 4/13/2017
   void updateIncludeLabel();
   void updateExcludeLabel();
+  void updateHighlightLabel();
 
   void setFont(const QFont &font);
   void selectMessageFormat();
@@ -91,6 +93,7 @@ class ConsoleWindow : public QMainWindow {
   void setWarnColor();
   void setErrorColor();
   void setFatalColor();
+  void setHighlightColor();
   void prevIndex();
   void nextIndex();
 

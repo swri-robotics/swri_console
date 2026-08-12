@@ -67,6 +67,8 @@ namespace swri_console
     static const QString COLORIZE_LOGS;
     static const QString ALTERNATE_LOG_ROW_COLORS;
     static const QString OUTPUT_FORMAT;
+    static const QString HIGHLIGHT_FILTER;
+    static const QString HIGHLIGHT_COLOR;
   };
 }
 
