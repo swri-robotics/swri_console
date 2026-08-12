@@ -38,6 +38,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <rcl_interfaces/msg/log.hpp>
 #include <deque>
+#include <vector>
 #include <rclcpp/time.hpp>
 
 namespace swri_console
@@ -93,6 +94,7 @@ public:
 
 public Q_SLOTS:
   void queueMessage(const rcl_interfaces::msg::Log::ConstSharedPtr msg);
+  void queueMessages(const std::vector<rcl_interfaces::msg::Log::ConstSharedPtr>& msgs);
   void processQueue();
 
 private:  

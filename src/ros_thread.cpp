@@ -116,18 +116,22 @@ void RosThread::stopRos()
 
 void RosThread::emptyLogQueue(rcl_interfaces::msg::Log::ConstSharedPtr msg)
 {
-  // Register log entry:
-  Q_EMIT logReceived(std::move(msg));
+  // Collect the message that triggered this callback along with any others
+  // already queued up in the subscription, and emit them as a single batch.
+  // This avoids posting one cross-thread queued signal per log message.
+  std::vector<rcl_interfaces::msg::Log::ConstSharedPtr> msgs;
+  msgs.push_back(std::move(msg));
 
-  // Take and register log entries in queue:
   rclcpp::MessageInfo message_info;
   while(true) {
     rcl_interfaces::msg::Log::SharedPtr m_ptr (new rcl_interfaces::msg::Log);
     if (!rosout_sub_->take(*m_ptr, message_info)) {
       break;
     }
-    Q_EMIT logReceived(std::move(m_ptr));
+    msgs.push_back(std::move(m_ptr));
   }
+
+  Q_EMIT logReceived(std::move(msgs));
 }
 
 rclcpp::QoS RosThread::getQos()
