@@ -1,6 +1,6 @@
 // *****************************************************************************
 //
-// Copyright (c) 2015, Southwest Research Institute® (SwRI®)
+// Copyright (c) 2026, Southwest Research Institute® (SwRI®)
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -35,6 +35,7 @@
 #include <QStringList>
 
 #include <swri_console/console_master.h>
+#include <swri_console/unix_signal_handler.h>
 
 void loadFonts()
 {
@@ -81,7 +82,12 @@ int main(int argc, char **argv)
   QCoreApplication::setOrganizationName("Southwest Research Institute");
   QCoreApplication::setOrganizationDomain("swri.org");
   QCoreApplication::setApplicationName("SwRI Console");
-  
+
+  // This signal handler catches SIGINT and SIGTERM so the application shuts
+  // down cleanly from the command line
+  swri_console::UnixSignalHandler signal_handler;
+  signal_handler.setup();
+
   swri_console::ConsoleMaster master(argc, argv);
   master.createNewWindow();
   QApplication::connect(&app, SIGNAL(lastWindowClosed()), &app, SLOT(quit()));

@@ -28,46 +28,52 @@
 //
 // *****************************************************************************
 
-#ifndef ROSOUT_LOG_LOADER_H
-#define ROSOUT_LOG_LOADER_H
+#ifndef SWRI_CONSOLE_UNIX_SIGNAL_HANDLER_H
+#define SWRI_CONSOLE_UNIX_SIGNAL_HANDLER_H
 
 #include <QObject>
-#include <QString>
-#include <QMetaType>
 
-#include <rclcpp/rclcpp.hpp>
-#include <rcl_interfaces/msg/log.hpp>
+class QSocketNotifier;
 
 namespace swri_console
 {
-  class RosoutLogLoader : public QObject
+  /**
+   * Bridges POSIX SIGINT/SIGTERM delivery into the Qt event loop.
+   *
+   * rclcpp::init() installs its own SIGINT handler that shuts down the ROS
+   * context, but has no way to stop QApplication::exec(), so the GUI event
+   * loop (and thus the process) never exits on Ctrl+C. This class uses the
+   * standard Qt self-pipe/socketpair pattern: the async-signal-safe handler
+   * only writes a byte to a socket, and a QSocketNotifier on the Qt thread
+   * reacts to that by calling QCoreApplication::quit(), which lets the
+   * process shut down cleanly instead of relying on an external supervisor
+   * to escalate to SIGTERM/SIGKILL after a timeout.
+   */
+  class UnixSignalHandler : public QObject
   {
     Q_OBJECT
   public:
-    void loadRosLog(const QString& filename);
-    void loadRosLogDirectory(const QString& logdirectory_name);
+    explicit UnixSignalHandler(QObject* parent = nullptr);
 
-  public Q_SLOTS:
-    void promptForLogFile();
-    void promptForLogDirectory();
+    // Installs the SIGINT/SIGTERM handlers. Must be called after the
+    // QApplication has been constructed.
+    void setup();
 
-  Q_SIGNALS:
-    /**
-     * Emitted every time a log message is received.  This will likely be emitted several times
-     * per bag file; finishedReading will be emitted when we're done.
-     */
-    void logReceived(const rcl_interfaces::msg::Log::ConstSharedPtr msg);
+    // Async-signal-safe handlers registered with sigaction().
+    static void intSignalHandler(int unused);
+    static void termSignalHandler(int unused);
 
-    /**
-     * Emitted after we're completely done reading the bag file.
-     */
-    void finishedReading();
+  private Q_SLOTS:
+    void handleSigInt();
+    void handleSigTerm();
 
   private:
-    int parseLine(const std::string& line, rcl_interfaces::msg::Log* log);
-    // rosgraph_msgs::Log::_level_type level_string_to_level_type(std::string level_str);
-    rcl_interfaces::msg::Log::_level_type level_string_to_level_type(const std::string& level_str);
+    static int sigintFd[2];
+    static int sigtermFd[2];
+
+    QSocketNotifier* sn_int_;
+    QSocketNotifier* sn_term_;
   };
 }
 
-#endif // ROSOUT_LOG_LOADER_H
+#endif //SWRI_CONSOLE_UNIX_SIGNAL_HANDLER_H

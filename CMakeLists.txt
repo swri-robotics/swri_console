@@ -49,6 +49,7 @@ set(HEADER_FILES
   include/swri_console/node_list_model.h
   include/swri_console/rosout_log_loader.h
   include/swri_console/ros_thread.h
+  include/swri_console/unix_signal_handler.h
   )
 
 set(SRC_FILES
@@ -62,6 +63,7 @@ set(SRC_FILES
   src/rosout_log_loader.cpp
   src/ros_thread.cpp
   src/settings_keys.cpp
+  src/unix_signal_handler.cpp
   )
 
 qt_add_resources(RCC_SRCS resources/images.qrc)
