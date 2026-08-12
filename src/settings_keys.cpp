@@ -55,4 +55,6 @@ namespace swri_console
   const QString SettingsKeys::COLORIZE_LOGS = "Colors/ColorizeLogs";
   const QString SettingsKeys::ALTERNATE_LOG_ROW_COLORS = "Logs/AlternateRowColors";
   const QString SettingsKeys::OUTPUT_FORMAT = "UI/OutputFormat";
+  const QString SettingsKeys::HIGHLIGHT_FILTER = "Filters/HighlightFilter";
+  const QString SettingsKeys::HIGHLIGHT_COLOR = "Colors/HighlightColor";
 }

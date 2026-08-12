@@ -284,6 +284,27 @@
             </property>
            </widget>
           </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="highlightLabel">
+            <property name="text">
+             <string>Highlight</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="2">
+           <widget class="QLineEdit" name="highlightText">
+            <property name="toolTip">
+             <string>Highlight messages that include substrings, without filtering them out. Separate substrings with a semicolon.</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="3">
+           <widget class="QPushButton" name="highlightColorWidget">
+            <property name="toolTip">
+             <string>Highlight color</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </item>
        </layout>
@@ -533,6 +554,8 @@
   <tabstop>searchText</tabstop>
   <tabstop>pushNext</tabstop>
   <tabstop>pushPrev</tabstop>
+  <tabstop>highlightText</tabstop>
+  <tabstop>highlightColorWidget</tabstop>
  </tabstops>
  <resources>
   <include location="../resources/images.qrc"/>

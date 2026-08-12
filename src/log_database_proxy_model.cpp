@@ -65,6 +65,7 @@ LogDatabaseProxyModel::LogDatabaseProxyModel(LogDatabase *db)
   , use_regular_expressions_(false)
   , latest_log_index_(0)
   , earliest_log_index_(0)
+  , highlight_color_(QApplication::palette().color(QPalette::Highlight))
   , debug_color_(QApplication::palette().color(QPalette::PlaceholderText))
   , info_color_(QApplication::palette().color(QPalette::Text))
   , warn_color_(QColor(255,127,0))
@@ -249,11 +250,7 @@ void LogDatabaseProxyModel::setExcludePreviewFilter(const QString& term)
     exclude_preview_regexp_.setPattern(QString());
   }
 
-  // The preview never changes which rows are accepted, so there's no need
-  // to rebuild msg_mapping_ via reset(); just repaint the affected rows.
-  if (rowCount(QModelIndex()) > 0) {
-    Q_EMIT dataChanged(index(0), index(rowCount(QModelIndex()) - 1), {Qt::BackgroundRole});
-  }
+  repaintBackgrounds();
 }
 
 void LogDatabaseProxyModel::setOutputFormat(const QString& format)
@@ -267,6 +264,48 @@ void LogDatabaseProxyModel::setOutputFormat(const QString& format)
   // remove rows per log entry (header/footer lines), so msg_mapping_ has
   // to be rebuilt rather than just repainted.
   reset();
+}
+
+void LogDatabaseProxyModel::repaintBackgrounds()
+{
+  // Highlight (like the exclude preview) never changes which rows are
+  // accepted, so there's no need to rebuild msg_mapping_ via reset(); just
+  // repaint the affected rows.
+  if (rowCount(QModelIndex()) > 0) {
+    Q_EMIT dataChanged(index(0), index(rowCount(QModelIndex()) - 1), {Qt::BackgroundRole});
+  }
+}
+
+void LogDatabaseProxyModel::setHighlightFilters(const QStringList &list)
+{
+  highlight_strings_ = list;
+  // The text and regexp filters are always updated at the same time, so this
+  // value will be saved by setHighlightRegexpPattern.
+  repaintBackgrounds();
+}
+
+void LogDatabaseProxyModel::setHighlightRegexpPattern(const QString& pattern)
+{
+  highlight_regexp_.setPattern(pattern);
+  QSettings settings;
+  settings.setValue(SettingsKeys::HIGHLIGHT_FILTER, pattern);
+  repaintBackgrounds();
+}
+
+void LogDatabaseProxyModel::setHighlightColor(const QColor& highlight_color)
+{
+  highlight_color_ = highlight_color;
+  QSettings settings;
+  settings.setValue(SettingsKeys::HIGHLIGHT_COLOR, highlight_color);
+  repaintBackgrounds();
+}
+
+bool LogDatabaseProxyModel::isHighlightValid() const
+{
+  if (use_regular_expressions_ && !highlight_regexp_.isValid()) {
+    return false;
+  }
+  return true;
 }
 
 void LogDatabaseProxyModel::setDebugColor(const QColor& debug_color)
@@ -435,7 +474,8 @@ QVariant LogDatabaseProxyModel::data(
       }
       return QVariant();
     case Qt::BackgroundRole:
-      if (!exclude_preview_term_.isEmpty() || !exclude_preview_regexp_.pattern().isEmpty()) {
+      if (!exclude_preview_term_.isEmpty() || !exclude_preview_regexp_.pattern().isEmpty() ||
+          !highlight_strings_.isEmpty() || !highlight_regexp_.pattern().isEmpty()) {
         break;
       }
       return QVariant();
@@ -510,6 +550,9 @@ QVariant LogDatabaseProxyModel::data(
   else if (role == Qt::BackgroundRole) {
     if (matchesExcludePreview(item)) {
       return QVariant(QColor(255, 210, 130));
+    }
+    if (matchesHighlight(item)) {
+      return QVariant(highlight_color_);
     }
     return QVariant();
   }
@@ -819,6 +862,24 @@ bool LogDatabaseProxyModel::matchesExcludePreview(const LogEntry &item) const
 
   return !exclude_preview_term_.isEmpty() &&
     item.text.join(" ").contains(exclude_preview_term_, Qt::CaseInsensitive);
+}
+
+// Return true if the item matches the (persistent) highlight filter.
+// Unlike the exclude preview, this never affects which rows are accepted --
+// it only decides whether the row gets tinted highlight_color_.
+bool LogDatabaseProxyModel::matchesHighlight(const LogEntry &item) const
+{
+  if (use_regular_expressions_) {
+    return !highlight_regexp_.pattern().isEmpty() &&
+      highlight_regexp_.match(item.text.join(" ")).hasMatch();
+  }
+
+  for (int i = 0; i < highlight_strings_.size(); i++) {
+    if (item.text.join(" ").contains(highlight_strings_[i], Qt::CaseInsensitive)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 // Formats a timestamp the same way regardless of whether it's going into

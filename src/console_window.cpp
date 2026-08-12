@@ -124,6 +124,9 @@ ConsoleWindow::ConsoleWindow(LogDatabase *db)
   QObject::connect(ui.action_RegularExpressions, SIGNAL(toggled(bool)),
                    this, SLOT(updateExcludeLabel()));
 
+  QObject::connect(ui.action_RegularExpressions, SIGNAL(toggled(bool)),
+                   this, SLOT(updateHighlightLabel()));
+
   QObject::connect(ui.action_SelectFont, SIGNAL(triggered(bool)),
                    this, SIGNAL(selectFont()));
 
@@ -143,8 +146,10 @@ ConsoleWindow::ConsoleWindow(LogDatabase *db)
                    this, SLOT(setErrorColor()));
   QObject::connect(ui.fatalColorWidget, SIGNAL(clicked(bool)),
                    this, SLOT(setFatalColor()));
+  QObject::connect(ui.highlightColorWidget, SIGNAL(clicked(bool)),
+                   this, SLOT(setHighlightColor()));
 
-  ui.nodeList->setModel(node_list_model_);  
+  ui.nodeList->setModel(node_list_model_);
   ui.messageList->setModel(db_proxy_);
   ui.messageList->setUniformItemSizes(true);
 
@@ -207,6 +212,10 @@ ConsoleWindow::ConsoleWindow(LogDatabase *db)
   QObject::connect(
     ui.action_RegularExpressions, SIGNAL(toggled(bool)),
     this, SLOT(excludeTextEdited()));
+
+  QObject::connect(
+    ui.highlightText, SIGNAL(textChanged(const QString &)),
+    this, SLOT(highlightFilterUpdated(const QString &)));
 
   // Connect 'Search' text modification to searchIndex, VCM 13 April 2017
   QObject::connect(
@@ -423,6 +432,25 @@ void ConsoleWindow::includeFilterUpdated(const QString &text)
   updateIncludeLabel();
 }
 
+void ConsoleWindow::highlightFilterUpdated(const QString &text)
+{
+  // Unlike exclude, highlighting never hides anything, so there's no harm
+  // in applying it live as the user types -- same as include.
+  QStringList items = text.split(";", Qt::SkipEmptyParts);
+  QStringList filtered;
+
+  for (int i = 0; i < items.size(); i++) {
+    QString x = items[i].trimmed();
+    if (!x.isEmpty()) {
+      filtered.append(x);
+    }
+  }
+
+  db_proxy_->setHighlightFilters(filtered);
+  db_proxy_->setHighlightRegexpPattern(text);
+  updateHighlightLabel();
+}
+
 void ConsoleWindow::excludeTextEdited()
 {
   QString text = ui.excludeText->text();
@@ -564,6 +592,15 @@ void ConsoleWindow::updateExcludeLabel()
   }
 }
 
+void ConsoleWindow::updateHighlightLabel()
+{
+  if (db_proxy_->isHighlightValid()) {
+    ui.highlightLabel->setText("Highlight");
+  } else {
+    ui.highlightLabel->setText("<font color='red'>Highlight</font>");
+  }
+}
+
 void ConsoleWindow::setFont(const QFont &font)
 {
   ui.messageList->setFont(font);
@@ -614,6 +651,11 @@ void ConsoleWindow::setFatalColor()
   chooseButtonColor(ui.fatalColorWidget);
 }
 
+void ConsoleWindow::setHighlightColor()
+{
+  chooseButtonColor(ui.highlightColorWidget);
+}
+
 void ConsoleWindow::chooseButtonColor(QPushButton* widget)
 {
   QColor old_color = getButtonColor(widget);
@@ -659,6 +701,9 @@ void ConsoleWindow::updateButtonColor(QPushButton* widget, const QColor& color)
   else if (widget == ui.fatalColorWidget) {
     db_proxy_->setFatalColor(color);
   }
+  else if (widget == ui.highlightColorWidget) {
+    db_proxy_->setHighlightColor(color);
+  }
   else {
     qWarning("Unexpected widget passed to ConsoleWindow::updateButtonColor.");
   }
@@ -687,6 +732,11 @@ void ConsoleWindow::loadColorButtonSetting(const QString& key, QPushButton* butt
   }
   else if (button == ui.fatalColorWidget) {
     defaultColor = Qt::magenta;
+  }
+  else if (button == ui.highlightColorWidget) {
+    // Highlight is the same role Qt uses for its own selection background,
+    // so it's already guaranteed to read well against the current theme.
+    defaultColor = QApplication::palette().color(QPalette::Highlight);
   }
   QColor color = settings.value(key, defaultColor).value<QColor>();
   updateButtonColor(button, color);
@@ -734,6 +784,7 @@ void ConsoleWindow::loadSettings()
   loadColorButtonSetting(SettingsKeys::WARN_COLOR, ui.warnColorWidget);
   loadColorButtonSetting(SettingsKeys::ERROR_COLOR, ui.errorColorWidget);
   loadColorButtonSetting(SettingsKeys::FATAL_COLOR, ui.fatalColorWidget);
+  loadColorButtonSetting(SettingsKeys::HIGHLIGHT_COLOR, ui.highlightColorWidget);
 
   // RCUTILS_CONSOLE_OUTPUT_FORMAT, if set, takes priority every launch (it's
   // meant to reflect the current shell environment, not a one-time default).
@@ -750,6 +801,8 @@ void ConsoleWindow::loadSettings()
   ui.includeText->setText(includeFilter);
   QString excludeFilter = settings.value(SettingsKeys::EXCLUDE_FILTER, "").toString();
   ui.excludeText->setText(excludeFilter);
+  QString highlightFilter = settings.value(SettingsKeys::HIGHLIGHT_FILTER, "").toString();
+  ui.highlightText->setText(highlightFilter);
 
   bool alternate_row_colors = settings.value(SettingsKeys::ALTERNATE_LOG_ROW_COLORS, true).toBool();
   ui.messageList->setAlternatingRowColors(alternate_row_colors);

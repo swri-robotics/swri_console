@@ -70,6 +70,10 @@ class LogDatabaseProxyModel : public QAbstractListModel
   void setExcludePreviewFilter(const QString& term);
   void setOutputFormat(const QString& format);
   const QString& outputFormat() const { return output_format_; }
+  void setHighlightFilters(const QStringList &list);
+  void setHighlightRegexpPattern(const QString& pattern);
+  void setHighlightColor(const QColor& highlight_color);
+  bool isHighlightValid() const;
   void setDebugColor(const QColor& debug_color);
   void setInfoColor(const QColor& info_color);
   void setWarnColor(const QColor& warn_color);
@@ -111,6 +115,8 @@ class LogDatabaseProxyModel : public QAbstractListModel
   bool acceptLogEntry(const LogEntry &item);
   bool testIncludeFilter(const LogEntry &item);
   bool matchesExcludePreview(const LogEntry &item) const;
+  bool matchesHighlight(const LogEntry &item) const;
+  void repaintBackgrounds();
   void formatTimestamp(const rclcpp::Time &stamp, char *buf, size_t size) const;
   void parseOutputFormat();
   int entryLineCount(const LogEntry &item) const;
@@ -155,6 +161,14 @@ class LogDatabaseProxyModel : public QAbstractListModel
   // rather than filtered out until the term is committed.
   QString exclude_preview_term_;
   QRegularExpression exclude_preview_regexp_;
+
+  // Highlight filter: unlike include/exclude, matching rows are never
+  // hidden -- they're just tinted highlight_color_ via Qt::BackgroundRole,
+  // same mechanism as exclude_preview_term_ above but persistent rather
+  // than typing-only.
+  QRegularExpression highlight_regexp_;
+  QStringList highlight_strings_;
+  QColor highlight_color_;
 
   // When non-empty, overrides the display_time_/display_logger_/display_function_
   // driven layout entirely.  Supports the same token names as ROS 2's
