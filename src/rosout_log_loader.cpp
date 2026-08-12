@@ -1,6 +1,6 @@
 // *****************************************************************************
 //
-// Copyright (c) 2017, Southwest Research Institute® (SwRI®)
+// Copyright (c) 2026, Southwest Research Institute® (SwRI®)
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
