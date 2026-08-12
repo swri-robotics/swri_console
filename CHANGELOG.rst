@@ -2,6 +2,14 @@
 Changelog for package swri_console
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.2.0 (2026-08-10)
+------------------
+* Updating for Qt6 compatibility (`#77 <https://github.com/swri-robotics/swri_console/issues/77>`_)
+* In case there is not metadata.yaml, still try to open the bare file instead of stopping on error (`#78 <https://github.com/swri-robotics/swri_console/issues/78>`_)
+* Adding lyrical to CI matrix
+* Update badges for Ubuntu Resolute
+* Contributors: David Anthony, Ferry Schoenmakers
+
 2.1.3 (2026-05-06)
 ------------------
 * Improve bag reading (`#76 <https://github.com/swri-robotics/swri_console/issues/76>`_)
