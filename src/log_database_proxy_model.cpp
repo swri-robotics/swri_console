@@ -259,14 +259,14 @@ void LogDatabaseProxyModel::setExcludePreviewFilter(const QString& term)
 void LogDatabaseProxyModel::setOutputFormat(const QString& format)
 {
   output_format_ = format;
+  parseOutputFormat();
   QSettings settings;
   settings.setValue(SettingsKeys::OUTPUT_FORMAT, format);
 
-  // Only changes how rows are rendered, not which rows are accepted, so
-  // there's no need to rebuild msg_mapping_ via reset(); just repaint.
-  if (rowCount(QModelIndex()) > 0) {
-    Q_EMIT dataChanged(index(0), index(rowCount(QModelIndex()) - 1), {Qt::DisplayRole});
-  }
+  // Unlike most other display-only tweaks, a multi-line format can add or
+  // remove rows per log entry (header/footer lines), so msg_mapping_ has
+  // to be rebuilt rather than just repainted.
+  reset();
 }
 
 void LogDatabaseProxyModel::setDebugColor(const QColor& debug_color)
@@ -702,7 +702,8 @@ void LogDatabaseProxyModel::processNewMessages()
       continue;
     }
 
-    for (int i = 0; i < item.text.size(); i++) {
+    int line_count = entryLineCount(item);
+    for (int i = 0; i < line_count; i++) {
       new_items.emplace_back(latest_log_index_, i);
     }
   }
@@ -739,10 +740,11 @@ void LogDatabaseProxyModel::processOldMessages()
       continue;
     }
 
-    for (int i = 0; i < item.text.size(); i++) {
+    int line_count = entryLineCount(item);
+    for (int i = 0; i < line_count; i++) {
       // Note that we have to add the lines backwards to maintain the proper order.
       early_mapping_.push_front(
-        LineMap(earliest_log_index_-1, item.text.size()-1-i));
+        LineMap(earliest_log_index_-1, line_count-1-i));
     }
   }
 
@@ -853,7 +855,76 @@ void LogDatabaseProxyModel::formatTimestamp(const rclcpp::Time &stamp, char *buf
 // Renders a row using output_format_, substituting the same token names
 // used by ROS 2's RCUTILS_CONSOLE_OUTPUT_FORMAT environment variable so a
 // user's existing value can largely be pasted in as-is.
+// Splits output_format_ into the (possibly empty) header lines that come
+// before the line containing {message}, that line itself (repeated once
+// per physical line of the log message), and the (possibly empty) footer
+// lines after it.  Called whenever output_format_ changes so rendering
+// doesn't have to re-split the string on every row.
+void LogDatabaseProxyModel::parseOutputFormat()
+{
+  format_pre_lines_.clear();
+  format_message_line_.clear();
+  format_post_lines_.clear();
+
+  if (output_format_.isEmpty()) {
+    return;
+  }
+
+  QStringList lines = output_format_.split('\n');
+  int message_line_index = -1;
+  for (int i = 0; i < lines.size(); i++) {
+    if (lines[i].contains("{message}")) {
+      message_line_index = i;
+      break;
+    }
+  }
+
+  if (message_line_index == -1) {
+    // No {message} token anywhere in the format; treat the whole thing as
+    // a one-time header and append the raw message line(s) after it, so
+    // the message itself doesn't silently disappear from the view.
+    format_pre_lines_ = lines;
+    format_message_line_ = "{message}";
+    return;
+  }
+
+  for (int i = 0; i < message_line_index; i++) {
+    format_pre_lines_.append(lines[i]);
+  }
+  format_message_line_ = lines[message_line_index];
+  for (int i = message_line_index + 1; i < lines.size(); i++) {
+    format_post_lines_.append(lines[i]);
+  }
+}
+
+// Number of rows a single log entry expands to: unchanged (one row per
+// physical message line) when there's no custom format, or header lines +
+// one row per message line + footer lines when there is.
+int LogDatabaseProxyModel::entryLineCount(const LogEntry &item) const
+{
+  if (output_format_.isEmpty()) {
+    return item.text.size();
+  }
+  return format_pre_lines_.size() + item.text.size() + format_post_lines_.size();
+}
+
 QString LogDatabaseProxyModel::formatCustomLine(const LogEntry &item, int line_index) const
+{
+  if (line_index < format_pre_lines_.size()) {
+    return substituteTokens(format_pre_lines_[line_index], item, QString());
+  }
+  line_index -= format_pre_lines_.size();
+
+  if (line_index < item.text.size()) {
+    return substituteTokens(format_message_line_, item, item.text[line_index]);
+  }
+  line_index -= item.text.size();
+
+  return substituteTokens(format_post_lines_[line_index], item, QString());
+}
+
+QString LogDatabaseProxyModel::substituteTokens(
+  const QString &line_template, const LogEntry &item, const QString &message) const
 {
   QString severity;
   switch (item.getLogLvl()) {
@@ -868,14 +939,14 @@ QString LogDatabaseProxyModel::formatCustomLine(const LogEntry &item, int line_i
   char stamp[128];
   formatTimestamp(item.stamp, stamp, sizeof(stamp));
 
-  QString line = output_format_;
+  QString line = line_template;
   line.replace("{severity}", severity);
   line.replace("{name}", QString::fromStdString(item.node));
   line.replace("{function_name}", QString::fromStdString(item.function));
   line.replace("{file_name}", QString::fromStdString(item.file));
   line.replace("{line_number}", QString::number(item.line));
   line.replace("{time}", stamp);
-  line.replace("{message}", item.text[line_index]);
+  line.replace("{message}", message);
   return line;
 }
 
