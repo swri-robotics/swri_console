@@ -42,6 +42,7 @@
 #include <swri_console/log_database.h>
 #include <swri_console/settings_keys.h>
 
+#include <QApplication>
 #include <QColor>
 #include <QFile>
 #include <QMessageBox>
@@ -64,8 +65,8 @@ LogDatabaseProxyModel::LogDatabaseProxyModel(LogDatabase *db)
   , use_regular_expressions_(false)
   , latest_log_index_(0)
   , earliest_log_index_(0)
-  , debug_color_(Qt::gray)
-  , info_color_(Qt::black)
+  , debug_color_(QApplication::palette().color(QPalette::PlaceholderText))
+  , info_color_(QApplication::palette().color(QPalette::Text))
   , warn_color_(QColor(255,127,0))
   , error_color_(Qt::red)
   , fatal_color_(Qt::magenta)
