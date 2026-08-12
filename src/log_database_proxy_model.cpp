@@ -256,6 +256,19 @@ void LogDatabaseProxyModel::setExcludePreviewFilter(const QString& term)
   }
 }
 
+void LogDatabaseProxyModel::setOutputFormat(const QString& format)
+{
+  output_format_ = format;
+  QSettings settings;
+  settings.setValue(SettingsKeys::OUTPUT_FORMAT, format);
+
+  // Only changes how rows are rendered, not which rows are accepted, so
+  // there's no need to rebuild msg_mapping_ via reset(); just repaint.
+  if (rowCount(QModelIndex()) > 0) {
+    Q_EMIT dataChanged(index(0), index(rowCount(QModelIndex()) - 1), {Qt::DisplayRole});
+  }
+}
+
 void LogDatabaseProxyModel::setDebugColor(const QColor& debug_color)
 {
   debug_color_ = debug_color;
@@ -439,6 +452,10 @@ QVariant LogDatabaseProxyModel::data(
   const LogEntry &item = db_->log()[line_idx.log_index];
 
   if (role == Qt::DisplayRole) {
+    if (!output_format_.isEmpty()) {
+      return QVariant(formatCustomLine(item, line_idx.line_index));
+    }
+
     char level = '?';
     if (item.getLogLvl() == rcl_interfaces::msg::Log::DEBUG) {
       level = 'D';
@@ -453,39 +470,7 @@ QVariant LogDatabaseProxyModel::data(
     }
 
     char stamp[128];
-    if (display_absolute_time_) {
-      if (human_readable_time_) {
-        char date_str[std::size("yyyy-mm-dd hh:mm:ss")];
-        const time_t time = static_cast<time_t>(item.stamp.seconds());
-        int32_t milliseconds = static_cast<int>(1000.0 * (item.stamp.seconds() - std::floor(item.stamp.seconds())));
-        std::strftime(std::data(date_str),
-          std::size(date_str),
-          "%F %T",
-          std::localtime(&time));
-        snprintf(stamp,
-          sizeof(stamp),
-          "%s:%03d",
-          date_str,
-          milliseconds);
-      } else {
-        snprintf(stamp,
-          sizeof(stamp),
-          "%f",
-          item.stamp.seconds());
-      }
-    } else {
-      rclcpp::Duration t = item.stamp - db_->minTime();
-
-      int32_t secs = t.seconds();
-      int hours = secs / 60 / 60;
-      int minutes = (secs / 60) % 60;
-      int seconds = (secs % 60);
-      int milliseconds = static_cast<int>(1000.0 * (t.seconds() - static_cast<double>(secs)));
-
-      snprintf(stamp, sizeof(stamp),
-               "%d:%02d:%02d:%03d",
-               hours, minutes, seconds, milliseconds);
-    }
+    formatTimestamp(item.stamp, stamp, sizeof(stamp));
 
     char id[256];
     if (display_logger_ && display_function_) {
@@ -832,6 +817,66 @@ bool LogDatabaseProxyModel::matchesExcludePreview(const LogEntry &item) const
 
   return !exclude_preview_term_.isEmpty() &&
     item.text.join(" ").contains(exclude_preview_term_, Qt::CaseInsensitive);
+}
+
+// Formats a timestamp the same way regardless of whether it's going into
+// the default fixed layout or a custom output_format_ line, so the two
+// stay in sync as display_absolute_time_/human_readable_time_ change.
+void LogDatabaseProxyModel::formatTimestamp(const rclcpp::Time &stamp, char *buf, size_t size) const
+{
+  if (display_absolute_time_) {
+    if (human_readable_time_) {
+      char date_str[std::size("yyyy-mm-dd hh:mm:ss")];
+      const time_t time = static_cast<time_t>(stamp.seconds());
+      int32_t milliseconds = static_cast<int>(1000.0 * (stamp.seconds() - std::floor(stamp.seconds())));
+      std::strftime(std::data(date_str),
+        std::size(date_str),
+        "%F %T",
+        std::localtime(&time));
+      snprintf(buf, size, "%s:%03d", date_str, milliseconds);
+    } else {
+      snprintf(buf, size, "%f", stamp.seconds());
+    }
+  } else {
+    rclcpp::Duration t = stamp - db_->minTime();
+
+    int32_t secs = t.seconds();
+    int hours = secs / 60 / 60;
+    int minutes = (secs / 60) % 60;
+    int seconds = (secs % 60);
+    int milliseconds = static_cast<int>(1000.0 * (t.seconds() - static_cast<double>(secs)));
+
+    snprintf(buf, size, "%d:%02d:%02d:%03d", hours, minutes, seconds, milliseconds);
+  }
+}
+
+// Renders a row using output_format_, substituting the same token names
+// used by ROS 2's RCUTILS_CONSOLE_OUTPUT_FORMAT environment variable so a
+// user's existing value can largely be pasted in as-is.
+QString LogDatabaseProxyModel::formatCustomLine(const LogEntry &item, int line_index) const
+{
+  QString severity;
+  switch (item.getLogLvl()) {
+    case rcl_interfaces::msg::Log::DEBUG: severity = "DEBUG"; break;
+    case rcl_interfaces::msg::Log::INFO:  severity = "INFO";  break;
+    case rcl_interfaces::msg::Log::WARN:  severity = "WARN";  break;
+    case rcl_interfaces::msg::Log::ERROR: severity = "ERROR"; break;
+    case rcl_interfaces::msg::Log::FATAL: severity = "FATAL"; break;
+    default: severity = "?"; break;
+  }
+
+  char stamp[128];
+  formatTimestamp(item.stamp, stamp, sizeof(stamp));
+
+  QString line = output_format_;
+  line.replace("{severity}", severity);
+  line.replace("{name}", QString::fromStdString(item.node));
+  line.replace("{function_name}", QString::fromStdString(item.function));
+  line.replace("{file_name}", QString::fromStdString(item.file));
+  line.replace("{line_number}", QString::number(item.line));
+  line.replace("{time}", stamp);
+  line.replace("{message}", item.text[line_index]);
+  return line;
 }
 
 // Return true if the item message contains at least one of the

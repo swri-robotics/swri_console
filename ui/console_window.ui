@@ -333,6 +333,7 @@
     <addaction name="action_RegularExpressions"/>
     <addaction name="action_ColorizeLogs"/>
     <addaction name="action_SelectFont"/>
+    <addaction name="action_MessageFormat"/>
    </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_Edit"/>
@@ -426,6 +427,14 @@
   <action name="action_SelectFont">
    <property name="text">
     <string>Select Font...</string>
+   </property>
+  </action>
+  <action name="action_MessageFormat">
+   <property name="text">
+    <string>Message Format...</string>
+   </property>
+   <property name="toolTip">
+    <string>Set a custom message format string. Leave blank to use the Show Timestamps/logger name/function name options above instead.</string>
    </property>
   </action>
   <action name="action_RegularExpressions">

@@ -42,6 +42,7 @@
 #include <swri_console/settings_keys.h>
 
 #include <QColorDialog>
+#include <QInputDialog>
 #include <QRegularExpression>
 #include <QApplication>
 #include <QClipboard>
@@ -125,6 +126,9 @@ ConsoleWindow::ConsoleWindow(LogDatabase *db)
 
   QObject::connect(ui.action_SelectFont, SIGNAL(triggered(bool)),
                    this, SIGNAL(selectFont()));
+
+  QObject::connect(ui.action_MessageFormat, SIGNAL(triggered(bool)),
+                   this, SLOT(selectMessageFormat()));
 
   QObject::connect(ui.action_ColorizeLogs, SIGNAL(toggled(bool)),
                    db_proxy_, SLOT(setColorizeLogs(bool)));
@@ -566,6 +570,25 @@ void ConsoleWindow::setFont(const QFont &font)
   ui.nodeList->setFont(font);
 }
 
+void ConsoleWindow::selectMessageFormat()
+{
+  bool ok = false;
+  QString format = QInputDialog::getText(
+    this,
+    tr("Message Format"),
+    tr("Format string. Supported tokens: {severity} {name} {function_name}\n"
+       "{file_name} {line_number} {time} {message}\n"
+       "Leave blank to use the Show Timestamps/logger name/function name\n"
+       "options instead."),
+    QLineEdit::Normal,
+    db_proxy_->outputFormat(),
+    &ok);
+
+  if (ok) {
+    db_proxy_->setOutputFormat(format);
+  }
+}
+
 void ConsoleWindow::setDebugColor()
 {
   chooseButtonColor(ui.debugColorWidget);
@@ -711,6 +734,16 @@ void ConsoleWindow::loadSettings()
   loadColorButtonSetting(SettingsKeys::WARN_COLOR, ui.warnColorWidget);
   loadColorButtonSetting(SettingsKeys::ERROR_COLOR, ui.errorColorWidget);
   loadColorButtonSetting(SettingsKeys::FATAL_COLOR, ui.fatalColorWidget);
+
+  // RCUTILS_CONSOLE_OUTPUT_FORMAT, if set, takes priority every launch (it's
+  // meant to reflect the current shell environment, not a one-time default).
+  // Otherwise fall back to whatever custom format the user last saved via
+  // the Message Format dialog, or the legacy fixed layout if neither is set.
+  QString envOutputFormat = QString::fromLocal8Bit(qgetenv("RCUTILS_CONSOLE_OUTPUT_FORMAT"));
+  QString outputFormat = envOutputFormat.isEmpty()
+    ? settings.value(SettingsKeys::OUTPUT_FORMAT, "").toString()
+    : envOutputFormat;
+  db_proxy_->setOutputFormat(outputFormat);
 
   // Finally, load the filter contents.
   QString includeFilter = settings.value(SettingsKeys::INCLUDE_FILTER, "").toString();
