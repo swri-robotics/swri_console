@@ -238,6 +238,23 @@ void LogDatabaseProxyModel::setExcludeRegexpPattern(const QString& pattern)
   reset();
 }
 
+void LogDatabaseProxyModel::setExcludePreviewFilter(const QString& term)
+{
+  if (use_regular_expressions_) {
+    exclude_preview_regexp_.setPattern(term);
+    exclude_preview_term_.clear();
+  } else {
+    exclude_preview_term_ = term;
+    exclude_preview_regexp_.setPattern(QString());
+  }
+
+  // The preview never changes which rows are accepted, so there's no need
+  // to rebuild msg_mapping_ via reset(); just repaint the affected rows.
+  if (rowCount(QModelIndex()) > 0) {
+    Q_EMIT dataChanged(index(0), index(rowCount(QModelIndex()) - 1), {Qt::BackgroundRole});
+  }
+}
+
 void LogDatabaseProxyModel::setDebugColor(const QColor& debug_color)
 {
   debug_color_ = debug_color;
@@ -299,6 +316,9 @@ bool LogDatabaseProxyModel::isIncludeValid() const
 bool LogDatabaseProxyModel::isExcludeValid() const
 {
   if (use_regular_expressions_ && !exclude_regexp_.isValid()) {
+    return false;
+  }
+  if (use_regular_expressions_ && !exclude_preview_regexp_.isValid()) {
     return false;
   }
   return true;
@@ -399,6 +419,12 @@ QVariant LogDatabaseProxyModel::data(
       if (colorize_logs_) {
         break;
       }
+      return QVariant();
+    case Qt::BackgroundRole:
+      if (!exclude_preview_term_.isEmpty() || !exclude_preview_regexp_.pattern().isEmpty()) {
+        break;
+      }
+      return QVariant();
     default:
       return QVariant();
   }
@@ -494,6 +520,12 @@ QVariant LogDatabaseProxyModel::data(
     }
 
     return QVariant(QString(header) + item.text[line_idx.line_index]);
+  }
+  else if (role == Qt::BackgroundRole) {
+    if (matchesExcludePreview(item)) {
+      return QVariant(QColor(255, 210, 130));
+    }
+    return QVariant();
   }
   else if (role == Qt::ForegroundRole && colorize_logs_) {
     switch (item.getLogLvl()) {
@@ -785,6 +817,20 @@ bool LogDatabaseProxyModel::acceptLogEntry(const LogEntry &item)
   }
 
   return true;
+}
+
+// Return true if the item matches the exclude term currently being typed
+// (but not yet committed).  Used to highlight rows instead of hiding them
+// while the user is still composing the term.
+bool LogDatabaseProxyModel::matchesExcludePreview(const LogEntry &item) const
+{
+  if (use_regular_expressions_) {
+    return !exclude_preview_regexp_.pattern().isEmpty() &&
+      exclude_preview_regexp_.match(item.text.join(" ")).hasMatch();
+  }
+
+  return !exclude_preview_term_.isEmpty() &&
+    item.text.join(" ").contains(exclude_preview_term_, Qt::CaseInsensitive);
 }
 
 // Return true if the item message contains at least one of the

@@ -193,7 +193,16 @@ ConsoleWindow::ConsoleWindow(LogDatabase *db)
 
   QObject::connect(
     ui.excludeText, SIGNAL(textChanged(const QString &)),
-    this, SLOT(excludeFilterUpdated(const QString &)));
+    this, SLOT(excludeTextEdited()));
+  QObject::connect(
+    ui.excludeText, SIGNAL(cursorPositionChanged(int, int)),
+    this, SLOT(excludeTextEdited()));
+  QObject::connect(
+    ui.excludeText, SIGNAL(editingFinished()),
+    this, SLOT(excludeTextEdited()));
+  QObject::connect(
+    ui.action_RegularExpressions, SIGNAL(toggled(bool)),
+    this, SLOT(excludeTextEdited()));
 
   // Connect 'Search' text modification to searchIndex, VCM 13 April 2017
   QObject::connect(
@@ -410,20 +419,60 @@ void ConsoleWindow::includeFilterUpdated(const QString &text)
   updateIncludeLabel();
 }
 
-void ConsoleWindow::excludeFilterUpdated(const QString &text)
+void ConsoleWindow::excludeTextEdited()
 {
-  QStringList items = text.split(";", Qt::SkipEmptyParts);
-  QStringList filtered;
-  
-  for (int i = 0; i < items.size(); i++) {
-    QString x = items[i].trimmed();
-    if (!x.isEmpty()) {
-      filtered.append(x);
+  QString text = ui.excludeText->text();
+  bool editing = ui.excludeText->hasFocus();
+
+  if (ui.action_RegularExpressions->isChecked()) {
+    // There's no natural way to split a single regexp into "committed" and
+    // "in progress" pieces, so treat the whole pattern as a preview while
+    // the field has focus, and only commit it as an active filter once the
+    // user moves on (matches the plain-string behavior below).
+    if (editing) {
+      db_proxy_->setExcludePreviewFilter(text);
+    } else {
+      db_proxy_->setExcludeRegexpPattern(text);
+      db_proxy_->setExcludePreviewFilter(QString());
     }
+  } else {
+    QString pending;
+    QString committedText = text;
+
+    if (editing) {
+      int cursor = ui.excludeText->cursorPosition();
+
+      // QString::lastIndexOf(ch, -1) means "search from the end", so guard
+      // the cursor == 0 case explicitly rather than passing cursor - 1 == -1
+      // and getting a match from the wrong end of the string.
+      int start = 0;
+      if (cursor > 0) {
+        int prevSemicolon = text.lastIndexOf(';', cursor - 1);
+        start = (prevSemicolon == -1) ? 0 : prevSemicolon + 1;
+      }
+
+      int end = text.indexOf(';', cursor);
+      if (end == -1) {
+        end = text.length();
+      }
+      pending = text.mid(start, end - start).trimmed();
+      committedText.remove(start, end - start);
+    }
+
+    QStringList items = committedText.split(";", Qt::SkipEmptyParts);
+    QStringList filtered;
+
+    for (int i = 0; i < items.size(); i++) {
+      QString x = items[i].trimmed();
+      if (!x.isEmpty()) {
+        filtered.append(x);
+      }
+    }
+
+    db_proxy_->setExcludeFilters(filtered);
+    db_proxy_->setExcludePreviewFilter(pending);
   }
 
-  db_proxy_->setExcludeFilters(filtered);
-  db_proxy_->setExcludeRegexpPattern(text);
   db_proxy_->clearSearchFailure();  // resets failed search variables, VCM 27 April 2017
   updateExcludeLabel();
 }

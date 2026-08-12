@@ -65,6 +65,7 @@ class LogDatabaseProxyModel : public QAbstractListModel
   void setExcludeFilters(const QStringList &list);
   void setIncludeRegexpPattern(const QString& pattern);
   void setExcludeRegexpPattern(const QString& pattern);
+  void setExcludePreviewFilter(const QString& term);
   void setDebugColor(const QColor& debug_color);
   void setInfoColor(const QColor& info_color);
   void setWarnColor(const QColor& warn_color);
@@ -105,6 +106,7 @@ class LogDatabaseProxyModel : public QAbstractListModel
   
   bool acceptLogEntry(const LogEntry &item);
   bool testIncludeFilter(const LogEntry &item);
+  bool matchesExcludePreview(const LogEntry &item) const;
   
   std::set<std::string> names_;
   uint8_t severity_mask_;
@@ -138,6 +140,12 @@ class LogDatabaseProxyModel : public QAbstractListModel
   QRegularExpression exclude_regexp_;
   QStringList include_strings_;
   QStringList exclude_strings_;
+
+  // The exclude term currently being typed (not yet committed to
+  // exclude_strings_/exclude_regexp_).  Matching rows are highlighted
+  // rather than filtered out until the term is committed.
+  QString exclude_preview_term_;
+  QRegularExpression exclude_preview_regexp_;
 
   QColor debug_color_;
   QColor info_color_;
