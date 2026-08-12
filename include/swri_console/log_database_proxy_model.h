@@ -36,6 +36,8 @@
 #include <QRegularExpression>
 #include <QStringList>
 
+#include <rclcpp/time.hpp>
+
 #include <cstdint>
 #include <set>
 #include <string>
@@ -66,6 +68,8 @@ class LogDatabaseProxyModel : public QAbstractListModel
   void setIncludeRegexpPattern(const QString& pattern);
   void setExcludeRegexpPattern(const QString& pattern);
   void setExcludePreviewFilter(const QString& term);
+  void setOutputFormat(const QString& format);
+  const QString& outputFormat() const { return output_format_; }
   void setDebugColor(const QColor& debug_color);
   void setInfoColor(const QColor& info_color);
   void setWarnColor(const QColor& warn_color);
@@ -107,6 +111,8 @@ class LogDatabaseProxyModel : public QAbstractListModel
   bool acceptLogEntry(const LogEntry &item);
   bool testIncludeFilter(const LogEntry &item);
   bool matchesExcludePreview(const LogEntry &item) const;
+  void formatTimestamp(const rclcpp::Time &stamp, char *buf, size_t size) const;
+  QString formatCustomLine(const LogEntry &item, int line_index) const;
   
   std::set<std::string> names_;
   uint8_t severity_mask_;
@@ -146,6 +152,12 @@ class LogDatabaseProxyModel : public QAbstractListModel
   // rather than filtered out until the term is committed.
   QString exclude_preview_term_;
   QRegularExpression exclude_preview_regexp_;
+
+  // When non-empty, overrides the display_time_/display_logger_/display_function_
+  // driven layout entirely.  Supports the same token names as ROS 2's
+  // RCUTILS_CONSOLE_OUTPUT_FORMAT: {severity} {name} {function_name} {file_name}
+  // {line_number} {time} {message}.
+  QString output_format_;
 
   QColor debug_color_;
   QColor info_color_;

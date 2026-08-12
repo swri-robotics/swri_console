@@ -84,6 +84,7 @@ class ConsoleWindow : public QMainWindow {
   void updateExcludeLabel();
 
   void setFont(const QFont &font);
+  void selectMessageFormat();
 
   void setDebugColor();
   void setInfoColor();
