@@ -78,7 +78,7 @@ class ConsoleWindow : public QMainWindow {
   void userScrolled(int);
 
   void includeFilterUpdated(const QString &);
-  void excludeFilterUpdated(const QString &);
+  void excludeTextEdited();
   void searchIndex();  // VM 4/13/2017
   void updateIncludeLabel();
   void updateExcludeLabel();
