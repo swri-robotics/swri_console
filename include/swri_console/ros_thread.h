@@ -34,6 +34,7 @@
 #include <QThread>
 
 #include <memory>
+#include <vector>
 
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp/executors/single_threaded_executor.hpp>
@@ -58,10 +59,11 @@ namespace swri_console
      */
     void connected(bool);
     /**
-     * Emitted every time a log message is received.  This can be emitted multiple times per spin of
-     * the ROS core; wait until spun() is emitted to do any processing on them.
+     * Emitted with every batch of log messages drained from the ROS subscription queue
+     * in a single spin.  This can be emitted multiple times per spin of the ROS core;
+     * wait until spun() is emitted to do any processing on them.
      */
-    void logReceived(rcl_interfaces::msg::Log::ConstSharedPtr msg);
+    void logReceived(std::vector<rcl_interfaces::msg::Log::ConstSharedPtr> msgs);
     /**
      * Emitted after every time ros::spinOnce() completes.
      */

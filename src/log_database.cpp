@@ -69,6 +69,13 @@ void LogDatabase::queueMessage(const rcl_interfaces::msg::Log::ConstSharedPtr ms
   new_msgs_.push_back(log);
 }
 
+void LogDatabase::queueMessages(const std::vector<rcl_interfaces::msg::Log::ConstSharedPtr>& msgs)
+{
+  for (const auto& msg : msgs) {
+    queueMessage(msg);
+  }
+}
+
 void LogDatabase::processQueue()
 {
   if (new_msgs_.empty()) {
