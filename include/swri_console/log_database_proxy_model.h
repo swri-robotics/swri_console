@@ -112,7 +112,10 @@ class LogDatabaseProxyModel : public QAbstractListModel
   bool testIncludeFilter(const LogEntry &item);
   bool matchesExcludePreview(const LogEntry &item) const;
   void formatTimestamp(const rclcpp::Time &stamp, char *buf, size_t size) const;
+  void parseOutputFormat();
+  int entryLineCount(const LogEntry &item) const;
   QString formatCustomLine(const LogEntry &item, int line_index) const;
+  QString substituteTokens(const QString &line_template, const LogEntry &item, const QString &message) const;
   
   std::set<std::string> names_;
   uint8_t severity_mask_;
@@ -156,8 +159,15 @@ class LogDatabaseProxyModel : public QAbstractListModel
   // When non-empty, overrides the display_time_/display_logger_/display_function_
   // driven layout entirely.  Supports the same token names as ROS 2's
   // RCUTILS_CONSOLE_OUTPUT_FORMAT: {severity} {name} {function_name} {file_name}
-  // {line_number} {time} {message}.
+  // {line_number} {time} {message}.  May span multiple lines: the one line
+  // containing {message} is repeated once per physical line of the log
+  // message; any lines before/after it are rendered once per log entry as
+  // a header/footer.  Derived from output_format_ by parseOutputFormat()
+  // whenever it changes.
   QString output_format_;
+  QStringList format_pre_lines_;
+  QString format_message_line_;
+  QStringList format_post_lines_;
 
   QColor debug_color_;
   QColor info_color_;
