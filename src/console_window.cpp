@@ -648,10 +648,13 @@ void ConsoleWindow::loadColorButtonSetting(const QString& key, QPushButton* butt
   // The color buttons don't have a default value set in the .ui file, so we need to
   // supply defaults for them here in case the appropriate setting isn't found.
   if (button == ui.debugColorWidget) {
-    defaultColor = Qt::gray;
+    // PlaceholderText is Qt's own "dimmed but still legible" text role, so
+    // it stays readable against the current theme's background without us
+    // having to hand-pick a gray that only works for one theme.
+    defaultColor = QApplication::palette().color(QPalette::PlaceholderText);
   }
   else if (button == ui.infoColorWidget) {
-    defaultColor = Qt::black;
+    defaultColor = QApplication::palette().color(QPalette::Text);
   }
   else if (button == ui.warnColorWidget) {
     defaultColor = QColor(255, 127, 0);
