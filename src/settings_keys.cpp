@@ -57,4 +57,5 @@ namespace swri_console
   const QString SettingsKeys::OUTPUT_FORMAT = "UI/OutputFormat";
   const QString SettingsKeys::HIGHLIGHT_FILTER = "Filters/HighlightFilter";
   const QString SettingsKeys::HIGHLIGHT_COLOR = "Colors/HighlightColor";
+  const QString SettingsKeys::NODE_COLORS = "Colors/NodeColors";
 }

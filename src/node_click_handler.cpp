@@ -34,6 +34,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp/logger.hpp>
 
+#include <QColorDialog>
 #include <QMessageBox>
 #include <QTextStream>
 
@@ -77,6 +78,11 @@ namespace swri_console
     auto* model = dynamic_cast<NodeListModel*>(list->model());
     node_name_ = model->nodeName(index_list.first());
 
+    std::vector<std::string> selected_nodes;
+    for (const auto& index : index_list) {
+      selected_nodes.push_back(model->nodeName(index));
+    }
+
     std::string service_name = node_name_ + GET_LOGGERS_SVC;
     // ros::ServiceClient client = nh_.serviceClient<roscpp::GetLoggers>(service_name);
     //rclcpp::Client<rclcpp::Logger>::SharedPtr client = nh_->create_client<rclcpp::Logger>(service_name);
@@ -119,8 +125,25 @@ namespace swri_console
     }
     */
     QMenu menu;
-    menu.addAction("Configuring logging levels not supported in ROS2.");
-    menu.exec(event->globalPos());
+    QAction* not_supported = menu.addAction("Configuring logging levels not supported in ROS2.");
+    not_supported->setDisabled(true);
+    menu.addSeparator();
+    QAction* select_color = menu.addAction("Select Color...");
+    QAction* clear_color = menu.addAction("Clear Color");
+
+    QAction* chosen = menu.exec(event->globalPos());
+    if (chosen == select_color) {
+      QColor color = QColorDialog::getColor(Qt::white, list, "Select Node Color");
+      if (color.isValid()) {
+        for (const auto& node : selected_nodes) {
+          Q_EMIT nodeColorSelected(node, color);
+        }
+      }
+    } else if (chosen == clear_color) {
+      for (const auto& node : selected_nodes) {
+        Q_EMIT nodeColorCleared(node);
+      }
+    }
 
     return false;
   }

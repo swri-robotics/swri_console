@@ -52,6 +52,7 @@
 #include <QScrollBar>
 #include <QMenu>
 #include <QSettings>
+#include <QVariant>
 
 using namespace Qt;
 
@@ -161,6 +162,11 @@ ConsoleWindow::ConsoleWindow(LogDatabase *db)
     SLOT(nodeSelectionChanged()));
 
   ui.nodeList->installEventFilter(node_click_handler_);
+
+  QObject::connect(node_click_handler_, SIGNAL(nodeColorSelected(const std::string&, const QColor&)),
+                    this, SLOT(setNodeColor(const std::string&, const QColor&)));
+  QObject::connect(node_click_handler_, SIGNAL(nodeColorCleared(const std::string&)),
+                    this, SLOT(clearNodeColor(const std::string&)));
 
   QObject::connect(
     ui.checkDebug, SIGNAL(toggled(bool)),
@@ -656,6 +662,16 @@ void ConsoleWindow::setHighlightColor()
   chooseButtonColor(ui.highlightColorWidget);
 }
 
+void ConsoleWindow::setNodeColor(const std::string& node, const QColor& color)
+{
+  db_proxy_->setNodeColor(node, color);
+}
+
+void ConsoleWindow::clearNodeColor(const std::string& node)
+{
+  db_proxy_->clearNodeColor(node);
+}
+
 void ConsoleWindow::chooseButtonColor(QPushButton* widget)
 {
   QColor old_color = getButtonColor(widget);
@@ -785,6 +801,11 @@ void ConsoleWindow::loadSettings()
   loadColorButtonSetting(SettingsKeys::ERROR_COLOR, ui.errorColorWidget);
   loadColorButtonSetting(SettingsKeys::FATAL_COLOR, ui.fatalColorWidget);
   loadColorButtonSetting(SettingsKeys::HIGHLIGHT_COLOR, ui.highlightColorWidget);
+
+  QVariantMap nodeColors = settings.value(SettingsKeys::NODE_COLORS).toMap();
+  for (auto it = nodeColors.constBegin(); it != nodeColors.constEnd(); ++it) {
+    db_proxy_->setNodeColor(it.key().toStdString(), it.value().value<QColor>());
+  }
 
   // RCUTILS_CONSOLE_OUTPUT_FORMAT, if set, takes priority every launch (it's
   // meant to reflect the current shell environment, not a one-time default).

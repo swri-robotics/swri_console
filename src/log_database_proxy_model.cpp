@@ -49,7 +49,21 @@
 #include <QTextStream>
 #include <QTimer>
 #include <QSettings>
+#include <QVariant>
 #include <QtGlobal>
+
+namespace {
+// Picks black or white text so it stays legible against an arbitrary
+// user-chosen background color, using the standard ITU-R BT.601 perceptual
+// luminance approximation.
+QColor ContrastingForeground(const QColor &background)
+{
+  double luminance = (0.299 * background.red() +
+                       0.587 * background.green() +
+                       0.114 * background.blue()) / 255.0;
+  return luminance > 0.5 ? QColor(Qt::black) : QColor(Qt::white);
+}
+}  // namespace
 
 namespace swri_console
 {
@@ -348,6 +362,36 @@ void LogDatabaseProxyModel::setFatalColor(const QColor& fatal_color)
   reset();
 }
 
+void LogDatabaseProxyModel::setNodeColor(const std::string& node, const QColor& color)
+{
+  node_colors_[node] = color;
+
+  QVariantMap map;
+  for (const auto &kv : node_colors_) {
+    map.insert(QString::fromStdString(kv.first), kv.second);
+  }
+  QSettings settings;
+  settings.setValue(SettingsKeys::NODE_COLORS, map);
+
+  repaintBackgrounds();
+}
+
+void LogDatabaseProxyModel::clearNodeColor(const std::string& node)
+{
+  if (node_colors_.erase(node) == 0) {
+    return;
+  }
+
+  QVariantMap map;
+  for (const auto &kv : node_colors_) {
+    map.insert(QString::fromStdString(kv.first), kv.second);
+  }
+  QSettings settings;
+  settings.setValue(SettingsKeys::NODE_COLORS, map);
+
+  repaintBackgrounds();
+}
+
 int LogDatabaseProxyModel::rowCount(const QModelIndex &parent) const
 {
   if (parent.isValid()) {
@@ -469,13 +513,14 @@ QVariant LogDatabaseProxyModel::data(
     case ExtendedLogRole:
       break;
     case Qt::ForegroundRole:
-      if (colorize_logs_) {
+      if (colorize_logs_ || !node_colors_.empty()) {
         break;
       }
       return QVariant();
     case Qt::BackgroundRole:
       if (!exclude_preview_term_.isEmpty() || !exclude_preview_regexp_.pattern().isEmpty() ||
-          !highlight_strings_.isEmpty() || !highlight_regexp_.pattern().isEmpty()) {
+          !highlight_strings_.isEmpty() || !highlight_regexp_.pattern().isEmpty() ||
+          !node_colors_.empty()) {
         break;
       }
       return QVariant();
@@ -554,9 +599,28 @@ QVariant LogDatabaseProxyModel::data(
     if (matchesHighlight(item)) {
       return QVariant(highlight_color_);
     }
+    auto node_color_it = node_colors_.find(item.node);
+    if (node_color_it != node_colors_.end()) {
+      return QVariant(node_color_it->second);
+    }
     return QVariant();
   }
-  else if (role == Qt::ForegroundRole && colorize_logs_) {
+  else if (role == Qt::ForegroundRole) {
+    // A node color takes over the text color too (for contrast) unless the
+    // row's background is actually coming from the exclude-preview or
+    // highlight tint instead, in which case severity coloring behaves as
+    // usual.
+    if (!matchesExcludePreview(item) && !matchesHighlight(item)) {
+      auto node_color_it = node_colors_.find(item.node);
+      if (node_color_it != node_colors_.end()) {
+        return QVariant(ContrastingForeground(node_color_it->second));
+      }
+    }
+
+    if (!colorize_logs_) {
+      return QVariant();
+    }
+
     switch (item.getLogLvl()) {
       case rcl_interfaces::msg::Log::DEBUG:
         return QVariant(debug_color_);

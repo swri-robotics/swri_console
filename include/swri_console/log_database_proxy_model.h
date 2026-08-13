@@ -39,6 +39,7 @@
 #include <rclcpp/time.hpp>
 
 #include <cstdint>
+#include <map>
 #include <set>
 #include <string>
 #include <deque>
@@ -79,6 +80,9 @@ class LogDatabaseProxyModel : public QAbstractListModel
   void setWarnColor(const QColor& warn_color);
   void setErrorColor(const QColor& error_color);
   void setFatalColor(const QColor& fatal_color);
+  void setNodeColor(const std::string& node, const QColor& color);
+  void clearNodeColor(const std::string& node);
+  const std::map<std::string, QColor>& nodeColors() const { return node_colors_; }
   bool isIncludeValid() const;
   bool isExcludeValid() const;
   int getItemIndex(const QString& searchText, int index, int increment);
@@ -188,6 +192,11 @@ class LogDatabaseProxyModel : public QAbstractListModel
   QColor warn_color_;
   QColor error_color_;
   QColor fatal_color_;
+
+  // Per-node background tint, set via the node list's right-click "Select
+  // Color..." menu.  Absent entries mean "no override for this node".
+  std::map<std::string, QColor> node_colors_;
+
   LogDatabase *db_;
 
   QString failedSearchText_;  // stores last failed search text, used to minimize looping through full data set, VCM 26 April 2017
