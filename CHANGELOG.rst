@@ -2,8 +2,8 @@
 Changelog for package swri_console
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.3.0 (2026-08-12)
+------------------
 * Adding color picker so messages from selected nodes can be highlighted (`#87 <https://github.com/swri-robotics/swri_console/issues/87>`_)
 * Adding highlight filter (`#86 <https://github.com/swri-robotics/swri_console/issues/86>`_)
 * Adding support for muiltiline format templates (`#85 <https://github.com/swri-robotics/swri_console/issues/85>`_)
