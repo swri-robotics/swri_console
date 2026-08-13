@@ -2,6 +2,19 @@
 Changelog for package swri_console
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Adding color picker so messages from selected nodes can be highlighted (`#87 <https://github.com/swri-robotics/swri_console/issues/87>`_)
+* Adding highlight filter (`#86 <https://github.com/swri-robotics/swri_console/issues/86>`_)
+* Adding support for muiltiline format templates (`#85 <https://github.com/swri-robotics/swri_console/issues/85>`_)
+* Adding support for RCUTILS_CONSOLE_OUTPUT_FORMAT. Defaults to value set in the environment, and falls back to a user specified value if not in the environment (`#84 <https://github.com/swri-robotics/swri_console/issues/84>`_)
+* Using system palette to choose colors instead of hardcoding them so dark mode works (`#83 <https://github.com/swri-robotics/swri_console/issues/83>`_)
+* Typing an exclude term now highlights matching log rows instead of hiding them, and only starts actually filtering once the user moves to the next term or shift focus away. (`#82 <https://github.com/swri-robotics/swri_console/issues/82>`_)
+* Condense all received messages into one vector when updating the GUI for efficiency (`#81 <https://github.com/swri-robotics/swri_console/issues/81>`_)
+* Adding graceful shutdown on SIGINT and SIGTERM from the command line (`#80 <https://github.com/swri-robotics/swri_console/issues/80>`_)
+* Fix formatting in README for supported ROS distributions
+* Contributors: David Anthony
+
 2.2.0 (2026-08-10)
 ------------------
 * Updating for Qt6 compatibility (`#77 <https://github.com/swri-robotics/swri_console/issues/77>`_)
