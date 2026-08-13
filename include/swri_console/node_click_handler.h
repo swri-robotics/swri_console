@@ -31,8 +31,10 @@
 #ifndef SWRI_CONSOLE_NODE_CLICK_HANDLER_H
 #define SWRI_CONSOLE_NODE_CLICK_HANDLER_H
 
+#include <string>
 #include <vector>
 
+#include <QColor>
 #include <QContextMenuEvent>
 #include <QObject>
 #include <QEvent>
@@ -47,6 +49,10 @@ namespace swri_console
   class NodeClickHandler : public QObject
   {
     Q_OBJECT
+
+  Q_SIGNALS:
+    void nodeColorSelected(const std::string& node, const QColor& color);
+    void nodeColorCleared(const std::string& node);
 
   public Q_SLOTS:
     void logLevelClicked();

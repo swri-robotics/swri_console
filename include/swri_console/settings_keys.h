@@ -69,6 +69,7 @@ namespace swri_console
     static const QString OUTPUT_FORMAT;
     static const QString HIGHLIGHT_FILTER;
     static const QString HIGHLIGHT_COLOR;
+    static const QString NODE_COLORS;
   };
 }
 

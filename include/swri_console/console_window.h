@@ -31,6 +31,8 @@
 #ifndef SWRI_CONSOLE_CONSOLE_WINDOW_H_
 #define SWRI_CONSOLE_CONSOLE_WINDOW_H_
 
+#include <string>
+
 #include <QtWidgets/QMainWindow>
 #include <QColor>
 #include <QPushButton>
@@ -94,6 +96,8 @@ class ConsoleWindow : public QMainWindow {
   void setErrorColor();
   void setFatalColor();
   void setHighlightColor();
+  void setNodeColor(const std::string& node, const QColor& color);
+  void clearNodeColor(const std::string& node);
   void prevIndex();
   void nextIndex();
 
