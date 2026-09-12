@@ -2,7 +2,7 @@
 
 """
 Minimal long-running node with enable_logger_service=True, for exercising
-swri_console's node-list "Set Log Level" context menu entry on Iron and
+swri_console's node-list "Set Log Level" context menu entry on Iron and newer.
 
 Usage: python3 logger_service_test_node.py
 """
