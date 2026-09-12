@@ -2,8 +2,8 @@
 Changelog for package swri_console
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.4.0 (2026-09-12)
+------------------
 * Update branch links in README.md to ros2-devel
 * Updating README (`#90 <https://github.com/swri-robotics/swri_console/issues/90>`_)
 * Fixing trailing comment (`#89 <https://github.com/swri-robotics/swri_console/issues/89>`_)
