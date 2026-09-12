@@ -25,7 +25,7 @@ Build Status
 
 &nbsp; | **Humble** | **Jazzy** | **Kilted** | **Lyrical** | **Rolling**
 :--- | :---: | :---: | :---: | :---: | :---:
-Branch | [`humble`](https://github.com/swri-robotics/swri_console/tree/kilted-devel) | [`jazzy`](https://github.com/swri-robotics/swri_console/tree/kilted-devel) | [`kilted`](https://github.com/swri-robotics/swri_console/tree/kilted-devel) | [`lyrical`](https://github.com/swri-robotics/swri_console/tree/ros2-devel) | [`rolling`](https://github.com/swri-robotics/swri_console/tree/ros2-devel)
+Branch | [`humble`](https://github.com/swri-robotics/swri_console/tree/ros2-devel) | [`jazzy`](https://github.com/swri-robotics/swri_console/tree/ros2-devel) | [`kilted`](https://github.com/swri-robotics/swri_console/tree/ros2-devel) | [`lyrical`](https://github.com/swri-robotics/swri_console/tree/ros2-devel) | [`rolling`](https://github.com/swri-robotics/swri_console/tree/ros2-devel)
 
 ### Released Versions
 
