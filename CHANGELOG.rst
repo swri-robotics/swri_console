@@ -2,6 +2,14 @@
 Changelog for package swri_console
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Update branch links in README.md to ros2-devel
+* Updating README (`#90 <https://github.com/swri-robotics/swri_console/issues/90>`_)
+* Fixing trailing comment (`#89 <https://github.com/swri-robotics/swri_console/issues/89>`_)
+* Adding ability to dynamically set logger level on Iron and newer  (`#88 <https://github.com/swri-robotics/swri_console/issues/88>`_)
+* Contributors: David Anthony
+
 2.3.0 (2026-08-12)
 ------------------
 * Adding color picker so messages from selected nodes can be highlighted (`#87 <https://github.com/swri-robotics/swri_console/issues/87>`_)
