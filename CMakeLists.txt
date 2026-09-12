@@ -32,6 +32,17 @@ else()
 endif()
 message(STATUS "Building swri_console against Qt${QT_VERSION_MAJOR}")
 
+# The logger level services that back the node context menu were added in
+# rcl_interfaces 1.6.0, which first shipped in Iron.  Older distros (humble is
+# still on 1.2.x) have no way to set a remote node's log level at all, so that
+# part of the menu is left out there.
+if(rcl_interfaces_VERSION VERSION_GREATER_EQUAL "1.6.0")
+  set(HAVE_LOGGER_SERVICES TRUE)
+else()
+  set(HAVE_LOGGER_SERVICES FALSE)
+endif()
+message(STATUS "Building swri_console with logger level services: ${HAVE_LOGGER_SERVICES}")
+
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 include_directories(include)
@@ -71,6 +82,10 @@ qt_wrap_ui(SRC_FILES ${UI_FILES})
 qt_wrap_cpp(SRC_FILES ${HEADER_FILES})
 
 add_executable(swri_console ${HEADER_FILES} ${SRC_FILES} ${RCC_SRCS} src/main.cpp)
+
+if(HAVE_LOGGER_SERVICES)
+  target_compile_definitions(swri_console PRIVATE SWRI_CONSOLE_HAS_LOGGER_SERVICES)
+endif()
 
 target_link_libraries(swri_console PUBLIC
   Qt${QT_VERSION_MAJOR}::Core
