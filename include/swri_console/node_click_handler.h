@@ -66,9 +66,11 @@ namespace swri_console
      * in level_actions with the level each of its actions would set.  The
      * loggers that the submenu applies to are remembered in logger_targets_.
      *
-     * Nothing is added if we can't talk to ROS, if none of the loggers belong to
-     * a node that is currently advertising the logger level services, or if
-     * we're built against a distro older than Iron; those have no such services.
+     * If we can't talk to ROS, if none of the loggers belong to a node that is
+     * currently advertising the logger level services, or if we're built
+     * against a distro older than Iron (those have no such services), a
+     * disabled "Set Log Level" entry is added instead, with a tooltip
+     * explaining why.
      */
     void addLoggerLevelMenu(QMenu* menu,
                             const std::vector<std::string>& loggers,

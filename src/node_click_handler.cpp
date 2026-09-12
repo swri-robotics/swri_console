@@ -148,6 +148,7 @@ namespace swri_console
     }
 
     QMenu menu(list);
+    menu.setToolTipsVisible(true);
 
     std::map<QAction*, uint8_t> level_actions;
     addLoggerLevelMenu(&menu, selected_nodes, level_actions);
@@ -177,6 +178,19 @@ namespace swri_console
     return false;
   }
 
+  namespace
+  {
+    // Adds a disabled "Set Log Level" entry explaining why the real submenu
+    // isn't available, so the option doesn't just silently vanish.
+    void addDisabledLoggerLevelMenu(QMenu* menu, const QString& reason)
+    {
+      QAction* action = menu->addAction("Set Log Level");
+      action->setEnabled(false);
+      action->setToolTip(reason);
+      menu->addSeparator();
+    }
+  }
+
   void NodeClickHandler::addLoggerLevelMenu(QMenu* menu,
                                             const std::vector<std::string>& loggers,
                                             std::map<QAction*, uint8_t>& level_actions)
@@ -184,13 +198,14 @@ namespace swri_console
     logger_targets_.clear();
 
 #ifndef SWRI_CONSOLE_HAS_LOGGER_SERVICES
-    // Distros older than Iron have no logger level services, so there's nothing
-    // we could offer here.
-    (void)menu;
+    // Distros older than Iron have no logger level services, so there's
+    // nothing we could offer here.
     (void)loggers;
     (void)level_actions;
+    addDisabledLoggerLevelMenu(menu, tr("Not supported by this ROS distro"));
 #else
     if (!initNode()) {
+      addDisabledLoggerLevelMenu(menu, tr("Not connected to ROS"));
       return;
     }
 
@@ -202,6 +217,8 @@ namespace swri_console
     }
 
     if (logger_targets_.empty()) {
+      addDisabledLoggerLevelMenu(
+        menu, tr("Node(s) not constructed with enable_logger_service"));
       return;
     }
 
